@@ -1,0 +1,265 @@
+---
+title: Progress Report
+subtitle: Clearer, better, faster, reproducible bacterial genus delineation procedure
+format: 
+  clean-revealjs:
+    self-contained: true
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+author:
+  - name: Charlie Pauvert
+    orcid: 0000-0001-9832-2507
+    email: cpauvert@ukaachen.de
+    affiliations: University Hospital of RWTH Aachen
+date: 2024-05-24
+bibliography: citations.bib
+---
+
+# Rationale {background-color="#40666e"}
+
+## Fantastic (and diverse) microorganisms
+
+!["Microbial Rainbow", Tal Danino, 2018](img/microbial-rainbow_1600px_Tal_Danino2018.jpg){fig-align="center"}
+
+## Novel names are continuously added
+
+![Validly published names International Code of Nomenclature of Prokaryotes (LPSN)](img/LPSN_figure__Validly_published_names_ICNP_per_year_and_category.png)
+
+. . .
+
+::: callout-warning
+## A description of the taxa is needed on top of the name!
+:::
+
+## Automated description of novel bacteria
+
+![@hitch_automated_2021](img/protologger_overview.png)
+
+## Focus on Genus delineation
+
+### Percentage of Conserved Proteins (POCP)
+
+-   Take two isolates: Quinoa and Strawberry
+-   They belong to the same genus if the POCP $\geq$ 50% [@qin_proposed_2014]
+
+$$ POCP = \dfrac{C_{QS} + C_{SQ}}{T_Q + T_S} \times 100$$
+
+::: callout-note
+With $C_{QS}$ the conserved number of proteins from $Q$ when aligned to $S$ and $T_Q$ the total number of proteins in $Q$
+:::
+
+## How to compute POCP?
+
+::: callout-note
+1.  Predict the proteins sequences of the two isolates from their genomes ($T_Q$ and $T_S$)
+2.  Align all proteins sequences of $Q$ to $S$ with BLASTP [@camacho_blast_2009]
+3.  Align all proteins sequences of $S$ to $Q$ with BLASTP [@camacho_blast_2009]
+4.  Keep conserved proteins, i.e.: e-value \< 1e−5, sequence identity \> 40% and aligned region \> 50% of the query protein sequence length ($C_{QS}$ and $C_{SQ}$)
+5.  Fill out the formula
+:::
+
+**A bottleneck hampering scalibility:** POCP is the most time- and resource consuming step in Protologger
+
+## What about paralogs?
+
+### A POCP of unique matches (POCPu)
+
+-   Proteins sequences from the query can match multiple subject sequences in the case of duplicated genes
+-   Briefly mentioned in the original paper, but no discussion on the expected influence on POCP.
+
+$$ POCPu = \dfrac{C_{uQS} + C_{uSQ}}{T_Q + T_S} \times 100$$ With $C_{uQS}$ the conserved number of proteins from **the unique matches** of $Q$ when aligned to $S$.
+
+::: callout-warning
+The unique matches assumption is made implicitly when using some POCP implementation!
+:::
+
+## Objectives
+
+1.  Find a faster replacement to BLASTP *without compromising the accuracy*
+2.  Evaluate the usefulness of POCP and POCPu for bacterial genus delineation
+
+# Methods {background-color="#40666e"}
+
+## Dataset
+
+### GTDB bacterial proteins sequences and taxonomy as gold standard
+
+```{r funnel}
+library(magrittr)
+library(dplyr)
+library(tibble)
+library(forcats)
+library(ggplot2)
+library(cowplot)
+funnel <- c(
+  "GTDB Genomes" = 394932,
+  "Representatives" = 80789,
+  "Valid names" = 11699,
+  "> 10 species per genus" = 5904,
+  "> 1 genera per family" = 4767
+) %>% enframe() %>% mutate(name = fct(name) %>% fct_rev())
+
+p_funnel <- ggplot(funnel, aes(x = name, y = value))+
+  geom_segment(aes(x = name, xend = name, y = 0, yend = value))+
+  geom_point(size = 3)+
+  geom_text(aes(label = prettyNum(value, big.mark = " ")), hjust = -0.3)+
+  scale_y_continuous(expand = expansion(mult = c(0,0.2)),
+                     labels = scales::label_number())+
+  labs(title = "GTDB genomes shortlist", x="Steps",
+       y = "Number of genomes remaining",
+       caption = "GTDB version 214. Valid names until 2023-08")+
+  coord_flip()+
+  theme_cowplot()
+p_funnel
+```
+
+## Tools in the benchmark {.smaller}
+### Many-versus-many proteins alignment tools
+
+- Reference: BLASTP
+- BLAST-based:
+  * BLASTPDB
+- DIAMOND-based:
+  * DIAMOND_FAST
+  * DIAMOND_SENSITIVE
+  * DIAMOND_VERYSENSITIVE
+  * DIAMOND_ULTRASENSITIVE
+- MMSeqs2-based:
+  * MMSEQS2_S1DOT0
+  * MMSEQS2_S2DOT5
+  * MMSEQS2_S6DOT0
+  * MMSEQS2_S7DOT5
+
+
+# Results {background-color="#40666e"}
+
+## Frustration
+
+- Started the project Q4 2022
+- Wrote the analysis workflow in Snakemake rapidly but it failed because too big (>7M) comparisons!)
+  * Tried a couple of workarounds, without success
+- Rewrote the entire pipeline in Nextflow in Q2 2023
+  * It failed again, tried a couple of workaround, without success
+- Splitted the comparison to have only within family comparisons Q4 2023
+  * Was running for 5 months when it crashed again
+- As of now, 15 families were ran totalizing 1076 genomes!
+
+
+## Overview of the families {.smaller}
+
+```{r}
+targets::tar_read(table_overview) %>% knitr::kable()
+```
+
+`r targets::tar_read(table_overview)%>% pull(CPUh) %>% sum() %>% prettyNum()` CPU-hours ~ 3.1 CPU years
+
+## BLASTP vs BLASTPDB
+### Example with Lactobacillaceae
+
+```{r, fig.align='center'}
+knitr::include_graphics("benchmark-gtdb-f__Lactobacillaceae/compare_pocp/plot-pocp-blastpdb.png")
+```
+
+
+
+## BLASTP vs all others methods (POCP)
+### Example with Lactobacillaceae
+
+```{r, fig.align='center'}
+knitr::include_graphics("benchmark-gtdb-f__Lactobacillaceae/compare_pocp/plot-pocp.png")
+```
+
+
+## BLASTP vs all others methods (POCPu)
+### Example with Lactobacillaceae
+
+```{r, fig.align='center'}
+knitr::include_graphics("benchmark-gtdb-f__Lactobacillaceae/compare_pocp/plot-pocpu.png")
+```
+
+## Performance
+### Example with Lactobacillaceae
+
+```{r}
+knitr::include_graphics("lactobacillaceae_perf.png")
+```
+
+
+## Performance
+### Example with Streptosporangiaceae
+
+```{r}
+knitr::include_graphics("streptosporangiaceae_perf.png")
+```
+
+
+## Regression coefficients
+### POCP
+
+To assess the goodness-of-fit between the BLASTP POCP values and the ones produced by the tools.
+
+```{r}
+targets::tar_read(r2) %>% filter(type=="POCP")%>%group_by(family)%>%
+arrange(desc(r.squared))%>%
+mutate(rank = dense_rank(desc(r.squared)))%>% ungroup() %>%
+group_by(tool)%>%
+summarise(median_rank = median(rank))%>% ungroup()%>%
+arrange(median_rank)%>% knitr::kable()
+```
+
+
+## Regression coefficients
+### POCPu
+
+```{r}
+targets::tar_read(r2) %>% filter(type=="POCPu")%>%group_by(family)%>%
+arrange(desc(r.squared))%>%
+mutate(rank = dense_rank(desc(r.squared)))%>% ungroup() %>%
+group_by(tool)%>%
+summarise(median_rank = median(rank))%>% ungroup()%>%
+arrange(median_rank)%>% knitr::kable()
+```
+
+## Genus delineation performance {.smaller}
+### Example with Lactobacillaceae
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+eval_genus<- readr::read_csv("benchmark-gtdb-f__Lactobacillaceae/eval_genus_delineation/evaluate_genus_delineation.csv",show_col_types = FALSE)
+eval_genus%>%select(!ends_with("_random")) %>% filter(type=="POCP")%>% arrange(type)%>% knitr::kable(digits=3)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+eval_genus%>%select(!ends_with("_random")) %>% filter(type=="POCPu")%>% arrange(type)%>% knitr::kable(digits=3)
+```
+:::
+
+::::
+
+# Conclusions {background-color="#40666e"}
+
+
+## Conclusions
+
+- POCP computations are currently limiting the scalability of Protologger.
+- Our extensive benchmark points to **diamond ultra-sensitive** as a faster but still accurate replacement
+
+
+Prospects:
+
+- Run the remaining families (potentially using only the diamond approach)
+- Explore the genus delineation results
+- Consolidate the manuscript for:
+  * *Briefings in bioinformatics*
+  * *Bioinformatics*
+
+
+# Thank you! {background-color="#40666e"}
+
+
+## References
