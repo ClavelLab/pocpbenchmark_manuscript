@@ -22,7 +22,9 @@ list(
   tar_target(table_overview, readr::read_csv("cpuhours.csv")%>% left_join(prot_n, by="family")),
   tar_target(r2, read_R2(prots), pattern = map(prots),iteration = "vector"),
   
-  tar_target(pocp_values, read_pocp(prots), pattern = map(prots)),
-  tar_target(plot_pocp, plot_pocp_distribution(pocp_values, "POCP")),
-  tar_target(plot_pocpu, plot_pocp_distribution(pocp_values, "POCPu"))
+  tar_target(pocp_values, read_pocp(prots), pattern = map(prots), format = "qs"),
+  tar_target(all_pocp,   dplyr::filter(pocp_values, type == "POCP"), format = "qs"),
+  tar_target(all_pocpu,   dplyr::filter(pocp_values, type == "POCPu"), format = "qs"),
+  tar_target(plot_pocp, plot_pocp_distribution(all_pocp, "POCP"), format = "qs"),
+  tar_target(plot_pocpu, plot_pocp_distribution(all_pocpu, "POCPu"), format = "qs")
 )

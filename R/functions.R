@@ -19,10 +19,12 @@ read_pocp <- function(path_to_family_dir){
     dplyr::mutate(family = family)
 }
 
+
+
 plot_pocp_distribution<-function(pocp_values, type = c("POCP", "POCPu")){
-  dplyr::filter(pocp_values, type == type)%>%
-  ggplot(aes(x = pocp, fill = same_genus_truth))+geom_density(alpha=0.5)+
+  ggplot(data = pocp_values, aes(x = pocp, fill = same_genus_truth))+geom_density(alpha=0.5)+
     facet_wrap(~tool)+theme_cowplot()+scale_fill_okabe_ito()+
     geom_vline(xintercept = 50, linetype="dashed")+
-    theme(legend.position = "bottom")
+    theme(legend.position = "bottom")+
+    labs(x=type)
 }
