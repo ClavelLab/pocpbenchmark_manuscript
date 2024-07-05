@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+benchmark-gtdb*
+old_R/
+*.html
+_targets/
