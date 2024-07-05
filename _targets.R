@@ -2,7 +2,7 @@ library(targets)
 library(tarchetypes)
 
 tar_option_set(
-  packages = c("tidyverse",
+  packages = c("tidyverse", "lubridate",
                 "ggplot2", "cowplot", "ggokabeito"),
   
 )
@@ -26,5 +26,15 @@ list(
   tar_target(all_pocp,   dplyr::filter(pocp_values, type == "POCP"), format = "qs"),
   tar_target(all_pocpu,   dplyr::filter(pocp_values, type == "POCPu"), format = "qs"),
   tar_target(plot_pocp, plot_pocp_distribution(all_pocp, "POCP"), format = "qs"),
-  tar_target(plot_pocpu, plot_pocp_distribution(all_pocpu, "POCPu"), format = "qs")
+  tar_target(plot_pocpu, plot_pocp_distribution(all_pocpu, "POCPu"), format = "qs"),
+  tar_target(compute_stats, read_compute_stats(prots),
+             pattern = map(prots),iteration = "vector", format = "qs"),
+  tar_target(db_parsed, get_db_parsed_stats(compute_stats),
+             pattern = map(compute_stats), iteration = "vector", format = "qs"),
+  tar_target(tool_parsed, get_tool_parsed_stats(compute_stats),
+             pattern = map(compute_stats), iteration = "vector", format = "qs"),
+  tar_target(median_db, generate_table_db(db_parsed), format = "qs"),
+  tar_target(median_tool, generate_table_tool(tool_parsed), format = "qs"),
+  tar_target(db_table, format_db_table(median_db), format = "qs"),
+  tar_target(tool_table, format_tool_table(median_tool), format = "qs")
 )
