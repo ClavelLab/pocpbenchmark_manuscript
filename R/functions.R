@@ -36,21 +36,22 @@ plot_pocp_distribution<-function(pocp_values, type = c("POCP", "POCPu")){
 }
 
 
-read_compute_stats <- function(path_to_family_dir){
+read_computing_metrics <- function(path_to_family_dir){
   require(magrittr)
   family <- stringr::str_remove(path_to_family_dir,"benchmark-gtdb-")
-  path_to_compute_stats <- list.files(paste0(path_to_family_dir, "/pipeline_info"),
+  path_to_computing_metrics <- list.files(paste0(path_to_family_dir, "/pipeline_info"),
                                       pattern = "execution_trace", full.names = TRUE) %>% 
     sort(decreasing = TRUE)
-  compute_stats <- readr::read_tsv(path_to_compute_stats[1], show_col_types = FALSE) %>% 
+  computing_metrics <- readr::read_tsv(path_to_computing_metrics[1], show_col_types = FALSE) %>% 
     filter(str_detect(name, "BLAST|DIAMOND|MMSEQS2") & exit == 0) %>%
     select(name, realtime, `%cpu`, peak_vmem, wchar, rchar) %>%
     separate_wider_delim(name, delim = " ",
                          names = c("name_id", "dataset_id")) %>%
     mutate(dataset_id = str_remove(dataset_id, "^\\(") %>% str_remove("\\)$")) %>%
     separate_wider_delim(name_id, delim = ":",names = c(NA, "category", "tool"))
-  compute_stats%>% 
-    dplyr::mutate(family = family)
+  computing_metrics%>% 
+    dplyr::mutate(Family = family) %>% 
+    dplyr::relocate(Family)
 }
 
 replace_ms <- function(chr_time){
@@ -76,9 +77,9 @@ get_comparison_id <- function(id){
 }
 
 
-parse_compute_stats <- function(compute_stats){
+parse_computing_metrics <- function(computing_metrics){
   require(magrittr)
-  compute_stats %>% mutate(
+  computing_metrics %>% mutate(
     comparison_id =get_comparison_id(dataset_id),
     time = replace_ms(realtime) %>% 
       parse_date_time(orders =  c("S","MS")) %>%
@@ -90,23 +91,23 @@ parse_compute_stats <- function(compute_stats){
   ) %>% select(family,category, tool, comparison_id, dataset_id, time, memory, cpu, io) 
 }
 
-get_db_parsed_stats <- function(compute_stats){
-  compute_stats %>%
-    parse_compute_stats() %>% 
+get_db_parsed_stats <- function(computing_metrics){
+  computing_metrics %>%
+    parse_computing_metrics() %>% 
     filter(tool %in% c("MMSEQS2_CREATEDB", "BLAST_MAKEBLASTDB", "DIAMOND_MAKEDB")) %>% 
     select(-dataset_id)
 }
-get_tool_parsed_stats <- function(compute_stats){
-  compute_stats %>%
-    parse_compute_stats() %>% 
+get_tool_parsed_stats <- function(computing_metrics){
+  computing_metrics %>%
+    parse_computing_metrics() %>% 
     filter(!tool %in% c("MMSEQS2_CREATEDB", "BLAST_MAKEBLASTDB", "DIAMOND_MAKEDB")) %>% 
     mutate(
       query = str_remove(dataset_id, "-.*")
     )
 }
 
-generate_table_tool <- function(compute_stats_tool){
-  compute_stats_tool %>% group_by(dataset_id) %>%
+generate_table_tool <- function(computing_metrics_tool){
+  computing_metrics_tool %>% group_by(dataset_id) %>%
   mutate(
     time_fold = time/time[tool == "BLAST_BLASTP"],
     memory_fold = memory/memory[tool == "BLAST_BLASTP"],
@@ -122,8 +123,8 @@ generate_table_tool <- function(compute_stats_tool){
       io_fold = median(io_fold))
 }
 
-generate_table_db <- function(compute_stats_db){
-  compute_stats_db %>%
+generate_table_db <- function(computing_metrics_db){
+  computing_metrics_db %>%
     group_by(tool) %>%
     summarise(
       n = n(),

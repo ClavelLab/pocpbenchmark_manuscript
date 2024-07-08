@@ -46,14 +46,10 @@ list(
   tar_target(all_pocpu,   dplyr::filter(pocp_values, type == "POCPu"), format = "qs"),
   tar_target(plot_pocp, plot_pocp_distribution(all_pocp, "POCP"), format = "qs"),
   tar_target(plot_pocpu, plot_pocp_distribution(all_pocpu, "POCPu"), format = "qs"),
-  tar_target(compute_stats, read_compute_stats(prots),
+  tar_target(computing_metrics, read_computing_metrics(prots),
              pattern = map(prots),iteration = "vector", format = "qs"),
-  tar_target(db_parsed, get_db_parsed_stats(compute_stats),
-             pattern = map(compute_stats), iteration = "vector", format = "qs"),
-  tar_target(tool_parsed, get_tool_parsed_stats(compute_stats),
-             pattern = map(compute_stats), iteration = "vector", format = "qs"),
-  tar_target(median_db, generate_table_db(db_parsed), format = "qs"),
-  tar_target(median_tool, generate_table_tool(tool_parsed), format = "qs"),
-  tar_target(db_table, format_db_table(median_db), format = "qs"),
-  tar_target(tool_table, format_tool_table(median_tool), format = "qs")
+  # 3. Parquet file for computing metrics
+  tar_target(computing_metrics_parquet, 
+             tibble_to_parquet(computing_metrics, "pocpbenchmark_computing_metrics.parquet")
+             )
 )
