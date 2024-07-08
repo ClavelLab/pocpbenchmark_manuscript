@@ -1,7 +1,13 @@
-read_stats <- function(path_to_family_dir){
+read_protein_stats <- function(path_to_family_dir){
   family <- stringr::str_remove(path_to_family_dir,"benchmark-gtdb-")
   prot <- readr::read_tsv(paste0(path_to_family_dir, "/proteins_statistics.tsv"), show_col_types = FALSE)
-  dplyr::mutate(prot, family = family)
+  prot %>% dplyr::mutate(
+    accession = stringr::str_remove(file,".faa$"),
+    family = family
+  ) %>%
+    dplyr::select(
+      accession,family, num_seqs, sum_len, min_len, avg_len, max_len
+    )
 }
 
 read_R2 <- function(path_to_family_dir){
