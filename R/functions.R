@@ -157,3 +157,9 @@ format_tool_table <- function(tool_table){
         "MMSEQS2_S6DOT0", "MMSEQS2_S7DOT5"))
     ) %>% arrange(tool)
 }
+
+
+tibble_to_parquet <- function(tibble, parquet_name){
+  arrow::write_parquet(tibble, parquet_name)
+  return(parquet_name)
+}
