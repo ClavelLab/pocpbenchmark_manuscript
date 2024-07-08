@@ -21,8 +21,9 @@ read_pocp <- function(path_to_family_dir){
   pocp_values <- readr::read_csv(paste0(path_to_family_dir, "/eval_genus_delineation/comparisons_classification_pocp_rand.csv"),
                                  show_col_types = FALSE)
   pocp_values %>%
-    dplyr::filter(tool != "blast_blastp") %>% 
-    dplyr::mutate(family = family)
+    dplyr::mutate(Family = family,
+                  is_recommended_tool = tool == "diamond_verysensitive") %>% 
+    dplyr::relocate(type, tool, is_recommended_tool, pocp)
 }
 
 

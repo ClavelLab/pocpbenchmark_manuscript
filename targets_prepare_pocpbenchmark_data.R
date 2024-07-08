@@ -39,17 +39,15 @@ list(
   # 2. Parquet file with Family metadata (CPUh, benchmark type, min/median/max proteins)
   tar_target(family_metadata_parquet,
              tibble_to_parquet(family_metadata, "pocpbenchmark_family_metadata.parquet")),
-  tar_target(r2, read_R2(prots), pattern = map(prots),iteration = "vector"),
-  
-  tar_target(pocp_values, read_pocp(prots), pattern = map(prots), format = "qs"),
-  tar_target(all_pocp,   dplyr::filter(pocp_values, type == "POCP"), format = "qs"),
-  tar_target(all_pocpu,   dplyr::filter(pocp_values, type == "POCPu"), format = "qs"),
-  tar_target(plot_pocp, plot_pocp_distribution(all_pocp, "POCP"), format = "qs"),
-  tar_target(plot_pocpu, plot_pocp_distribution(all_pocpu, "POCPu"), format = "qs"),
   tar_target(computing_metrics, read_computing_metrics(prots),
              pattern = map(prots),iteration = "vector", format = "qs"),
   # 3. Parquet file for computing metrics
   tar_target(computing_metrics_parquet, 
              tibble_to_parquet(computing_metrics, "pocpbenchmark_computing_metrics.parquet")
-             )
+             ),
+  tar_target(pocp_values, read_pocp(prots), pattern = map(prots), format = "qs"),
+  # 4. Parquet for all computed POCP values
+  tar_target(pocp_values_parquet,
+             tibble_to_parquet(pocp_values, "pocpbenchmark_pocp_values.parquet")
+  )
 )
