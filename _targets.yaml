@@ -1,0 +1,6 @@
+prepare_pocpbenchmark_data:
+  script: targets_prepare_pocpbenchmark_data.R
+  store: prepare_pocpbenchmark_data
+analyze_pocpbenchmark_data:
+  script: targets_analyze_pocpbenchmark_data.R
+  store: analyze_pocpbenchmark_data
