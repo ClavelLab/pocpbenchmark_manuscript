@@ -75,5 +75,6 @@ list(
                select(-Family) %>% rename("Family"="label") %>% 
                mutate(Family = as_factor(Family),
                       Family = fct_reorder(Family, pocp))
-  )
+  ),
+  tar_quarto(slides_retreat, "2024-07-10_RetreatSlidesPOCP.qmd")
 )

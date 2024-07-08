@@ -1,0 +1,124 @@
+---
+title: AG Clavel Retreat 2024
+subtitle: Clearer, better, faster, reproducible bacterial genus delineation procedure
+format: 
+  clean-revealjs:
+    self-contained: true
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+author:
+  - name: Charlie Pauvert
+    orcid: 0000-0001-9832-2507
+    email: cpauvert@ukaachen.de
+    affiliations: University Hospital of RWTH Aachen
+date: 2024-07-10
+bibliography: citations.bib
+---
+
+## Where to draw the line?
+
+### Bacterial species delineation
+
+- Modern microbiologists tend to agree to an actionable species definition using the Average Nucleotide Identity (>95-96) or similar genome-based metric.
+- However, identifying more evolutionary-distant relationships is more challenging with these nucleotide based-indices without reconstructing a phylogenetic tree.
+
+### Bacterial genus delineation
+
+- @qin_proposed_2014 suggested the Percentage of Conserved Proteins (POCP $\geq$ 50%) to group genomes in the same genera using BLASTP.
+- It is still used and investigated for its speed or concerns of paralogs proteins [@riesco_update_2024;@holzer_pocp-nf:_2024, and this study]
+
+
+
+
+## POCP benchmark outline
+
+###  Study aims
+
+1.  Identify a scalable alternative to BLASTP *without compromising its accuracy* to compute POCP
+2.  Evaluate the usefulness of POCP (and POCPu) for bacterial genus delineation
+
+
+> **Hypothesis** The POCP provides an interpretable and already used metric that can delineate bacterial genera in most cases
+
+### Gold standard genomes and taxonomy dataset
+
+- 4 767 GTDB genomes with valid names across 35 families and 4 phyla
+- 10 bioinformatics procedures ranked: 39k CPU-Hours (~4.5 years)
+
+
+## POCPu delineates genera in most cases
+<!-- ### DIAMOND verysensitive uses 5-10x more CPU but 1/20 of the time -->
+
+```{r libs, echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(cowplot)
+library(ggokabeito)
+library(magrittr)
+```
+
+
+```{r pocp_plot}
+p_pocp <- targets::tar_read(all_pocp) %>% 
+  ggplot(aes(x = pocp, fill = same_genus_truth))+
+  geom_density(alpha = 0.5)+
+  theme_cowplot(rel_small = 10/14)+
+  scale_fill_okabe_ito(labels = targets::tar_read(pocp_group_sizes))+
+  geom_vline(xintercept = 50, linetype="dashed")+
+  # theme(legend.position = "inside", legend.position.inside = c(0.65, 0.75))+
+  labs(x="POCP with\nDIAMOND very-sensitive", fill = "Gold\nstandard", y = "Density")+
+  scale_y_continuous(expand = expansion(mult  = c(0,0.6)))+
+  scale_x_continuous(expand = expansion(add = c(25,0)))+
+  annotate("segment", x = 55, xend = 70, y=0.029, yend = 0.029,
+           color="black", arrow=arrow(type= "closed", length = unit(0.05, "in"))
+           )+
+  annotate("text",x = 55, y=0.029, hjust=0, vjust=-0.85,
+           label="Same\ngenera")+
+  annotate("segment", x = 45, xend = 30, y=0.029, yend = 0.029,
+           color="black", arrow=arrow(type= "closed", length = unit(0.05, "in"))
+           )+
+  annotate("text",x = 45, y=0.029, hjust=1, vjust=-0.85,
+           label="Different\ngenera")
+  
+p_pocpu <- targets::tar_read(all_pocpu) %>% 
+  ggplot(aes(x = pocp, fill = same_genus_truth))+
+  geom_density(alpha = 0.5)+
+  theme_cowplot(rel_small = 10/14)+
+  scale_fill_okabe_ito(labels = targets::tar_read(pocpu_group_sizes))+
+  geom_vline(xintercept = 50, linetype="dashed")+
+  theme(legend.position = "right")+
+  labs(x="POCPu with\nDIAMOND very-sensitive", fill = "Gold\nstandard",y = "Density")+
+    theme(legend.position = "bottom", legend.title.position = "left",
+          legend.direction = "vertical")
+
+# legend <- cowplot::get_plot_component(p_pocpu,'guide-box-right', return_all = TRUE)
+p_global <- plot_grid(p_pocp+theme(legend.position = "none"),
+                      p_pocpu,
+                      # axis = "l",
+                      # legend,
+                      nrow = 2,
+                      # rel_heights = c(0.6, 0.4),
+                      labels = c("A","B"))
+```
+
+
+```{r figure, fig.dpi=300}
+# fig.width=7, fig.height=6
+library(ggridges)
+library(dplyr)
+library(forcats)
+p_ridges <- targets::tar_read(pocpu_ridges) %>% 
+  ggplot(aes(x = pocp,y = Family))+
+  geom_density_ridges(alpha=0.5, fill =  "#56B4E9")+
+  geom_vline(xintercept = 50, linetype="dashed")+
+  theme_cowplot(rel_small = 10/14)+
+  labs(x="Per-Family POCPu (Intra-genera)",
+       fill = "",y = "Family (n genomes included)")+
+  scale_y_discrete(expand = expansion(add = c(0,1)))
+
+plot_grid(p_global, p_ridges, ncol = 2, axis="b",labels = c("","C"),
+          rel_widths =  c(0.4, 0.6))
+```
+
+
+## References
