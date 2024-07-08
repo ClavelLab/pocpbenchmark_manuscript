@@ -22,9 +22,23 @@ list(
   tar_target(genome_metadata_parquet,
              tibble_to_parquet(genome_metadata, "pocpbenchmark_genome_metadata.parquet"),
                                   format = "file"),
-  tar_target(prot_n, prot_stats %>% dplyr::select(family, num_seqs)%>%dplyr::group_by(family) %>%
-               summarise(n_genomes = n(), median_proteins = median(num_seqs))),
-  tar_target(table_overview, readr::read_csv("cpuhours.csv")%>% left_join(prot_n, by="family")),
+  tar_target(
+    cpu_hours_path, "cpu_hours_benchmark_type_per_family.csv", format = "file"
+  ),
+  tar_target(
+    cpu_hours, readr::read_csv(cpu_hours_path, show_col_types = FALSE)
+  ),
+  tar_target(prot_stats_per_family,
+             prot_stats %>% dplyr::select(family, num_seqs) %>%
+               dplyr::group_by(family) %>%
+               summarise(n_genomes = n(), median_proteins = median(num_seqs),
+                         min_proteins = min(num_seqs), max_proteins = max(num_seqs))
+             ),
+  tar_target(family_metadata, cpu_hours %>% left_join(prot_stats_per_family,
+                                                     by=c("Family"="family"))),
+  # 2. Parquet file with Family metadata (CPUh, benchmark type, min/median/max proteins)
+  tar_target(family_metadata_parquet,
+             tibble_to_parquet(family_metadata, "pocpbenchmark_family_metadata.parquet")),
   tar_target(r2, read_R2(prots), pattern = map(prots),iteration = "vector"),
   
   tar_target(pocp_values, read_pocp(prots), pattern = map(prots), format = "qs"),
