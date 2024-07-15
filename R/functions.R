@@ -36,6 +36,17 @@ plot_pocp_distribution<-function(pocp_values, type = c("POCP", "POCPu")){
     labs(x=type)
 }
 
+pivot_pocp <- function(pocp_values,family_metadata, type = c("POCP", "POCPu")){
+  families_to_keep <- dplyr::filter(family_metadata, benchmark_type == "full")
+  dplyr::filter(pocp_values, type == {{ type }}) %>% 
+    dplyr::semi_join(families_to_keep, by = "Family") %>% 
+    dplyr::select(type, tool, is_recommended_tool, pocp, query, subject, Family) %>% 
+    # Widen the data with all tools as column and prepend pocp or pocpu to the tool
+    pivot_wider(names_from = tool, values_from = pocp, id_cols = c(type, Family,query, subject)) %>%
+    # Select only the columns of diamond and mmseqs
+    pivot_longer(cols = -c(query, subject,type,Family, blast_blastp), names_to = "tool", values_to = "pocp") %>%
+    separate(tool, into = c("aligner", "parameter"), sep = "_", remove = FALSE)
+}
 
 read_computing_metrics <- function(path_to_family_dir){
   require(magrittr)

@@ -76,5 +76,13 @@ list(
                mutate(Family = as_factor(Family),
                       Family = fct_reorder(Family, pocp))
   ),
-  tar_quarto(slides_retreat, "2024-07-10_RetreatSlidesPOCP.qmd")
+  tar_quarto(slides_retreat, "2024-07-10_RetreatSlidesPOCP.qmd"),
+  tar_target(blast_vs_all_pocp,
+             pivot_pocp(pocp_values,family_metadata, type = "POCP"),
+             format = "parquet"
+  ),
+  tar_target(blast_vs_all_pocpu,
+             pivot_pocp(pocp_values,family_metadata, type = "POCPu"),
+             format = "parquet"
+  )
 )
