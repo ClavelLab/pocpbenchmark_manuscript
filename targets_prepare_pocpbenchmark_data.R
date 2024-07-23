@@ -6,7 +6,7 @@ tar_option_set(
   
 )
 
-tar_source()
+tar_source("R/prepare_data_functions.R")
 
 # End this file with a list of target objects.
 list(
