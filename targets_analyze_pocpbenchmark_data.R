@@ -7,9 +7,9 @@ tar_option_set(
   
 )
 
-tar_source("R/data_manipulation_functions.R",
+tar_source(c("R/data_manipulation_functions.R",
            "R/plot_functions.R", 
-           "R/table_functions.R")
+           "R/table_functions.R"))
 
 # End this file with a list of target objects.
 list(
