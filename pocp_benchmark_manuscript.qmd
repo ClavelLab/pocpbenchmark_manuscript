@@ -1,0 +1,34 @@
+---
+title: Clearer, better, faster, reproducible bacterial genus delineation procedure
+author:
+  - name: Charlie Pauvert
+    orcid: 0000-0001-9832-2507
+    email: cpauvert@ukaachen.de
+    affiliations: University Hospital of RWTH Aachen
+license: "CC BY"
+---
+
+```{r setup}
+library(tidyverse)
+library(targets)
+```
+
+
+# Introduction
+
+```{r cpu_hours}
+overall_stats <- tar_read(family_metadata) %>%
+  select(Family,benchmark_type, n_genomes,CPU_hours) %>%
+  mutate(
+    n_comparisons=n_genomes*(n_genomes-1),
+    n_comparisons=if_else(benchmark_type=="full",
+                          n_comparisons*10, n_comparisons)
+                          ) %>%
+  summarise(
+    n = sum(n_comparisons),
+    total_hours = sum(CPU_hours) %>% round(),
+    total_years = as.period(total_hours, unit = "hours") %>% as.numeric("years")
+  ) %>% mutate(across(n:total_years, ~prettyNum(.x,big.mark = " ", digits=2)))
+```
+
+Still, this study needed `r overall_stats$n` pairwise comparisons for a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).

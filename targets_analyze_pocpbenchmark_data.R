@@ -100,5 +100,6 @@ list(
                       plot_pocp_vs_blast("POCPu"),
                     width = 9, height = 5, dpi = 300, bg = "white"),
              format = "file"
-  )
+  ),
+  tar_quarto(manuscript, "pocp_benchmark_manuscript.qmd")
 )
