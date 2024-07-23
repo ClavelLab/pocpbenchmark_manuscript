@@ -22,7 +22,15 @@ read_pocp <- function(path_to_family_dir){
                                  show_col_types = FALSE)
   pocp_values %>%
     dplyr::mutate(Family = family,
-                  is_recommended_tool = tool == "diamond_verysensitive") %>% 
+                  tool = stringr::str_to_upper(tool) %>%
+                    factor(levels = c(
+                      "BLAST_BLASTP", "BLAST_BLASTPDB",
+                      "DIAMOND_FAST", "DIAMOND_SENSITIVE",
+                      "DIAMOND_VERYSENSITIVE", "DIAMOND_ULTRASENSITIVE",
+                      "MMSEQS2_S1DOT0","MMSEQS2_S2DOT5",
+                      "MMSEQS2_S6DOT0", "MMSEQS2_S7DOT5")),
+                  is_recommended_tool = tool == "DIAMOND_VERYSENSITIVE"
+                  ) %>% 
     dplyr::relocate(type, tool, is_recommended_tool, pocp)
 }
 
@@ -66,16 +74,7 @@ plot_pocp_vs_blast <- function(df, pocp_label){
     coord_fixed()+
     scale_y_continuous(limits = extremes)+
     scale_x_continuous(limits = extremes)+
-    facet_wrap(~ factor(tool, levels = c(
-      "diamond_fast",
-      "diamond_sensitive",
-      "diamond_verysensitive",
-      "diamond_ultrasensitive",
-      "mmseqs2_s1dot0",
-      "mmseqs2_s2dot5",
-      "mmseqs2_s6dot0",
-      "mmseqs2_s7dot5"
-    )), nrow = 2, labeller = as_labeller(function(x) stringr::str_to_upper(x))) +
+    facet_wrap(~ tool, nrow = 2) +
     labs(x = paste0(pocp_label, " based on blastp (in %)"),
          y = paste0(pocp_label, " based on other tools (in %)"),
          color = "Highest density\nregions probability")+
