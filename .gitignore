@@ -2,7 +2,19 @@
 .Rhistory
 .RData
 .Ruserdata
+# Local files generated from targets zip extraction
 benchmark-gtdb*
+# ignore targets stores
+_targets/
+analyze_pocpbenchmark_data/
+prepare_pocpbenchmark_data/
+# Junk around
 old_R/
 *.html
-_targets/
+*.png
+*.pdf
+*.zip
+# Parquet files that are artefacts
+*.parquet
+# Quarto folder rendering
+*_cache/
