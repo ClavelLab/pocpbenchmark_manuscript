@@ -61,13 +61,5 @@ format_db_table <- function(db_table){
     )
 }
 format_tool_table <- function(tool_table){
-  tool_table %>%
-    mutate(
-      tool= factor(tool, levels = c(
-        "BLAST_BLASTP", "BLAST_BLASTPDB",
-        "DIAMOND_FAST", "DIAMOND_SENSITIVE",
-        "DIAMOND_VERYSENSITIVE", "DIAMOND_ULTRASENSITIVE",
-        "MMSEQS2_S1DOT0","MMSEQS2_S2DOT5",
-        "MMSEQS2_S6DOT0", "MMSEQS2_S7DOT5"))
-    ) %>% arrange(tool)
+  format_factor_tool(tool_table) %>% arrange(tool)
 }

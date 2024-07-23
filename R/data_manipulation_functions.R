@@ -1,5 +1,17 @@
 # Data manipulation functions for the analysis {targets} workflow
 
+# Ensure the tool variable has the correct levels
+format_factor_tool <- function(tool_table){
+  tool_table %>%
+    mutate(
+      tool= factor(tool, levels = c(
+        "BLAST_BLASTP", "BLAST_BLASTPDB",
+        "DIAMOND_FAST", "DIAMOND_SENSITIVE",
+        "DIAMOND_VERYSENSITIVE", "DIAMOND_ULTRASENSITIVE",
+        "MMSEQS2_S1DOT0","MMSEQS2_S2DOT5",
+        "MMSEQS2_S6DOT0", "MMSEQS2_S7DOT5"))
+    )
+}
 
 # Pivot POCP values to a longer form to compare with BLASTP
 pivot_pocp <- function(pocp_values,family_metadata, type = c("POCP", "POCPu")){
@@ -10,8 +22,9 @@ pivot_pocp <- function(pocp_values,family_metadata, type = c("POCP", "POCPu")){
     # Widen the data with all tools as column and prepend pocp or pocpu to the tool
     pivot_wider(names_from = tool, values_from = pocp, id_cols = c(type, Family,query, subject)) %>%
     # Select only the columns of diamond and mmseqs
-    pivot_longer(cols = -c(query, subject,type,Family, blast_blastp), names_to = "tool", values_to = "pocp") %>%
-    separate(tool, into = c("aligner", "parameter"), sep = "_", remove = FALSE)
+    pivot_longer(cols = -c(query, subject,type,Family, BLAST_BLASTP), names_to = "tool", values_to = "pocp") %>%
+    separate(tool, into = c("aligner", "parameter"), sep = "_", remove = FALSE) %>% 
+    format_factor_tool()
 }
 
 # Helpers to replace values or get variable in order to parse computing metrics
