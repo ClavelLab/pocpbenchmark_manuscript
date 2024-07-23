@@ -12,7 +12,7 @@ tar_source()
 list(
   tar_files_input(archives,list.files("data_benchmark", full.names = T)),
   tar_target(extracted, unzip(archives), pattern = map(archives), format = "file"),
-  tar_files(prots, list.files(pattern = "benchmark-gtdb-f*"), format = "file"),
+  tar_files_input(prots, list.files(pattern = "benchmark-gtdb-f*"), format = "file"),
   tar_target(prot_stats, read_protein_stats(prots), pattern = map(prots),iteration = "vector"),
   tar_target(shortlist_path, "shortlisted_genomes.csv", format = "file"),
   tar_target(genome_metadata,
