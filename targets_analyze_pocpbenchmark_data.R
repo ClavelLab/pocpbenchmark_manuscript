@@ -2,7 +2,7 @@ library(targets)
 library(tarchetypes)
 
 tar_option_set(
-  packages = c("tidyverse", "lubridate", "arrow",
+  packages = c("tidyverse", "lubridate", "arrow","ggdensity",
                "ggplot2", "cowplot", "ggokabeito"),
   
 )
@@ -84,5 +84,19 @@ list(
   tar_target(blast_vs_all_pocpu,
              pivot_pocp(pocp_values,family_metadata, type = "POCPu"),
              format = "parquet"
+  ),
+  tar_target(fig_blast_vs_all_pocp,
+             ggsave("fig_blast_vs_all_pocp.png",
+                    blast_vs_all_pocp %>% arrange(desc(pocp)) %>% 
+                      plot_pocp_vs_blast("POCP"),
+                    width = 9, height = 5, dpi = 300, bg = "white"),
+             format = "file"
+  ),
+  tar_target(fig_blast_vs_all_pocpu,
+             ggsave("fig_blast_vs_all_pocpu.png",
+                    blast_vs_all_pocpu %>% arrange(desc(pocp)) %>% 
+                      plot_pocp_vs_blast("POCPu"),
+                    width = 9, height = 5, dpi = 300, bg = "white"),
+             format = "file"
   )
 )

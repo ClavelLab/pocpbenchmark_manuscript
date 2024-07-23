@@ -569,6 +569,22 @@
       ],
       "Hash": "15e9634c0fcd294799e9b2e929ed1b86"
     },
+    "ggdensity": {
+      "Package": "ggdensity",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "MASS",
+        "ggplot2",
+        "isoband",
+        "scales",
+        "stats",
+        "tibble",
+        "vctrs"
+      ],
+      "Hash": "e54962536e4954ac823400b3c9e8e32e"
+    },
     "ggokabeito": {
       "Package": "ggokabeito",
       "Version": "0.1.0",

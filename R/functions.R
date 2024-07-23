@@ -48,6 +48,42 @@ pivot_pocp <- function(pocp_values,family_metadata, type = c("POCP", "POCPu")){
     separate(tool, into = c("aligner", "parameter"), sep = "_", remove = FALSE)
 }
 
+# Function to generate the pocp vs blast plot and the blast vs blastdb supplementary plot
+plot_pocp_vs_blast <- function(df, pocp_label){
+  # Get the min max values to set up matching x and y axes intervals
+  extremes<- df %>%
+    summarise(
+      min = min(blast_blastp, pocp),
+      max = max(blast_blastp, pocp)) %>%
+    as_vector()
+  
+  p <- df %>%
+    # Remove the database implementation for a supplementary figure
+    filter(tool != "blast_blastpdb") %>%
+    ggplot(aes(x = blast_blastp, y = pocp)) +
+    ggdensity::geom_hdr_points(size=0.5) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +
+    coord_fixed()+
+    scale_y_continuous(limits = extremes)+
+    scale_x_continuous(limits = extremes)+
+    facet_wrap(~ factor(tool, levels = c(
+      "diamond_fast",
+      "diamond_sensitive",
+      "diamond_verysensitive",
+      "diamond_ultrasensitive",
+      "mmseqs2_s1dot0",
+      "mmseqs2_s2dot5",
+      "mmseqs2_s6dot0",
+      "mmseqs2_s7dot5"
+    )), nrow = 2, labeller = as_labeller(function(x) stringr::str_to_upper(x))) +
+    labs(x = paste0(pocp_label, " based on blastp (in %)"),
+         y = paste0(pocp_label, " based on other tools (in %)"),
+         color = "Highest density\nregions probability")+
+    theme_cowplot(font_size = 12)+
+    theme(legend.position = "bottom", strip.text.x = element_text(size = 8))
+  return(p)
+}
+
 read_computing_metrics <- function(path_to_family_dir){
   require(magrittr)
   family <- stringr::str_remove(path_to_family_dir,"benchmark-gtdb-")
