@@ -3,7 +3,7 @@ library(tarchetypes)
 
 tar_option_set(
   packages = c("tidyverse", "lubridate", "arrow","ggdensity",
-               "ggplot2", "cowplot", "ggokabeito", "treeio"),
+               "ggplot2", "cowplot", "ggokabeito", "treeio", "ggtree"),
   
 )
 
@@ -115,5 +115,7 @@ list(
                         ),
                       across(Domain:Species, ~ str_remove(.x, "[dpcofgs]__"))
                       ),
-             format = "qs")
+             format = "qs"),
+  tar_target(fig_tree, plot_tree(shortlisted_tree,tree_metadata), format = "qs"),
+  tar_target(fig_phyla_count, plot_phyla_count(tree_metadata), format = "qs")
 )
