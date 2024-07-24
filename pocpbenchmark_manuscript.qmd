@@ -50,3 +50,28 @@ overall_stats <- tar_read(family_metadata) %>%
 ```
 
 Still, this study needed `r overall_stats$n` pairwise comparisons for a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).
+
+# Methods
+
+## GTDB bacterial proteins sequences and taxonomy as gold standard
+
+Publicly-available microbial proteins sequences from shortlisted bacteria were used for our comparison.
+The Genome Taxonomy DataBase (GTDB) is a well-maintained and metadata rich microbial resource that provides curated taxonomy along genomes and genome-derived proteins sequences [@parksGTDBOngoingCensus2022].
+We devised inclusion criteria to span a wide breadth of the phylogenetic tree while maintaining achievable comparisons with the time, human and computing resources available.
+
+Any bacterial entry available in the GTDB (r214) was included provided (1) the bacteria has a valid name according to the LPSN, (2) the entry is a representative genome, (3) the bacteria belongs to a family with at least two genuses, and (5) it belongs to a genus with at least ten genomes.
+
+Since version r214, GTDB provides proteins sequences FASTA file (`.faa`) as compressed files (`.gz`).
+While we support the decision to save storage and network load, we had to add an extraction step before use to ensure a fair comparison as only BLAST cannot natively process compressed FASTA files.
+
+We used r214.0 and are aware that r214.1 corrected the taxonomy assignation of the genome `GB_GCA_902406375.1` to *Collinsella sp002232035*.
+This change did not impact our study as the genome in question is not part of the shortlist.
+
+The bacterial phylogenetic tree of the shortlisted genomes was constructed by trimming the bacterial tree released by GTDB using custom Python scripts and the ETE3 library [@huerta-cepasETEReconstructionAnalysis2016].
+
+
+Expected pairwise comparisons between a query sequence ($Q$) and a subject sequence ($S$) were defined by banning self-comparisons ($Q \neq S$) and considering reciprocal comparisons ($Q\text{-}S$ and $S\text{-}Q$) only within the same family to prevent exponential explosion.
+
+
+
+# References
