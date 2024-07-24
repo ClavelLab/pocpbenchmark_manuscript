@@ -29,6 +29,7 @@ bibliography: references.bib
 ```{r setup}
 library(tidyverse)
 library(targets)
+library(cowplot)
 ```
 
 
@@ -162,18 +163,27 @@ Nextflow natively keep track of the time, CPU, memory and disk usage of each pro
 Statistical analyses, data crunching and visualisation were orchestrated with the R workflow manager targets v.1.7.0 [@landauTargetsPackageDynamic2021].
 
 
-## Results
+# Results
 
-```{r fig-tree-phyla,fig.width=7, fig.height=10, fig.dpi=300, fig.cap="Overview of the phylogenetic diversity of the genomes shortlisted for the benchmark. The 4 767 genomes are placed on the phylogenetic tree of the GTDB (A) and colored depending whether the genomes were included in the benchmark with all approaches (shamrock green) or only with the recommended approach (sky magenta). The distribution of genomes by Phyla is indicated for each benchmark type (B).}
+::: {#fig-tree-phyla}
+
+```{r}
+#| fig-width: 7
+#| fig-height: 10
+#| fig-dpi: 300
+library(ggtree)
 tar_load(c(fig_phyla_count, fig_tree))
-leg<-get_legend(fig_phyla_count)
+leg<-cowplot::get_legend(fig_phyla_count)
 plot_grid(
-  rotate_tree(fig_tree, 20),
+  ggtree::rotate_tree(fig_tree, 20),
   fig_phyla_count+theme(legend.position = "none"),
   nrow = 2, labels = "AUTO",
   rel_heights = c(0.7,0.3)
 )+draw_plot(leg, x=0.65,y=-0.15)
 ```
+
+Overview of the phylogenetic diversity of the genomes shortlisted for the benchmark. The `r nrow(tar_read(genome_metadata)) %>% prettyNum(big.mark=" ")` genomes are placed on the phylogenetic tree of the GTDB (A) and colored depending whether the genomes were included in the benchmark with all approaches (shamrock green) or only with the recommended approach (sky magenta). The distribution of genomes by Phyla is indicated for each benchmark type (B).
+:::
 
 # References
 
