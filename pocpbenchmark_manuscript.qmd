@@ -143,6 +143,24 @@ Linear regressions were used in `r R.version.string` to fit the expected POCP (o
 The coefficient of determination R^2^ of the linear regression is used as an interpretable and bounded goodness-of-fit measure between the expected and measured values instead of others errors measurement [@chiccoCoefficientDeterminationRsquared2021].
 We did not rely on the adjusted coefficient of determination as the linear regressions had only one predictor.
 
+
+## Metrics to evaluate genus delineation
+
+We computed classification metrics with a positive event defined as "both genomes belong to the same genus".
+Thus, for a pair of bacterial genomes with a POCP (or POCPu) > 50%, the pair is a True Positive ($TP$) if the pair belong to the same genus, or if not to False Positive ($FP$).
+Conversely, for a pair of bacterial genomes with a POCP (or POCPu) $\leq$ 50%, the pair is a False Negative ($FN$) if the pair belong to the same genus, or if not to True Negative ($TN$).
+We use the Sensitivity ($\frac{TP}{TP+FN}$), Specificity ($\frac{TN}{TN+FP}$), and the False-discovery rate ($\frac{FP}{FP+TP}$) to assess the classification performance of both POCP and POCPu.
+
+
+## Workflow implementation
+
+Automatic protein sequences download, data preprocessing, many-versus-many protein alignments, as well as POCP computation and delineation metrics calculations were run using the workflow tool nextflow [@ditommasoNextflowEnablesReproducible2017], as well as components of nf-core [@ewelsNfcoreFrameworkCommunitycurated2020].
+On top of a workflow manager, tools used in the benchmark are shipped within Docker container [@merkelDockerLightweightLinux2014]  or bioconda [@thebiocondateamBiocondaSustainableComprehensive2018a] environments to ensure reproducibility, scalability and ease future extensions of the benchmark.
+
+Nextflow natively keep track of the time, CPU, memory and disk usage of each process in an execution trace log file that we used to evaluate computing resources utilization. Process duration is available as walltime and realtime, the CPU usage is reported as a percentage of usage of a unique CPU, meaning multi-threaded processes will have a value higher than 100%.
+
+Statistical analyses, data crunching and visualisation were orchestrated with the R workflow manager targets v.1.7.0 [@landauTargetsPackageDynamic2021].
+
 # References
 
 ::: {#refs}
