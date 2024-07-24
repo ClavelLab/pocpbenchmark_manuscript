@@ -3,7 +3,7 @@ library(tarchetypes)
 
 tar_option_set(
   packages = c("tidyverse", "lubridate", "arrow","ggdensity",
-               "ggplot2", "cowplot", "ggokabeito"),
+               "ggplot2", "cowplot", "ggokabeito", "treeio"),
   
 )
 
@@ -101,5 +101,19 @@ list(
                     width = 9, height = 5, dpi = 300, bg = "white"),
              format = "file"
   ),
-  tar_quarto(manuscript, "pocp_benchmark_manuscript.qmd")
+  tar_target(tree_file, "shorlisted_genomes.newick", format = "file"),
+  tar_target(shortlisted_tree, treeio::read.tree(file = tree_file), format = "qs"),
+  tar_target(tree_metadata,
+             genome_metadata %>% select(accession,Domain:Species) %>% 
+             left_join(
+               select(family_metadata, Family, benchmark_type), by = "Family"
+               ) %>% 
+               rename("label"="accession") %>% 
+               mutate(benchmark_type = forcats::as_factor(benchmark_type) %>% 
+                        forcats::fct_recode(
+                          "All approaches"="full", "Recommended approach"="recommended"
+                        ),
+                      across(Domain:Species, ~ str_remove(.x, "[dpcofgs]__"))
+                      ),
+             format = "qs")
 )
