@@ -18,5 +18,5 @@ old_R/
 *.parquet
 # Quarto folder rendering
 *_cache/
-
 /.quarto/
+_manuscript
