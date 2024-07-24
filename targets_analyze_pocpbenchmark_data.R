@@ -3,7 +3,8 @@ library(tarchetypes)
 
 tar_option_set(
   packages = c("tidyverse", "lubridate", "arrow","ggdensity",
-               "ggplot2", "cowplot", "ggokabeito", "treeio", "ggtree"),
+               "ggplot2", "cowplot", "ggokabeito", "treeio", "ggtree",
+               "jsonlite"),
   
 )
 
@@ -117,5 +118,8 @@ list(
                       ),
              format = "qs"),
   tar_target(fig_tree, plot_tree(shortlisted_tree,tree_metadata), format = "qs"),
-  tar_target(fig_phyla_count, plot_phyla_count(tree_metadata), format = "qs")
+  tar_target(fig_phyla_count, plot_phyla_count(tree_metadata), format = "qs"),
+  tar_target(lpsn_stats_file, "lpsn30.json", format = "file"),
+  tar_target(lpsn_stats, parse_lpsn_stats(lpsn_stats_file), format = "qs"),
+  tar_target(fig_lpsn_stats, plot_lpsn_stats(lpsn_stats), format = "qs")
 )

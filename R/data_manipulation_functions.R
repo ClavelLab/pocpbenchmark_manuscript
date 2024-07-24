@@ -63,3 +63,18 @@ parse_computing_metrics <- function(computing_metrics){
       rlang::parse_bytes(wchar) %>% as.numeric()
   ) %>% select(family,category, tool, comparison_id, dataset_id, time, memory, cpu, io) 
 }
+
+# From the figure <https://lpsn.dsmz.de/statistics/figure/30>
+# the data used can be guessed to be at <https://lpsn.dsmz.de/data/figure/30>
+# downloaded and manually fixed of broken strings to get valid json to be parsed
+# for genera stats
+parse_lpsn_stats <- function(lpsn_json){
+  jsonlite::fromJSON(readLines(lpsn_json)) %>%
+    select(amount_is,grouping,subgroup,amount) %>% 
+    arrange(grouping) %>% 
+    filter(subgroup == "genus") %>% 
+    mutate(
+      n = cumsum(amount),
+      grouping=as.factor(grouping)
+    ) 
+}

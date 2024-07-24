@@ -58,3 +58,36 @@ plot_phyla_count<-function(tree_metadata){
     coord_flip()+
     theme_cowplot()
 }
+
+plot_lpsn_stats <- function(lpsn_stats){
+  p_lpsn <- ggplot(lpsn_stats, aes(x = grouping, y = n))+
+    geom_segment(
+      aes(xend = grouping,x = grouping, y = n, yend=0),
+      color = ifelse(lpsn_stats$grouping %in% c(2014,2024), "#E69F00", "#999999"),
+      linewidth = ifelse(lpsn_stats$grouping %in% c(2014,2024), 1.5,1))+
+    geom_point(
+      color = ifelse(lpsn_stats$grouping %in% c(2014,2024), "#E69F00", "#999999"),
+      linewidth = ifelse(lpsn_stats$grouping %in% c(2014,2024), 1.5,1)
+    )+
+    coord_flip()+
+    labs(y="Validly published genus names under ICNP",
+         x="Year")+
+    theme_minimal_vgrid()+
+    theme(axis.line.x =  element_line(color="black",linewidth = 0.5),
+          axis.line.y = element_line(color="black",linewidth = 0.5))
+  lpsn_annotations <- lpsn_stats %>%
+    filter(grouping %in% c(2014,2024)) %>%
+    select(grouping,n) %>% 
+    mutate(label = glue::glue(
+      "n = {n}\n  genera",
+      n = prettyNum(n, big.mark = " ")
+    )
+    )
+  
+  p_lpsn+
+    geom_text(data=lpsn_annotations,aes(x=grouping,y=n, label=label), 
+              color="#E69F00", size=4 , angle=0, fontface="bold",
+              hjust=-0.1, vjust=0.8
+    )+
+    scale_y_continuous(expand = expansion(add = c(0,800)))
+}
