@@ -73,5 +73,77 @@ The bacterial phylogenetic tree of the shortlisted genomes was constructed by tr
 Expected pairwise comparisons between a query sequence ($Q$) and a subject sequence ($S$) were defined by banning self-comparisons ($Q \neq S$) and considering reciprocal comparisons ($Q\text{-}S$ and $S\text{-}Q$) only within the same family to prevent exponential explosion.
 
 
+## Definition of Percentage of Conserved Proteins (POCP)
+
+The percentage of conserved proteins (POCP) between two genomes $Q$ and $S$ is defined as:
+
+$$
+POCP = \dfrac{C_{QS} + C_{SQ}}{T_Q + T_S} \times 100\%
+$$ {#eq-pocp}
+
+where $C_{QS}$ represent the conserved number of proteins from $Q$ when aligned to $S$ and conversely $C_{SQ}$ represent the conserved number of proteins from $S$ when aligned to $Q$, and $T_Q + T_S$ represent the total number of proteins in the two genomes being compared, respectively [adapted from @qinProposedGenusBoundary2014].
+The range of POCP is theoretically $\left[0-100\%\right]$.
+Conserved proteins are defined as protein sequences matches from the query with an e-value < $10^{−5}$, a sequence identity > 40%, and an aligned region > 50% of the query protein sequence length.
+
+
+However, proteins sequences from the query can match multiple subject sequences in the case of duplicated genes.
+While briefly mentioned in the original paper that "The number of conserved proteins in each genome of strains being compared was slightly different because of the existence of duplicate genes (paralogs)" [@qinProposedGenusBoundary2014, p. 2211], the expected influence on the POCP values is lacking.
+In our experience, this results in POCP values above the theoretical upper bound of 100%.
+Therefore, we defined the POCP with unique matches (POCPu) between two genomes $Q$ and $S$ as:
+
+$$
+POCPu = \dfrac{C_{uQS} + C_{uSQ}}{T_Q + T_S} \times 100\%
+$$ {#eq-pocpu}
+
+where $C_{uQS}$ represent the conserved number of proteins from *the unique matches of* $Q$ when aligned to $S$ and conversely $C_{uSQ}$ represent the conserved number of proteins from *the unique matches of* $S$ when aligned to $Q$, and $T_Q + T_S$ represent the total number of proteins in the two genomes being compared, respectively.
+Thus the range of POCP is actually $\left[0-\infty\right[$ and the range of POCPu is $\left[0-100\%\right]$.
+Note that the assumption regarding unique matches is made implicitly when using some POCP implementation [e.g., @holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024; @linSilentGeneBiopyBiopy2021].
+
+## Approaches for proteins sequence alignment benchmark
+
+Many-versus-many proteins sequences comparisons are required to assess the number of conserved proteins.
+While @qinProposedGenusBoundary2014 provided limited guidance on how to implement the computation of POCP, it is assumed that the BLASTP algorithm is the standard.
+It is the approach implemented in Protologger [@hitch_automated_2021].
+We first use the BLASTP approach [@camachoBLASTArchitectureApplications2009] using the parameters fitting @qinProposedGenusBoundary2014 procedure @tbl-tools-parameters.
+We also considered a slightly altered BLASTP approach, named BLASTPDB where BLAST databases are first built for the two genomes considered @tbl-tools-parameters.
+This allow parallel alignments on multiple CPU, which is not possible with BLASTP.
+We then included two tools that are usually used as faster BLASTP alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMseqs2 [@steineggerMMseqs2EnablesSensitive2017].
+The former is being used in @holzerPOCPnfAutomaticNextflow2024 while the latter is used in EzAAI [@kimIntroducingEzAAIPipeline2021].
+Similarly to BLASTPDB, these approaches require that a protein database is built for each genome before performing the alignment @tbl-tools-parameters.
+DIAMOND and MMseqs2 were both used with four different sensitivity thresholds @tbl-tools-parameters on a recent comparisons [@buchfinkSensitiveProteinAlignments2021].
+
+```{r tbl-tools-parameters, tab.cap="List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold."}
+tibble::tribble(
+  ~Name, ~Parameters,
+  "BLASTP","--evalue 0.00001 --qcov_hsp_perc 50.0",
+  "BLASTPDB","--evalue 0.00001 --qcov_hsp_perc 50.0",
+  "DIAMOND_FAST","--evalue 0.00001 --query-cover 50.0 --fast",
+  "DIAMOND_SENSITIVE","--evalue 0.00001 --query-cover 50.0 --sensitive",
+  "DIAMOND_VERYSENSITIVE","--evalue 0.00001 --query-cover 50.0 --very-sensitive",
+  "DIAMOND_ULTRASENSITIVE","--evalue 0.00001 --query-cover 50.0 --ultra-sensitive",
+  "MMSEQS2_S1DOT0","--e-profile 0.00001 --cov-mode 1 -c 0.50 -s 1.0",
+  "MMSEQS2_S2DOT5","--e-profile 0.00001 --cov-mode 1 -c 0.50 -s 2.5",
+  "MMSEQS2_S6DOT0","--e-profile 0.00001 --cov-mode 1 -c 0.50 -s 6.0",
+  "MMSEQS2_S7DOT5","--e-profile 0.00001 --cov-mode 1 -c 0.50 -s 7.5"
+) %>% 
+  mutate(
+    Name = if_else(Name=="DIAMOND_VERYSENSITIVE", "**DIAMOND_VERYSENSITIVE**", Name),
+    `Needs database?` = if_else(Name == "BLASTP", "No", "Yes"),
+    Parameters = glue::glue("`{p}`", p=Parameters)
+    ) %>%
+  rename("Approach name"="Name") %>% 
+  select(`Approach name`, `Needs database?`, Parameters) %>% knitr::kable()
+```
+
+All proteins matches were filtered to keep only matches with > 40 % identity to all the query sequences matches for POCP ($C_{QS}$ and $C_{SQ}$ in @eq-pocp) and only unique query sequence matches for POCPu ($C_{QS}$ and $C_{SQ}$ in @eq-pocpu).
+Note that the filtering was adapted to the method as the range of percentage of identity in MMseqs2 is $[0-1]$ and $[0-100]$ for BLAST and DIAMOND.
+The total number of proteins per genomes ($T_Q$ and $T_S$ in @eq-pocp and @eq-pocpu) was computed using seqkit stats v2.2.0 [@shenSeqKitCrossPlatformUltrafast2016].
+
+Linear regressions were used in `r R.version.string` to fit the expected POCP (or POCPu) values obtained via the legacy BLASTP approach against the others approaches considered.
+The coefficient of determination R^2^ of the linear regression is used as an interpretable and bounded goodness-of-fit measure between the expected and measured values instead of others errors measurement [@chiccoCoefficientDeterminationRsquared2021].
+We did not rely on the adjusted coefficient of determination as the linear regressions had only one predictor.
 
 # References
+
+::: {#refs}
+:::
