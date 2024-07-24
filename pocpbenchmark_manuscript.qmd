@@ -149,7 +149,7 @@ We did not rely on the adjusted coefficient of determination as the linear regre
 We computed classification metrics with a positive event defined as "both genomes belong to the same genus".
 Thus, for a pair of bacterial genomes with a POCP (or POCPu) > 50%, the pair is a True Positive ($TP$) if the pair belong to the same genus, or if not to False Positive ($FP$).
 Conversely, for a pair of bacterial genomes with a POCP (or POCPu) $\leq$ 50%, the pair is a False Negative ($FN$) if the pair belong to the same genus, or if not to True Negative ($TN$).
-We use the Sensitivity ($\frac{TP}{TP+FN}$), Specificity ($\frac{TN}{TN+FP}$), and the False-discovery rate ($\frac{FP}{FP+TP}$) to assess the classification performance of both POCP and POCPu.
+We use the Sensitivity (${TP}/{TP+FN}$), Specificity (${TN}/{TN+FP}$), and the False-discovery rate (${FP}/{FP+TP}$) to assess the classification performance of both POCP and POCPu.
 
 
 ## Workflow implementation
