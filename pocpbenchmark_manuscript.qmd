@@ -35,23 +35,6 @@ library(cowplot)
 
 # Introduction
 
-```{r cpu_hours}
-overall_stats <- tar_read(family_metadata) %>%
-  select(Family,benchmark_type, n_genomes,CPU_hours) %>%
-  mutate(
-    n_comparisons=n_genomes*(n_genomes-1),
-    n_comparisons=if_else(benchmark_type=="full",
-                          n_comparisons*10, n_comparisons)
-                          ) %>%
-  summarise(
-    n = sum(n_comparisons),
-    total_hours = sum(CPU_hours) %>% round(),
-    total_years = as.period(total_hours, unit = "hours") %>% as.numeric("years")
-  ) %>% mutate(across(n:total_years, ~prettyNum(.x,big.mark = " ", digits=2)))
-```
-
-Still, this study needed `r overall_stats$n` pairwise comparisons for a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).
-
 # Methods
 
 ## GTDB bacterial proteins sequences and taxonomy as gold standard
@@ -165,6 +148,60 @@ Statistical analyses, data crunching and visualisation were orchestrated with th
 
 # Results
 
+We evaluated ten proteins alignment approaches based on three tools for improved genus delineation using the Percentage Of Conserved Proteins (POCP) using publicly-available data from the GTDB [@parksGTDBOngoingCensus2022].
+
+
+```{r funnel}
+funnel <- c(
+  "GTDB_Genomes" = 394932,
+  "Representatives" = 80789,
+  "Valid_names" = 11699,
+  "More_10_species_per_genus" = 5904,
+  "More_1_genus_per_family" = 4767
+)
+funnel_text <- funnel %>% prettyNum(big.mark=" ") %>% as.list() %>% 
+  glue::glue_data(
+    "Out of a total of {GTDB_Genomes} GTDB bacterial genomes",
+    "{Representatives} are representative genomes with proper taxonomy",
+    "{Valid_names} have valid names",
+    "{More_10_species_per_genus} belongs to a genus with at least ten genomes",
+    "and {More_1_genus_per_family} belongs to a family with at least two genera", .sep = ", "
+    )
+phyla_count_text <- tar_read(tree_metadata) %>%
+  count(Phylum) %>% arrange(desc(n)) %>%
+  glue::glue_data("{Phylum} (n = {n})",
+                  n = prettyNum(n, big.mark=" ")) %>%
+  glue::glue_collapse(sep = ", ", last = " and ")
+```
+
+
+
+`r funnel_text`.
+This thousand-genomes shortlist provides a representative sample of bacterial phylogenetic diversity (@fig-tree-phyla A) that is divided between four phyla: `r phyla_count_text`
+
+
+```{r cpu_hours}
+overall_stats <- tar_read(family_metadata) %>%
+  select(Family,benchmark_type, n_genomes,CPU_hours) %>%
+  mutate(
+    n_comparisons_planned=n_genomes*(n_genomes-1),
+    n_comparisons_realized=if_else(benchmark_type=="full",
+                          n_comparisons_planned*10, n_comparisons_planned)
+                          ) %>%
+  summarise(
+    n_planned = sum(n_comparisons_planned*10),
+    n_realized = sum(n_comparisons_realized),
+    total_hours = sum(CPU_hours) %>% round(),
+    total_years = as.period(total_hours, unit = "hours") %>% as.numeric("years")
+  ) %>% mutate(across(n_realized:total_years, ~prettyNum(.x,big.mark = " ", digits=2)))
+```
+
+
+This should have resulted in `r overall_stats$n_planned %>% prettyunits::pretty_num(style = "nopad")` pairwise comparisons to be run for each of the ten approaches considered (@tbl-tools-parameters) totalizing > 10 millions processes.
+However, early results from the first 17 out of 35 families to be ran were so compelling that we decided to save human and computing resources by splitting the families into two benchmark group: the full benchmark using all ten approaches or using only the recommended approach.
+Genomes from all around the tree are included in the two groups (@fig-tree-phyla A) and in all the four phyla (@fig-tree-phyla B).
+Still, this study needed `r overall_stats$n_realized` pairwise comparisons for a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).
+
 ::: {#fig-tree-phyla}
 
 ```{r}
@@ -184,6 +221,8 @@ plot_grid(
 
 Overview of the phylogenetic diversity of the genomes shortlisted for the benchmark. The `r nrow(tar_read(genome_metadata)) %>% prettyNum(big.mark=" ")` genomes are placed on the phylogenetic tree of the GTDB (A) and colored depending whether the genomes were included in the benchmark with all approaches (shamrock green) or only with the recommended approach (sky magenta). The distribution of genomes by Phyla is indicated for each benchmark type (B).
 :::
+
+
 
 # References
 
