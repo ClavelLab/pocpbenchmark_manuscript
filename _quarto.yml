@@ -1,10 +1,10 @@
 project:
   type: manuscript
   render: 
-    - pocp_benchmark_manuscript.qmd
+    - pocpbenchmark_manuscript.qmd
 
 manuscript:
-  article: pocp_benchmark_manuscript.qmd
+  article: pocpbenchmark_manuscript.qmd
 
 format:
   html: default
