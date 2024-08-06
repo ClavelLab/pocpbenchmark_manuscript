@@ -119,7 +119,9 @@ The former is being used in @holzerPOCPnfAutomaticNextflow2024 while the latter 
 Similarly to BLASTPDB, these approaches require that a protein database is built for each genome before performing the alignment @tbl-tools-parameters.
 DIAMOND and MMseqs2 were both used with four different sensitivity thresholds @tbl-tools-parameters on a recent comparisons [@buchfinkSensitiveProteinAlignments2021].
 
-```{r tbl-tools-parameters, tab.cap="List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold."}
+```{r tbl-tools-parameters}
+#| tbl-cap: "List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold."
+#| tbl-cap-location: bottom
 tibble::tribble(
   ~Name, ~Parameters,
   "BLASTP","--evalue 0.00001 --qcov_hsp_perc 50.0",
@@ -227,7 +229,7 @@ Still, this study needed `r overall_stats$n_realized` pairwise comparisons for a
 
 ::: {#fig-tree-phyla}
 
-```{r}
+```{r tree-phyla}
 #| fig-width: 7
 #| fig-height: 10
 #| fig-dpi: 300
