@@ -247,7 +247,40 @@ plot_grid(
 Overview of the phylogenetic diversity of the genomes shortlisted for the benchmark. The `r nrow(tar_read(genome_metadata)) %>% prettyNum(big.mark=" ")` genomes are placed on the phylogenetic tree of the GTDB (A) and colored depending whether the genomes were included in the benchmark with all approaches (shamrock green) or only with the recommended approach (sky magenta). The distribution of genomes by Phyla is indicated for each benchmark type (B).
 :::
 
+## Comparison with the BLASTP legacy approach
 
+
+
+::: {#fig-blast-vs-all-pocp}
+
+```{r blast_vs_all_pocp}
+#| fig-width: 9
+#| fig-height: 5
+#| fig-dpi: 300
+tar_read(fig_blast_vs_all_pocp)
+```
+
+Adequacy between POCP values computed with the legacy BLASTP against flavors of faster BLASTP alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].
+Each point ($n$ = `r tar_read(blast_vs_all_pocp) %>% count(tool) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")` per tool) represents a POCP value between two genomes (see @eq-pocp).
+The colors represent the probability of finding a point within a certain region, with darker colors indicating higher probabilities. The regions shown are the smallest areas that contain 50%, 80%, 95%, 99% and 100% of the data points, and are known as Highest Density Regions (HDRs).
+Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
+:::
+
+
+::: {#fig-blast-vs-all-pocpu}
+
+```{r blast_vs_all_pocpu}
+#| fig-width: 9
+#| fig-height: 5
+#| fig-dpi: 300
+tar_read(fig_blast_vs_all_pocpu)
+```
+
+Adequacy between POCPu values computed with the legacy BLASTP against flavors of faster BLASTP alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].
+Each point ($n$ = `r tar_read(blast_vs_all_pocpu) %>% count(tool) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")` per tool) represents a POCPu value between two genomes (see @eq-pocpu).
+The colors represent the probability of finding a point within a certain region, with darker colors indicating higher probabilities. The regions shown are the smallest areas that contain 50%, 80%, 95%, 99% and 100% of the data points, and are known as Highest Density Regions (HDRs).
+Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
+:::
 
 # References
 

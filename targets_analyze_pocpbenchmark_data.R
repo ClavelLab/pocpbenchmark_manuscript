@@ -4,7 +4,7 @@ library(tarchetypes)
 tar_option_set(
   packages = c("tidyverse", "lubridate", "arrow","ggdensity",
                "ggplot2", "cowplot", "ggokabeito", "treeio", "ggtree",
-               "jsonlite"),
+               "jsonlite", "broom"),
   
 )
 
@@ -89,18 +89,14 @@ list(
              format = "parquet"
   ),
   tar_target(fig_blast_vs_all_pocp,
-             ggsave("fig_blast_vs_all_pocp.png",
                     blast_vs_all_pocp %>% arrange(desc(pocp)) %>% 
                       plot_pocp_vs_blast("POCP"),
-                    width = 9, height = 5, dpi = 300, bg = "white"),
-             format = "file"
+             format = "qs"
   ),
   tar_target(fig_blast_vs_all_pocpu,
-             ggsave("fig_blast_vs_all_pocpu.png",
                     blast_vs_all_pocpu %>% arrange(desc(pocp)) %>% 
                       plot_pocp_vs_blast("POCPu"),
-                    width = 9, height = 5, dpi = 300, bg = "white"),
-             format = "file"
+             format = "qs"
   ),
   tar_target(tree_file, "shorlisted_genomes.newick", format = "file"),
   tar_target(shortlisted_tree, treeio::read.tree(file = tree_file), format = "qs"),
