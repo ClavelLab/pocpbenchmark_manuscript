@@ -202,7 +202,7 @@ phyla_count_text <- tar_read(tree_metadata) %>%
 
 
 `r funnel_text`.
-This thousand-genomes shortlist provides a representative sample of bacterial phylogenetic diversity (@fig-tree-phyla A) that is divided between four phyla: `r phyla_count_text`
+This thousand-genomes shortlist provides a representative sample of bacterial phylogenetic diversity (@fig-tree-phyla A) that is divided between four phyla: `r phyla_count_text`.
 
 
 ```{r cpu_hours}
@@ -249,6 +249,28 @@ Overview of the phylogenetic diversity of the genomes shortlisted for the benchm
 
 ## Comparison with the BLASTP legacy approach
 
+Using the `r targets::tar_read(tree_metadata) %>% count(benchmark_type) %>% deframe() %>% .[["All approaches"]] %>% prettyNum(big.mark = " ")` genomes from the full benchmark (@fig-tree-phyla), we evaluate whether the accuracy of the POCP calculation is not sacrificed in the name of computational performance.
+
+We first made sure that the database approach to BLASTP (@tbl-tools-parameters), that allows for parallel computations produced similar POCP values to the BLASTP approach (@suppfig-blastdb A).
+
+::: {#suppfig-blastdb}
+```{r blastdb}
+#| fig-width: 9
+#| fig-height: 5
+#| fig-dpi: 300
+tar_read(fig_blast_vs_blastdb)
+```
+
+Adequacy between POCP (A) and POCPu (B) values computed with the legacy BLASTP against the BLASTP_DB approach that build databases before alignment.
+Each point ($n$ = `r tar_read(blast_vs_all_pocpu) %>% count(tool) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")` per tool) represents a POCP/POCPu value between two genomes (see @eq-pocp and @eq-pocpu).
+The colors represent the probability of finding a point within a certain region, with darker colors indicating higher probabilities. The regions shown are the smallest areas that contain 50%, 80%, 95%, 99% and 100% of the data points, and are known as Highest Density Regions (HDRs).
+Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
+:::
+
+
+All flavors of DIAMOND have a coefficient of determination ($R^2$) above 0.99 when matching their POCP values with the original from BLASTP, with the exception of the DIAMOND_FAST approach that deviates more from the expected values (@fig-blast-vs-all-pocp).
+This deviation is exacerbated when using the MMSEQS2_S1DOT0 approach, but is somehow rescued with the others MMSEQS2 approaches, though they perform worse than the DIAMOND approaches.
+It should be noted that the reported POCP values exceed the supposed POCP upper bound of 100% (@fig-blast-vs-all-pocp).
 
 
 ::: {#fig-blast-vs-all-pocp}
@@ -281,6 +303,13 @@ Each point ($n$ = `r tar_read(blast_vs_all_pocpu) %>% count(tool) %>% pull(n) %>
 The colors represent the probability of finding a point within a certain region, with darker colors indicating higher probabilities. The regions shown are the smallest areas that contain 50%, 80%, 95%, 99% and 100% of the data points, and are known as Highest Density Regions (HDRs).
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
+
+
+These higher-than-100% POCP values disappears when using the POCPu (@fig-blast-vs-all-pocpu and @suppfig-blastdb B).
+Otherwise, the same patterns observed for POCP hold for POCPu, though with higher values of coefficient of determination (@fig-blast-vs-all-pocpu).
+The 3 different sensitive approaches of DIAMOND produce POCPu values that match perfectly the ones produce by the legacy approach BLASTP.
+However, the MMSEQS2 approaches, whilst better with POCPu than POCP, still tend to underestimate POCPu values.
+For all tools, two clusters of yellow points are visible. They indicate regions where at least 50% of the data points are located, with the first and second regions being below and above 50% on the x-axis BLASTP POCPu, respectively. 
 
 # References
 

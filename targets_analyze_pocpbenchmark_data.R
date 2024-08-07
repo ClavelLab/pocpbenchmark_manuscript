@@ -98,6 +98,12 @@ list(
                       plot_pocp_vs_blast("POCPu"),
              format = "qs"
   ),
+  tar_target(fig_blast_vs_blastdb,
+             plot_grid( blast_vs_all_pocp %>% arrange(desc(pocp)) %>% 
+                          plot_pocp_blastdb("POCP"),
+                        blast_vs_all_pocpu %>% arrange(desc(pocp)) %>% 
+                          plot_pocp_blastdb("POCPu"),
+                        ncol = 2, labels = "AUTO"), format = "qs"),
   tar_target(tree_file, "shorlisted_genomes.newick", format = "file"),
   tar_target(shortlisted_tree, treeio::read.tree(file = tree_file), format = "qs"),
   tar_target(tree_metadata,

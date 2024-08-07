@@ -50,6 +50,55 @@ plot_pocp_vs_blast <- function(df, pocp_label, with_R2=TRUE){
   return(p)
 }
 
+# POCP vs blast plot
+plot_pocp_blastdb <- function(df, pocp_label, with_R2=TRUE){
+  # 
+  df <- df %>% filter(tool == "BLAST_BLASTPDB")
+  # Get the min max values to set up matching x and y axes intervals
+  extremes<- df %>%
+    summarise(
+      min = min(BLAST_BLASTP, pocp),
+      max = max(BLAST_BLASTP, pocp)) %>%
+    as_vector()
+  
+  p <- df %>%
+    ggplot(aes(x = BLAST_BLASTP, y = pocp)) +
+    ggdensity::geom_hdr_points(size=0.5) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +
+    coord_fixed()+
+    scale_y_continuous(limits = extremes)+
+    scale_x_continuous(limits = extremes)+
+    labs(x = paste0(pocp_label, " based on BLASTP (in %)"),
+         y = paste0(pocp_label, " based on BLASTP database (in %)"),
+         color = "Highest density\nregions probability")+
+    theme_cowplot(font_size = 12)+
+    theme(legend.position = "bottom", strip.text.x = element_text(size = 8))
+  
+  if(with_R2){
+    df_R2 <- df %>% group_by(tool) %>%
+      nest() %>%
+      mutate(
+        fit = map(data, ~ lm(BLAST_BLASTP ~ pocp, data = .)),
+        tidied = map(fit, broom::glance)
+      ) %>%
+      unnest(tidied) %>%
+      select(-data, -fit) %>%
+      ungroup() %>% select(tool,r.squared,p.value,nobs ) %>% 
+      rename("R2"="r.squared", "p"="p.value") %>% 
+      mutate(
+        p_label = map_chr(p, scales::label_pvalue()),
+        label = glue::glue("atop(italic(R)^2 == {R2}, italic(p){p_label})",
+                           R2=round(R2,digits = 3) %>% prettyNum()))
+    
+    
+    p <- p + 
+      geom_text(data = df_R2,
+                aes(x = extremes[1], y=0.75*extremes[2], label = label),
+                size=3, hjust=0, vjust=0,parse = TRUE)
+  }
+  return(p)
+}
+
 # Subset tree of GTDB
 plot_tree <- function(tree, metadata, size_factor=40){
   ggtree::ggtree(tree, layout = "circular") %<+%
