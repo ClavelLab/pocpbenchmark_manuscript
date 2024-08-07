@@ -8,13 +8,14 @@ manuscript:
 
 format:
   html: default
-  jats: default
-  docx: default
+  #jats: default
+  #docx: default
   
   # (other formats)
   # pdf: default
 
 execute:
   freeze: true
+  cache: true
 
 
