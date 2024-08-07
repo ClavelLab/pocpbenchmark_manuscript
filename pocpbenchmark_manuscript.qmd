@@ -311,6 +311,25 @@ The 3 different sensitive approaches of DIAMOND produce POCPu values that match 
 However, the MMSEQS2 approaches, whilst better with POCPu than POCP, still tend to underestimate POCPu values.
 For all tools, two clusters of yellow points are visible. They indicate regions where at least 50% of the data points are located, with the first and second regions being below and above 50% on the x-axis BLASTP POCPu, respectively. 
 
+::: {#tbl-tools-metrics}
+
+```{r tools-metrics}
+#| tbl-cap-location: bottom
+tar_read(tool_table) %>% filter(tool!="BLAST_BLASTP") %>%
+  select(-n) %>%
+  rename("Approach name" = "tool",
+         "Time"="time_fold", "Memory"="memory_fold",
+         "CPU"="cpu_fold", "Disk usage (I/O)"="io_fold") %>% 
+  knitr::kable(digits = 3)
+```
+
+Fold change of computing metrics for the 9 approaches used in the benchmark compared to the BLAST_BLASTP approach.
+The metrics include processing time as real-time, memory usage, CPU usage and disk usage as input/output (I/O).
+A fold change below 1 means the metric is lower, whilst above 1 means it is higher, compared to the BLAST_BLASTP approach.
+The fold change values are median computed over ($n$ = `r tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")` number of processes tracked per approach.
+:::
+
+
 # References
 
 ::: {#refs}
