@@ -327,6 +327,10 @@ A fold change below 1 means the metric is lower, whilst above 1 means it is high
 The fold change values are median computed over ($n$ = `r tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")` number of processes tracked per approach.
 :::
 
+- The BLASTPDB approach is a strong contender because whilst using more resources, it performs exactly the same as BLASTP (@suppfig-blastdb) in a fraction of the time (@tbl-tools-metrics).
+- Still, 
+- DIAMOND still performs 10 times faster than BLASTDB and in less than 4% (change wording here) of the time.
+- TODO: include exact R2 value to compare DIADMONDFAST and very sensititve?
 
 # References
 
