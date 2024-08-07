@@ -4,7 +4,7 @@ library(tarchetypes)
 tar_option_set(
   packages = c("tidyverse", "lubridate", "arrow","ggdensity",
                "ggplot2", "cowplot", "ggokabeito", "treeio", "ggtree",
-               "jsonlite", "broom"),
+               "jsonlite", "broom", "magrittr"),
   
 )
 

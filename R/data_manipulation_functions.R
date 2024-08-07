@@ -30,7 +30,6 @@ pivot_pocp <- function(pocp_values,family_metadata, type = c("POCP", "POCPu")){
 # Helpers to replace values or get variable in order to parse computing metrics
 # 
 replace_ms <- function(chr_time){
-  require(magrittr)
   dplyr::if_else(stringr::str_detect(chr_time, "ms"),
                  true = stringr::str_remove(chr_time, "ms") %>%
                    strtoi() %>% sapply(.,function(x)x*0.001)%>% paste0("s"),
@@ -41,7 +40,6 @@ replace_percent <- function(chr_percent) {
   as.numeric(gsub("%", "", chr_percent))
 }
 get_comparison_id <- function(id){
-  require(magrittr)
   dplyr::if_else(stringr::str_detect(id, "-"),
                  true = stringr::str_split(id, "-") %>%
                    sapply(.,function(x)str_sort(x) %>% paste(collapse = "-")),
@@ -51,7 +49,6 @@ get_comparison_id <- function(id){
 
 # Parse the nextflow execution trace
 parse_computing_metrics <- function(computing_metrics){
-  require(magrittr)
   computing_metrics %>% mutate(
     comparison_id =get_comparison_id(dataset_id),
     time = replace_ms(realtime) %>% 
@@ -61,7 +58,7 @@ parse_computing_metrics <- function(computing_metrics){
     cpu = replace_percent(`%cpu`),
     io = rlang::parse_bytes(rchar) %>% as.numeric() +
       rlang::parse_bytes(wchar) %>% as.numeric()
-  ) %>% select(family,category, tool, comparison_id, dataset_id, time, memory, cpu, io) 
+  ) %>% select(Family,category, tool, comparison_id, dataset_id, time, memory, cpu, io)
 }
 
 # From the figure <https://lpsn.dsmz.de/statistics/figure/30>
