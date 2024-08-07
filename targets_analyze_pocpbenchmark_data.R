@@ -126,8 +126,13 @@ list(
   tar_target(fig_lpsn_stats, plot_lpsn_stats(lpsn_stats), format = "qs"),
   tar_file(computing_metrics_parquet, "pocpbenchmark_computing_metrics.parquet"),
   tar_target(computing_metrics, read_parquet(computing_metrics_parquet), format = "parquet"),
-  tar_target(db_parsed, get_db_parsed_stats(computing_metrics), format = "qs"),
-  tar_target(tool_parsed, get_tool_parsed_stats(computing_metrics), format = "qs"),
+  tar_target(computing_metrics_fullbenchmark,
+             computing_metrics %>% left_join(
+               select(family_metadata, Family, benchmark_type), by = "Family"
+             ) %>% filter(benchmark_type == "full") %>% select(-benchmark_type),
+             format = "parquet"),
+  tar_target(db_parsed, get_db_parsed_stats(computing_metrics_fullbenchmark), format = "qs"),
+  tar_target(tool_parsed, get_tool_parsed_stats(computing_metrics_fullbenchmark), format = "qs"),
   tar_target(median_db, generate_table_db(db_parsed), format = "qs"),
   tar_target(median_tool, generate_table_tool(tool_parsed), format = "qs"),
   tar_target(db_table, format_db_table(median_db), format = "qs"),
