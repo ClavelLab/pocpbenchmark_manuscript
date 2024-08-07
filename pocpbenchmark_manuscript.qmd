@@ -121,7 +121,6 @@ DIAMOND and MMseqs2 were both used with four different sensitivity thresholds @t
 
 ```{r tbl-tools-parameters}
 #| tbl-cap: "List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold."
-#| tbl-cap-location: bottom
 tibble::tribble(
   ~Name, ~Parameters,
   "BLASTP","--evalue 0.00001 --qcov_hsp_perc 50.0",
@@ -314,7 +313,6 @@ For all tools, two clusters of yellow points are visible. They indicate regions 
 ::: {#tbl-tools-metrics}
 
 ```{r tools-metrics}
-#| tbl-cap-location: bottom
 tar_read(tool_table) %>% filter(tool!="BLAST_BLASTP") %>%
   select(-n) %>%
   rename("Approach name" = "tool",
