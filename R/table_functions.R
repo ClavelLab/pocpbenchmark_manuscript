@@ -82,3 +82,32 @@ get_lm_R2 <- function(df, type = c("POCP", "POCPu")){
       label = glue::glue("atop(italic(R)^2 == {R2}, italic(p){p_label})",
                          R2=round(R2,digits = 3) %>% prettyNum()))
 }
+
+# Helper to join and format both R2 values for POCP and POCPu regressions
+format_R2_table <- function(pocp_table, pocpu_table){
+  rename_R2_table <- function(tbl){
+    tbl %>% select(tool, R2, p_label, nobs, type) %>%
+      rename_with(~paste(unique(tbl$type), .x,sep = "_", recycle0 = TRUE),
+                  c(R2,p_label,nobs)) %>%
+      select(-type)
+  }
+  
+  full_join(
+    rename_R2_table(pocp_table),
+    rename_R2_table(pocpu_table),
+    by = "tool") %>% 
+    gt::gt(rowname_col = "tool") %>%
+    tab_stubhead("Approach name") %>% cols_align(align = "left", columns = "tool") %>%
+    tab_spanner("POCP", starts_with("POCP_")) %>% 
+    tab_spanner("POCPu", starts_with("POCPu_")) %>% cols_hide(ends_with("_nobs")) %>% 
+    cols_label(
+      POCP_R2 = md("$R^2$"),POCPu_R2 = md("$R^2$"),
+      POCP_p_label = md("$p$-value"),POCPu_p_label = md("$p$-value")
+    ) %>%
+    tab_footnote(footnote = md(paste("Linear regressions with $n$ =",
+                                     unique(pocp_table$POCP_nobs) %>% prettyNum(big.mark = " "),"comparisons per approach.")),
+                 locations = cells_column_spanners("POCP")) %>%
+    tab_footnote(footnote = md(paste("Linear regressions with $n$ =",
+                                     unique(pocpu_table$POCPu_nobs) %>% prettyNum(big.mark = " "),"comparisons per approach.")),
+                 locations = cells_column_spanners("POCPu"))
+}
