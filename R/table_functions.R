@@ -63,3 +63,22 @@ format_db_table <- function(db_table){
 format_tool_table <- function(tool_table){
   format_factor_tool(tool_table) %>% arrange(tool)
 }
+
+# Fit linear regressions to blast_vs_all comparisons and extract R2
+get_lm_R2 <- function(df, type = c("POCP", "POCPu")){
+  df %>% group_by(tool) %>%
+    nest() %>%
+    mutate(
+      fit = map(data, ~ lm(BLAST_BLASTP ~ pocp, data = .)),
+      tidied = map(fit, broom::glance)
+    ) %>%
+    unnest(tidied) %>%
+    select(-data, -fit) %>%
+    ungroup() %>% select(tool,r.squared,p.value,nobs ) %>% 
+    rename("R2"="r.squared", "p"="p.value") %>% 
+    mutate(
+      type = {{ type }},
+      p_label = map_chr(p, scales::label_pvalue()),
+      label = glue::glue("atop(italic(R)^2 == {R2}, italic(p){p_label})",
+                         R2=round(R2,digits = 3) %>% prettyNum()))
+}

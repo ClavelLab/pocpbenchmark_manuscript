@@ -88,6 +88,10 @@ list(
              pivot_pocp(pocp_values,family_metadata, type = "POCPu"),
              format = "parquet"
   ),
+  tar_target(blast_vs_all_pocp_R2, get_lm_R2(blast_vs_all_pocp, type = "POCP"),
+             format = "qs"),
+  tar_target(blast_vs_all_pocpu_R2, get_lm_R2(blast_vs_all_pocpu, type = "POCPu"),
+             format = "qs"),
   tar_target(fig_blast_vs_all_pocp,
                     blast_vs_all_pocp %>% arrange(desc(pocp)) %>% 
                       plot_pocp_vs_blast("POCP"),
