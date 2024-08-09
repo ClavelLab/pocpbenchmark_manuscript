@@ -384,6 +384,10 @@ A more sustainable alternative would be DIAMOND_VERYSENSITIVE that performs 10 t
 More importantly, DIAMOND_VERYSENSITIVE POCPu provides extremely similar results to the legacy approach BLAST_BLASTP (@fig-blast-vs-all-pocpu and @tbl-R2) and is essentially identical to DIAMOND_ULTRASENSITIVE POCPu $R^2$ up to 5 digits (@tbl-R2).
 Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternative to BLAST_BLASTP for POCP/POCPu computations.
 
+## Genus delineation with POCP and POCPu
+
+We set out to evaluate whether the POCP (or POCPu) with a threshold of 50% is a useful in delineating bacterial genus.
+
 # References
 
 ::: {#refs}

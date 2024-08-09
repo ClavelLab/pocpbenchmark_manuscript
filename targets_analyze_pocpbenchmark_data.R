@@ -47,7 +47,7 @@ list(
                mutate(
                  label = glue::glue(
                    "{type} (n = {n})",
-                   type = if_else(same_genus_truth, "Intra-genera","Inter-genera"),
+                   type = if_else(same_genus_truth, "Within genus","Between genera"),
                    n = prettyNum(n, big.mark =" ")
                  )
                ) %>% select(-n) %>% deframe(),
@@ -58,7 +58,7 @@ list(
                mutate(
                  label = glue::glue(
                    "{type} (n = {n})",
-                   type = if_else(same_genus_truth, "Intra-genera","Inter-genera"),
+                   type = if_else(same_genus_truth, "Within genus","Between genera"),
                    n = prettyNum(n, big.mark =" ")
                  )
                ) %>% select(-n) %>% deframe(),
