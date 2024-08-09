@@ -4,7 +4,7 @@ library(tarchetypes)
 tar_option_set(
   packages = c("tidyverse", "lubridate", "arrow","ggdensity",
                "ggplot2", "cowplot", "ggokabeito", "treeio", "ggtree",
-               "jsonlite", "broom"),
+               "jsonlite", "broom", "magrittr", "gt"),
   
 )
 
@@ -88,6 +88,12 @@ list(
              pivot_pocp(pocp_values,family_metadata, type = "POCPu"),
              format = "parquet"
   ),
+  tar_target(blast_vs_all_pocp_R2, get_lm_R2(blast_vs_all_pocp, type = "POCP"),
+             format = "qs"),
+  tar_target(blast_vs_all_pocpu_R2, get_lm_R2(blast_vs_all_pocpu, type = "POCPu"),
+             format = "qs"),
+  tar_target(R2_table, format_R2_table(blast_vs_all_pocp_R2,blast_vs_all_pocpu_R2),
+             format = "qs"),
   tar_target(fig_blast_vs_all_pocp,
                     blast_vs_all_pocp %>% arrange(desc(pocp)) %>% 
                       plot_pocp_vs_blast("POCP"),
@@ -123,5 +129,18 @@ list(
   tar_target(fig_phyla_count, plot_phyla_count(tree_metadata), format = "qs"),
   tar_target(lpsn_stats_file, "lpsn30.json", format = "file"),
   tar_target(lpsn_stats, parse_lpsn_stats(lpsn_stats_file), format = "qs"),
-  tar_target(fig_lpsn_stats, plot_lpsn_stats(lpsn_stats), format = "qs")
+  tar_target(fig_lpsn_stats, plot_lpsn_stats(lpsn_stats), format = "qs"),
+  tar_file(computing_metrics_parquet, "pocpbenchmark_computing_metrics.parquet"),
+  tar_target(computing_metrics, read_parquet(computing_metrics_parquet), format = "parquet"),
+  tar_target(computing_metrics_fullbenchmark,
+             computing_metrics %>% left_join(
+               select(family_metadata, Family, benchmark_type), by = "Family"
+             ) %>% filter(benchmark_type == "full") %>% select(-benchmark_type),
+             format = "parquet"),
+  tar_target(db_parsed, get_db_parsed_stats(computing_metrics_fullbenchmark), format = "qs"),
+  tar_target(tool_parsed, get_tool_parsed_stats(computing_metrics_fullbenchmark), format = "qs"),
+  tar_target(median_db, generate_table_db(db_parsed), format = "qs"),
+  tar_target(median_tool, generate_table_tool(tool_parsed), format = "qs"),
+  tar_target(db_table, format_db_table(median_db), format = "qs"),
+  tar_target(tool_table, format_tool_table(median_tool), format = "qs")
 )

@@ -121,7 +121,6 @@ DIAMOND and MMseqs2 were both used with four different sensitivity thresholds @t
 
 ```{r tbl-tools-parameters}
 #| tbl-cap: "List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold."
-#| tbl-cap-location: bottom
 tibble::tribble(
   ~Name, ~Parameters,
   "BLASTP","--evalue 0.00001 --qcov_hsp_perc 50.0",
@@ -310,6 +309,50 @@ Otherwise, the same patterns observed for POCP hold for POCPu, though with highe
 The 3 different sensitive approaches of DIAMOND produce POCPu values that match perfectly the ones produce by the legacy approach BLASTP.
 However, the MMSEQS2 approaches, whilst better with POCPu than POCP, still tend to underestimate POCPu values.
 For all tools, two clusters of yellow points are visible. They indicate regions where at least 50% of the data points are located, with the first and second regions being below and above 50% on the x-axis BLASTP POCPu, respectively. 
+
+::: {#tbl-tools-metrics}
+
+```{r tools-metrics}
+tar_read(tool_table) %>% filter(tool!="BLAST_BLASTP") %>%
+  select(-n) %>%
+  rename("Approach name" = "tool",
+         "Time"="time_fold", "Memory"="memory_fold",
+         "CPU"="cpu_fold", "Disk usage (I/O)"="io_fold") %>% 
+  knitr::kable(digits = 3)
+```
+
+Fold change of computing metrics for the 9 approaches used in the benchmark compared to the BLAST_BLASTP approach.
+The metrics include processing time as real-time, memory usage, CPU usage and disk usage as input/output (I/O).
+A fold change below 1 means the metric is lower, whilst above 1 means it is higher, compared to the BLAST_BLASTP approach.
+The fold change values are median computed over ($n$ = `r tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")` number of processes tracked per approach.
+:::
+
+The BLAST_BLASTPDB approach is a strong contender for a BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-blastdb and @tbl-r2) in a fraction of the time (@tbl-tools-metrics).
+Still, DIAMOND-based sensitive approaches are way faster with excellent adequacy with BLAST_BLASTP approach, especially for POCPu (@tbl-R2).
+Whilst DIAMOND_ULTRASENSITIVE would have the highest $R^2$ value using POCPu (@tbl-R2), it has the highest memory consumption and disk usage of the tested approaches (@tbl-tools-metrics).
+A more sustainable alternative would be DIAMOND_VERYSENSITIVE that performs 10 times faster than BLAST_BLASTPDB, in less than $1/20^{th}$ of the time of BLAST_BLASTP, while still maintaining reasonable usage of the resources (@tbl-tools-metrics). More importantly, DIAMOND_VERYSENSITIVE POCPu provides extremely similar results to the legacy approach BLAST_BLASTP (@fig-blast-vs-all-pocpu and @tbl-R2) and is essentially identical to DIAMOND_ULTRASENSITIVE POCPu $R^2$ up to 5 digits (@tbl-R2).
+
+
+::: {#tbl-R2}
+
+```{r R2}
+#| classes: plain
+library(gt)
+tar_load(R2_table)
+R2_table %>% arrange(desc(POCPu_R2)) %>%
+    gt::gt(rowname_col = "tool") %>%
+    tab_stubhead("Approach name") %>% cols_align(align = "left", columns = "tool") %>%
+    tab_spanner("POCP", starts_with("POCP_")) %>%
+    tab_spanner("POCPu", starts_with("POCPu_")) %>% cols_hide(ends_with("_nobs")) %>%
+    cols_label(
+      POCP_R2 = md("$R^2$"),POCPu_R2 = md("$R^2$"),
+      POCP_p_label = md("$p$-value"),POCPu_p_label = md("$p$-value")
+    ) %>%
+  tab_options(column_labels.font.weight = "bold")
+```
+
+Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r unique(R2_table$POCP_nobs) %>% prettyNum(big.mark = " ")` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
+:::
 
 # References
 
