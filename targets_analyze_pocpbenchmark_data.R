@@ -96,12 +96,12 @@ list(
              format = "qs"),
   tar_target(fig_blast_vs_all_pocp,
                     blast_vs_all_pocp %>% arrange(desc(pocp)) %>% 
-                      plot_pocp_vs_blast("POCP"),
+                      plot_pocp_vs_blast("POCP", R2_table),
              format = "qs"
   ),
   tar_target(fig_blast_vs_all_pocpu,
                     blast_vs_all_pocpu %>% arrange(desc(pocp)) %>% 
-                      plot_pocp_vs_blast("POCPu"),
+                      plot_pocp_vs_blast("POCPu", R2_table),
              format = "qs"
   ),
   tar_target(fig_blast_vs_blastdb,
