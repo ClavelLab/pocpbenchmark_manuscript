@@ -355,7 +355,7 @@ Still, DIAMOND-based sensitive approaches are way faster with excellent adequacy
 Whilst DIAMOND_ULTRASENSITIVE would have the highest $R^2$ value using POCPu (@tbl-R2), it has the highest memory consumption and disk usage of the tested approaches (@tbl-tools-metrics).
 A more sustainable alternative would be DIAMOND_VERYSENSITIVE that performs 10 times faster than BLAST_BLASTPDB, in less than $1/20^{th}$ of the time of BLAST_BLASTP, while still maintaining reasonable usage of the resources (@tbl-tools-metrics).
 More importantly, DIAMOND_VERYSENSITIVE POCPu provides extremely similar results to the legacy approach BLAST_BLASTP (@fig-blast-vs-all-pocpu and @tbl-R2) and is essentially identical to DIAMOND_ULTRASENSITIVE POCPu $R^2$ up to 5 digits (@tbl-R2).
-Therefore, we consider the POCPu from DIAMOND_VERYSENSITIVE to be a valid and scalable alternative to BLAST_BLASTP.
+Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternative to BLAST_BLASTP for POCP/POCPu computations.
 
 # References
 
