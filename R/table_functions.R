@@ -95,19 +95,5 @@ format_R2_table <- function(pocp_table, pocpu_table){
   full_join(
     rename_R2_table(pocp_table),
     rename_R2_table(pocpu_table),
-    by = "tool") %>% 
-    gt::gt(rowname_col = "tool") %>%
-    tab_stubhead("Approach name") %>% cols_align(align = "left", columns = "tool") %>%
-    tab_spanner("POCP", starts_with("POCP_")) %>% 
-    tab_spanner("POCPu", starts_with("POCPu_")) %>% cols_hide(ends_with("_nobs")) %>% 
-    cols_label(
-      POCP_R2 = md("$R^2$"),POCPu_R2 = md("$R^2$"),
-      POCP_p_label = md("$p$-value"),POCPu_p_label = md("$p$-value")
-    ) %>%
-    tab_footnote(footnote = md(paste("Linear regressions with $n$ =",
-                                     unique(pocp_table$POCP_nobs) %>% prettyNum(big.mark = " "),"comparisons per approach.")),
-                 locations = cells_column_spanners("POCP")) %>%
-    tab_footnote(footnote = md(paste("Linear regressions with $n$ =",
-                                     unique(pocpu_table$POCPu_nobs) %>% prettyNum(big.mark = " "),"comparisons per approach.")),
-                 locations = cells_column_spanners("POCPu"))
+    by = "tool")
 }
