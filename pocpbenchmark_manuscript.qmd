@@ -43,6 +43,39 @@ library(cowplot)
 
 # Introduction
 
+## why is it important, why caring about it
+
+Genus name occurs before species name in the binomial nomenclature, therefore genera are our first contact with the bacterial entities we are studying.
+These names open the door to existing knowledge in the form of databases entries [@reimerBacDive2022Knowledge2022; @schochNCBITaxonomyComprehensive2020] and articles [@rosonovskiEuropePMC20232024], and can help us know more about their evolutionary histories and infer ecological roles. With far more bacterial genomes from isolates or metagenomes available than previously possible [@haftRefSeqProkaryoticGenome2024], we need to clearly and quickly identify when two bacterial entities belong to the same genus or different genera, a process termed genus delineation.
+
+Whilst the Average Nucleotide Identity [ANI, @jainHighThroughputANI2018] help delineate species almost unanimously [@parksCompleteDomaintospeciesTaxonomy2020], genus delineation lacks such consensus.
+Indeed, no single appropriate ANI threshold were found to separate prokaryotic genera [@qinProposedGenusBoundary2014], but later family-based thresholds delineate genera using ANI plus alignment fraction [@barcoGenusDefinitionBacteria2020].
+Protein sequences replaced nucleic sequences to emulate the ANI with the Average Aminoacid Identity [AAI, @konstantinidisGenomeBasedTaxonomyProkaryotes2005], but without explicit threshold for genus delineation [@rodriguez-rBypassingCultivationIdentify2014]. Tentative threshold were published later [@konstantinidisUncultivatedMicrobesNeed2017], but are seldom mentioned in AAI tools implementations [@dieckmannEDGAR3ComparativeGenomics2021; @kimIntroducingEzAAIPipeline2021; @medlarAAIprofilerFastProteomewide2018].
+An alternative genus delineation method was proposed with an interpretable metric: the Percentage of Conserved Proteins (POCP) [@qinProposedGenusBoundary2014].
+If two bacterial entities share more than half of their conserved proteins, i.e., POCP > 50%, they belong to the same genus.
+
+POCP serves as a line of evidence within a taxonomic inquiry in the automated description of novel bacterial taxa by Protologger [@hitch_automated_2021].
+However, the number of valid genus names has nearly doubled (@suppfig-lpsn) in the ten years since the original proposition of @qinProposedGenusBoundary2014 to delineate genera. This increase warrants for scalable methods as well as a timely reevaluation of POCP with an extended dataset.
+
+
+## what is missing, context studies
+
+POCP calculations require many-against-many proteins alignment tools, which are computationally demanding.
+Scientists could of course invest in more hardware to scale up these computations, but this short-term solution is not sustainable. 
+Few scientists or microbiology teams have access to "20 000 GPUs" even if that would significantly speed up many-against-many proteins alignments [@selvitopiExtremeScaleManyagainstManyProtein2022].
+
+@hernandez-salmeronProgressQuicklyFinding2020 compared proteins alignment tools to find faster alternatives that are as precise. Such tools are also used in POCP calculations, but this benchmark ranked tools to identify orthologs not to calculate POCP. Recently, @holzerPOCPnfAutomaticNextflow2024 suggested to use DIAMOND with ultra-sensitive settings to compute POCP faster than with BLASTP. His approach is based on previously available script [@holzerHoelzerPocp2020], now transformed into a useful nextflow workflow [@holzerPOCPnfAutomaticNextflow2024]. However, his comparisons are based on limited set of 5 genera, each ranging from 15 to 167 genomes. 
+@riescoUpdateProposedMinimal2024 evaluated much more genomes -- 1 573 type strains -- but calculated POCP -- using Bio-Py [@linSilentGeneBiopyBiopy2021] -- only to be compared with AAI.
+However, the tools in these studies implicitly assume conserved proteins have unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021]. This discrepancy probably stems from a subjective and personal interpretation of the original implementation [@qinProposedGenusBoundary2014].
+We need a clear definition of POCP to prevent bioinformatics tools with unclear implementation to proliferate, which impedes results repeatability.
+
+## what is the value we bring? What gaps are we filling
+
+First, we aim to identify a scalable alternative to BLASTP to compute POCP. Whilst fast and scalable, this alternative should not compromise the accuracy of the legacy approach.
+Second, we hypothesize that POCP provides an interpretable and already used metric that can delineate bacterial genera in most cases.
+Therefore, we will test our hypothesis and evaluate how well POCP can delineate correctly bacterial genera using the identified alternative.
+Eventually, we hope to provide modern microbiologists with a best-practice tool they can confidently use in their workflow to assess whether their isolates belong to a novel genus.
+
 ::: {#suppfig-lpsn}
 
 ```{r suppfiglpsn}
@@ -55,7 +88,6 @@ tar_read(fig_lpsn_stats)
 Cumulative number of validly published genera names according to the International Code of Nomenclature of Prokaryotes (ICNP). The year 2014 is highlighted as it corresponds to the year of publication of the paper by Qin et al. (doi: 10.1128/JB.01688-14) describing the Percentage of Conserved Proteins (POCP) to delineate genus. The number of valid genera is highlighted ten years later. The data was accessed on 2024-07-19 at the List of Prokaryotic names with Standing in Nomenclature.
 :::
 
-Ten years after the original proposition of @qinProposedGenusBoundary2014 to delineate genera, the number of valid genus names has almost doubled (@suppfig-lpsn).
 
 
 # Methods
