@@ -350,7 +350,7 @@ A fold change below 1 means the metric is lower, whilst above 1 means it is high
 The fold change values are median computed over ($n$ = `r tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")` number of processes tracked per approach.
 :::
 
-The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-blastdb and @tbl-r2) in a fraction of the time (@tbl-tools-metrics).
+The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-blastdb and @tbl-R2) in a fraction of the time (@tbl-tools-metrics).
 Still, DIAMOND-based sensitive approaches are way faster with excellent adequacy with BLAST_BLASTP approach, especially for POCPu (@tbl-R2).
 Whilst DIAMOND_ULTRASENSITIVE would have the highest $R^2$ value using POCPu (@tbl-R2), it has the highest memory consumption and disk usage of the tested approaches (@tbl-tools-metrics).
 A more sustainable alternative would be DIAMOND_VERYSENSITIVE that performs 10 times faster than BLAST_BLASTPDB, in less than $1/20^{th}$ of the time of BLAST_BLASTP, while still maintaining reasonable usage of the resources (@tbl-tools-metrics).
