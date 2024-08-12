@@ -111,13 +111,13 @@ Note that the assumption regarding unique matches is made implicitly when using 
 Many-versus-many proteins sequences comparisons are required to assess the number of conserved proteins.
 While @qinProposedGenusBoundary2014 provided limited guidance on how to implement the computation of POCP, it is assumed that the BLASTP algorithm is the standard.
 It is the approach implemented in Protologger [@hitch_automated_2021].
-We first use the BLASTP approach v2.14.0+ [@camachoBLASTArchitectureApplications2009] using the parameters fitting @qinProposedGenusBoundary2014 procedure @tbl-tools-parameters.
-We also considered a slightly altered BLASTP approach, named BLASTPDB where BLAST databases are first built for the two genomes considered @tbl-tools-parameters.
+We first use the BLASTP approach v2.14.0+ [@camachoBLASTArchitectureApplications2009] using the parameters fitting @qinProposedGenusBoundary2014 procedure (@tbl-tools-parameters).
+We also considered a slightly altered BLASTP approach, named BLASTPDB where BLAST databases are first built for the two genomes considered (@tbl-tools-parameters).
 This allow parallel alignments on multiple CPU, which is not possible with BLASTP.
 We then included two tools that are usually used as faster BLASTP alternatives: DIAMOND v2.1.6 [@buchfinkSensitiveProteinAlignments2021] and MMseqs2 v15.6f452 [@steineggerMMseqs2EnablesSensitive2017].
 The former is being used in @holzerPOCPnfAutomaticNextflow2024 while the latter is used in EzAAI [@kimIntroducingEzAAIPipeline2021].
-Similarly to BLASTPDB, these approaches require that a protein database is built for each genome before performing the alignment @tbl-tools-parameters.
-DIAMOND and MMseqs2 were both used with four different sensitivity thresholds @tbl-tools-parameters on a recent comparisons [@buchfinkSensitiveProteinAlignments2021].
+Similarly to BLASTPDB, these approaches require that a protein database is built for each genome before performing the alignment (@tbl-tools-parameters).
+DIAMOND and MMseqs2 were both used with four different sensitivity thresholds (@tbl-tools-parameters) on a recent comparisons [@buchfinkSensitiveProteinAlignments2021].
 
 ```{r tbl-tools-parameters}
 #| tbl-cap: "List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold."
@@ -149,7 +149,7 @@ The total number of proteins per genomes ($T_Q$ and $T_S$ in @eq-pocp and @eq-po
 
 Linear regressions were used in `r R.version.string` to fit the expected POCP (or POCPu) values obtained via the legacy BLASTP approach against the others approaches considered.
 The coefficient of determination R^2^ of the linear regression is used as an interpretable and bounded goodness-of-fit measure between the expected and measured values instead of others errors measurement [@chiccoCoefficientDeterminationRsquared2021].
-We did not rely on the adjusted coefficient of determination as the linear regressions had only one predictor.
+We did not rely on the adjusted coefficient of determination as the linear regressions had only one predictor, namely the POCP (or POCPu) values of the evaluated approach.
 
 
 ## Metrics to evaluate genus delineation
