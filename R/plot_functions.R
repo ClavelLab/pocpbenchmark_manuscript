@@ -19,7 +19,7 @@ plot_pocp_vs_blast <- function(df, pocp_label, R2_table){
     scale_y_continuous(limits = extremes)+
     scale_x_continuous(limits = extremes)+
     facet_wrap(~ tool, nrow = 2) +
-    labs(x = paste0(pocp_label, " based on BLASTP (in %)"),
+    labs(x = paste0(pocp_label, " based on BLAST_BLASTP (in %)"),
          y = paste0(pocp_label, " based on other tools (in %)"),
          color = "Highest density\nregions probability")+
     theme_cowplot(font_size = 12)+
@@ -59,8 +59,8 @@ plot_pocp_blastdb <- function(df, pocp_label, with_R2=TRUE){
     coord_fixed()+
     scale_y_continuous(limits = extremes)+
     scale_x_continuous(limits = extremes)+
-    labs(x = paste0(pocp_label, " based on BLASTP (in %)"),
-         y = paste0(pocp_label, " based on BLASTP database (in %)"),
+    labs(x = paste0(pocp_label, " based on BLAST_BLASTP (in %)"),
+         y = paste0(pocp_label, " based on BLAST_BLASTPDB (in %)"),
          color = "Highest density\nregions probability")+
     theme_cowplot(font_size = 12)+
     theme(legend.position = "bottom", strip.text.x = element_text(size = 8))
