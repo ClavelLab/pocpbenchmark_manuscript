@@ -195,7 +195,7 @@ We use the Sensitivity (${TP}/{TP+FN}$), Specificity (${TN}/{TN+FP}$), and the F
 ## Workflow implementation
 
 Automatic protein sequences download, data preprocessing, many-versus-many protein alignments, as well as POCP computation and delineation metrics calculations were run using the workflow tool nextflow v23.10.0 [@ditommasoNextflowEnablesReproducible2017], as well as components of nf-core [@ewelsNfcoreFrameworkCommunitycurated2020].
-On top of a workflow manager, tools used in the benchmark are shipped within Docker container [@merkelDockerLightweightLinux2014]  or bioconda [@thebiocondateamBiocondaSustainableComprehensive2018a] environments to ensure reproducibility, scalability and ease future extensions of the benchmark.
+On top of a workflow manager, tools used in the benchmark are shipped within Docker container [@merkelDockerLightweightLinux2014]  or bioconda [@thebiocondateamBiocondaSustainableComprehensive2018] environments to ensure reproducibility, scalability and ease future extensions of the benchmark.
 
 Nextflow natively keep track of the time, CPU, memory and disk usage of each process in an execution trace log file that we used to evaluate computing resources utilization. Process duration is available as walltime and realtime, the CPU usage is reported as a percentage of usage of a unique CPU, meaning multi-threaded processes will have a value higher than 100%.
 
