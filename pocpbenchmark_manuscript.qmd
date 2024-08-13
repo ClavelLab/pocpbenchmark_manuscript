@@ -43,8 +43,6 @@ library(cowplot)
 
 # Introduction
 
-## why is it important, why caring about it
-
 Genus name occurs before species name in the binomial nomenclature, therefore genera are our first contact with the bacterial entities we are studying.
 These names open the door to existing knowledge in the form of databases entries [@reimerBacDive2022Knowledge2022; @schochNCBITaxonomyComprehensive2020] and articles [@rosonovskiEuropePMC20232024], and can help us know more about their evolutionary histories and infer ecological roles. With far more bacterial genomes from isolates or metagenomes available than previously possible [@haftRefSeqProkaryoticGenome2024], we need to clearly and quickly identify when two bacterial entities belong to the same genus or different genera, a process termed genus delineation.
 
@@ -58,8 +56,6 @@ POCP serves as a line of evidence within a taxonomic inquiry in the automated de
 However, the number of valid genus names has nearly doubled (@suppfig-lpsn) in the ten years since the original proposition of @qinProposedGenusBoundary2014 to delineate genera. This increase warrants for scalable methods as well as a timely reevaluation of POCP with an extended dataset.
 
 
-## what is missing, context studies
-
 POCP calculations require many-against-many proteins alignment tools, which are computationally demanding.
 Scientists could of course invest in more hardware to scale up these computations, but this short-term solution is not sustainable. 
 Few scientists or microbiology teams have access to "20 000 GPUs" even if that would significantly speed up many-against-many proteins alignments [@selvitopiExtremeScaleManyagainstManyProtein2022].
@@ -69,7 +65,6 @@ Few scientists or microbiology teams have access to "20 000 GPUs" even if that w
 However, the tools in these studies implicitly assume conserved proteins have unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021]. This discrepancy probably stems from a subjective and personal interpretation of the original implementation [@qinProposedGenusBoundary2014].
 We need a clear definition of POCP to prevent bioinformatics tools with unclear implementation to proliferate, which impedes results repeatability.
 
-## what is the value we bring? What gaps are we filling
 
 First, we aim to identify a scalable alternative to BLASTP to compute POCP. Whilst fast and scalable, this alternative should not compromise the accuracy of the legacy approach.
 Second, we hypothesize that POCP provides an interpretable and already used metric that can delineate bacterial genera in most cases.
