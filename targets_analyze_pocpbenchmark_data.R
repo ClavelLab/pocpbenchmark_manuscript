@@ -145,5 +145,7 @@ list(
   tar_target(median_db, generate_table_db(db_parsed), format = "qs"),
   tar_target(median_tool, generate_table_tool(tool_parsed), format = "qs"),
   tar_target(db_table, format_db_table(median_db), format = "qs"),
-  tar_target(tool_table, format_tool_table(median_tool), format = "qs")
+  tar_target(tool_table, format_tool_table(median_tool), format = "qs"),
+  tar_target(p_pocp, plot_pocp_density(all_pocpu), format = "qs"),
+  tar_target(p_pocpu, plot_pocpu_density(all_pocpu), format = "qs")
 )

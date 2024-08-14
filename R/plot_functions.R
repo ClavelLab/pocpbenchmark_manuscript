@@ -154,3 +154,39 @@ plot_lpsn_stats <- function(lpsn_stats){
     )+
     scale_y_continuous(expand = expansion(add = c(0,800)))
 }
+
+plot_pocp_density <- function(df){
+  df %>% 
+    ggplot(aes(x = pocp, fill = same_genus_truth))+
+    geom_density(alpha = 0.5)+
+    theme_cowplot(rel_small = 10/14)+
+    scale_fill_okabe_ito(labels = c("TRUE"="Within genus","FALSE"="Between genera"))+
+    geom_vline(xintercept = 50, linetype="dashed")+
+    labs(x="POCP", fill = "True category", y = "Density")+
+    scale_y_continuous(expand = expansion(mult  = c(0,0.6)))+
+    scale_x_continuous(expand = expansion(add = c(25,0)))+
+    annotate("segment", x = 55, xend = 70, y=0.029, yend = 0.029,
+             color="black", arrow=arrow(type= "closed", length = unit(0.05, "in"))
+    )+
+    annotate("text",x = 55, y=0.029, hjust=0, vjust=-0.85,
+             label="Same\ngenus")+
+    annotate("segment", x = 45, xend = 30, y=0.029, yend = 0.029,
+             color="black", arrow=arrow(type= "closed", length = unit(0.05, "in"))
+    )+
+    annotate("text",x = 45, y=0.029, hjust=1, vjust=-0.85,
+             label="Different\ngenera")
+}
+
+plot_pocpu_density <- function(df){
+  df %>% 
+    ggplot(aes(x = pocp, fill = same_genus_truth))+
+    geom_density(alpha = 0.5)+
+    theme_cowplot(rel_small = 10/14)+
+    scale_fill_okabe_ito(labels = c("TRUE"="Within genus","FALSE"="Between genera"))+
+    geom_vline(xintercept = 50, linetype="dashed")+
+    theme(legend.position = "right")+
+    labs(x="POCPu", fill = "True category",y = "Density")+
+    theme(legend.position = "bottom", legend.title.position = "left",
+          legend.direction = "vertical")+
+    scale_y_continuous(expand = expansion(mult = c(0,0.01)))
+}
