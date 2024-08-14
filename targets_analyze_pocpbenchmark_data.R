@@ -73,8 +73,8 @@ list(
                left_join(select(genome_metadata, Phylum,Family) %>% unique(),
                          by ="Family") %>% select(Family,label, Phylum)
   ),
-  tar_target(mcc_pocpu, get_mcc(all_pocpu), format = "qs"),
-  tar_target(mcc_pocpu_mean, get_mcc_mean(mcc_pocpu), format = "qs"),
+  tar_target(mcc_pocpu_family, get_mcc(all_pocpu, per_family = TRUE), format = "qs"),
+  tar_target(mcc_pocpu_global, get_mcc(all_pocpu, per_family = FALSE), format = "qs"),
   tar_target(pocpu_ridges, 
              all_pocpu %>% 
                filter(same_genus_truth) %>%

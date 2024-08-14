@@ -77,22 +77,13 @@ parse_lpsn_stats <- function(lpsn_json){
 }
 
 # Get Matthews Correlation Coefficient for classification and random classification
-get_mcc <- function(all_pocpu){
+get_mcc <- function(all_pocpu, per_family = TRUE){
   all_pocpu %>% 
   select(type, tool, starts_with("same_"), Family) %>% 
     mutate(across(starts_with("same_"), ~forcats::as_factor(.x))) %>%
-    group_by(Family) %>% 
-    summarise(
+    {if(per_family) group_by(., Family) else . } %>%
+    summarise(.,
       mcc = mcc_vec(truth = same_genus_truth, estimate = same_genus),
       mcc_random = mcc_vec(truth = same_genus_truth, estimate = same_genus_random)
-    ) %>% 
-    pivot_longer(cols = c(mcc, mcc_random))
-}
-
-get_mcc_mean <- function(mcc_df){
-  mcc_df %>% group_by(name) %>%
-    summarise(mean = mean(value),
-              SE = sd(value)) %>%
-    mutate(meanpos = mean + 1 *SE,
-           meanneg = mean - 1 *SE)
+    )
 }
