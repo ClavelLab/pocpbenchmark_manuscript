@@ -55,6 +55,7 @@ library(ggplot2)
 library(cowplot)
 library(ggokabeito)
 library(magrittr)
+library(stringr)
 ```
 
 
@@ -84,8 +85,7 @@ p_pocpu <- targets::tar_read(all_pocpu) %>%
   ggplot(aes(x = pocp, fill = same_genus_truth))+
   geom_density(alpha = 0.5)+
   theme_cowplot(rel_small = 10/14)+
-  scale_fill_okabe_ito(labels = targets::tar_read(pocpu_group_sizes))+
-  geom_vline(xintercept = 50, linetype="dashed")+
+scale_fill_okabe_ito(labels = c("TRUE"="Within genus","FALSE"="Between genera"))+  geom_vline(xintercept = 50, linetype="dashed")+
   theme(legend.position = "right")+
   labs(x="POCPu", fill = "True category",y = "Density")+
     theme(legend.position = "bottom", legend.title.position = "left",
@@ -123,16 +123,42 @@ plot_grid(p_global, p_ridges, ncol = 2, axis="b",labels = c("","C"),
           rel_widths =  c(0.4, 0.6))
 ```
 
-```{r}
-targets::tar_read(pocpu_ridges) %>% 
-  ggplot(aes(x = pocp,y = Family, fill = Phylum))+
-  geom_density_ridges(alpha=0.5, stat = "density", aes(height = after_stat(density)),rel_min_height=0.005)+
-  geom_vline(xintercept = 50, linetype="dashed")+
-  theme_cowplot(rel_small = 10/14)+
-  labs(x="Within genus POCPu",
-       fill = "",y = "Bacterial families")+
-  scale_y_discrete(expand = expansion(add = c(0,1)),labels = parse(text = levels(targets::tar_read(pocpu_ridges)$Family)))+
-  scale_fill_brewer(palette = "Set1")+facet_wrap(~Phylum, scales = "free_y", ncol=1)
+## Alternate figure
+
+```{r figalt, echo=FALSE}
+targets::tar_load(mcc_pocpu)
+targets::tar_load(mcc_pocpu_mean)
+mcc_df <- filter(mcc_pocpu,name == "mcc")
+
+mcc_pocpu <- mcc_df %>% left_join(targets::tar_read(family_label), by = "Family") %>% 
+  mutate(label = as_factor(label),
+         label = fct_reorder(label,value, .fun = max))
+
+mcc_random_df <- filter(mcc_pocpu,name == "mcc_random")
+p<-ggplot(mcc_pocpu) +
+    # geom_segment(data = mcc_random_df,
+    #            aes(x = value, y = label,
+    #                xend = mcc_df$value, yend = mcc_df$label),
+    #            color = "#999999", linewidth = 1)+
+  geom_segment(aes(x=value,xend = 0,y=label,yend=label),color = "#999999")+
+  geom_point(aes(x = value,y=label,color = name))+
+  scale_color_manual(values = c("mcc" = "#E69F00", "mcc_random"= "#999999"))+
+  scale_y_discrete(labels = function(x) as.character(x) %>% parse(text = .))+
+  geom_vline(data = filter(mcc_pocpu_mean, name == "mcc"), aes(xintercept = mean), linetype="dashed")+
+  geom_text(aes(x=value,y=label, label = prettyNum(value,digits = 2)),
+            hjust=-0.3,size=3)+
+  theme_cowplot(font_size = 12,rel_small = 10/14)+
+  theme(legend.position = "none")+
+  labs(x = "Matthews Correlation Coefficient", y ="Bacterial families" )+
+  facet_grid(rows = vars(Phylum), scales = "free_y", space = "free",switch = "y",
+             labeller = as_labeller(function(x) str_remove(x,"p__")))+
+  scale_x_continuous(expand = expansion(mult =  c(0,0.1)), limits = c(0,1))
 ```
+
+```{r}
+plot_grid(p_global, p, ncol = 2, axis="b",labels = c("","C"),
+          rel_widths =  c(0.4, 0.6))
+```
+
 
 ## References
