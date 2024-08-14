@@ -146,6 +146,9 @@ list(
   tar_target(median_tool, generate_table_tool(tool_parsed), format = "qs"),
   tar_target(db_table, format_db_table(median_db), format = "qs"),
   tar_target(tool_table, format_tool_table(median_tool), format = "qs"),
-  tar_target(p_pocp, plot_pocp_density(all_pocpu), format = "qs"),
-  tar_target(p_pocpu, plot_pocpu_density(all_pocpu), format = "qs")
+  tar_target(p_pocp, plot_pocp_density(all_pocp), format = "qs"),
+  tar_target(p_pocpu, plot_pocpu_density(all_pocpu), format = "qs"),
+  tar_target(p_mcc, plot_mcc(mcc_pocpu_family, family_label, mcc_pocpu_global), format = "qs"),
+  tar_target(p_mcc_random, plot_mcc_random(mcc_pocpu_family, family_label, mcc_pocpu_global), format = "qs"),
+  tar_target(p_genus_delineation, plot_genus_delineation(p_pocp,p_pocpu, p_mcc), format = "qs")
 )

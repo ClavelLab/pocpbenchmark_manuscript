@@ -392,13 +392,10 @@ We set out to evaluate whether the POCP (or POCPu) with a threshold of 50% is a 
 ::: {#fig-genus-delineation}
 
 ```{r genus-delineation}
+#| fig-width: 11
+#| fig-height: 6
 #| fig-dpi: 300
-p_densities <- plot_grid(
-  targets::tar_read(p_pocp)+theme(legend.position = "none"),
-  targets::tar_read(p_pocpu),
-  nrow = 2,
-  labels = c("A","B")
-)
+targets::tar_read(p_genus_delineation)
 ```
 
 :::
