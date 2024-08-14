@@ -4,7 +4,7 @@ library(tarchetypes)
 tar_option_set(
   packages = c("tidyverse", "lubridate", "arrow","ggdensity",
                "ggplot2", "cowplot", "ggokabeito", "treeio", "ggtree",
-               "jsonlite", "broom", "magrittr", "gt"),
+               "jsonlite", "broom", "magrittr", "gt", "yardstick"),
   
 )
 
@@ -71,6 +71,8 @@ list(
                                   n_genomes = prettyNum(n_genomes, big.mark= " "))
              ) %>% select(Family,label)
   ),
+  tar_target(mcc_pocpu, get_mcc(all_pocpu), format = "qs"),
+  tar_target(mcc_pocpu_mean, get_mcc_mean(mcc_pocpu), format = "qs"),
   tar_target(pocpu_ridges, 
              all_pocpu %>% 
                filter(same_genus_truth) %>%
