@@ -186,7 +186,9 @@ plot_pocpu_density <- function(df){
     geom_vline(xintercept = 50, linetype="dashed")+
     theme(legend.position = "right")+
     labs(x="POCPu", fill = "True category",y = "Density")+
-    theme(legend.position = "bottom", legend.location = "plot")+
+    theme(legend.position = "bottom",
+          legend.title = element_text(size = 9, 
+                                      margin = margin(r = 0.5, unit = "cm")))+
     scale_y_continuous(expand = expansion(mult = c(0,0.01)))
 }
 
