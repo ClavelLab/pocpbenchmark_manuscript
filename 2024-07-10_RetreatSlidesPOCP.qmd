@@ -63,9 +63,9 @@ p_pocp <- targets::tar_read(all_pocp) %>%
   ggplot(aes(x = pocp, fill = same_genus_truth))+
   geom_density(alpha = 0.5)+
   theme_cowplot(rel_small = 10/14)+
-  scale_fill_okabe_ito(labels = targets::tar_read(pocp_group_sizes))+
+  scale_fill_okabe_ito(labels = c("TRUE"="Within genus","FALSE"="Between genera"))+
   geom_vline(xintercept = 50, linetype="dashed")+
-  labs(x="POCP", fill = "Gold\nstandard", y = "Density")+
+  labs(x="POCP", fill = "True category", y = "Density")+
   scale_y_continuous(expand = expansion(mult  = c(0,0.6)))+
   scale_x_continuous(expand = expansion(add = c(25,0)))+
   annotate("segment", x = 55, xend = 70, y=0.029, yend = 0.029,
@@ -109,17 +109,30 @@ library(ggridges)
 library(dplyr)
 library(forcats)
 p_ridges <- targets::tar_read(pocpu_ridges) %>% 
+  mutate(Phylum = str_remove(query_gtdb_taxonomy, "d__Bacteria;p__") %>% str_remove(";.*$")) %>% 
   ggplot(aes(x = pocp,y = Family))+
-  geom_density_ridges(alpha=0.5, fill =  "#56B4E9")+
+  geom_density_ridges(alpha=0.5, fill =  "#56B4E9", stat = "density", aes(height = after_stat(density), bw=1.2, trim = TRUE))+
   geom_vline(xintercept = 50, linetype="dashed")+
   theme_cowplot(rel_small = 10/14)+
   labs(x="Within genus POCPu",
        fill = "",y = "Bacterial families")+
-  scale_y_discrete(expand = expansion(add = c(0,1)))
+  scale_y_discrete(expand = expansion(add = c(0,1)),labels = parse(text = levels(targets::tar_read(pocpu_ridges)$Family)))+
+ coord_cartesian(xlim = c(0,100))
 
 plot_grid(p_global, p_ridges, ncol = 2, axis="b",labels = c("","C"),
           rel_widths =  c(0.4, 0.6))
 ```
 
+```{r}
+targets::tar_read(pocpu_ridges) %>% 
+  ggplot(aes(x = pocp,y = Family, fill = Phylum))+
+  geom_density_ridges(alpha=0.5, stat = "density", aes(height = after_stat(density)),rel_min_height=0.005)+
+  geom_vline(xintercept = 50, linetype="dashed")+
+  theme_cowplot(rel_small = 10/14)+
+  labs(x="Within genus POCPu",
+       fill = "",y = "Bacterial families")+
+  scale_y_discrete(expand = expansion(add = c(0,1)),labels = parse(text = levels(targets::tar_read(pocpu_ridges)$Family)))+
+  scale_fill_brewer(palette = "Set1")+facet_wrap(~Phylum, scales = "free_y", ncol=1)
+```
 
 ## References

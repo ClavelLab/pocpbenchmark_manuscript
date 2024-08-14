@@ -74,9 +74,8 @@ list(
   tar_target(pocpu_ridges, 
              all_pocpu %>% 
                filter(same_genus_truth) %>%
-               left_join(family_label, by ="Family") %>%
-               select(-Family) %>% rename("Family"="label") %>% 
-               mutate(Family = as_factor(Family),
+               left_join(genome_metadata %>% select(Phylum,Family) %>% unique(), by ="Family") %>%
+               mutate(Family = glue::glue("italic(\"{Family}\")") %>% as_factor(),
                       Family = fct_reorder(Family, pocp))
   ),
   tar_quarto(slides_retreat, "2024-07-10_RetreatSlidesPOCP.qmd"),
