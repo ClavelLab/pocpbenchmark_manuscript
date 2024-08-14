@@ -66,10 +66,12 @@ list(
   ),
   tar_target(family_label, 
              family_metadata %>% mutate(
-               label = glue::glue("{fam} (n = {n_genomes})",
+               label = glue::glue("italic(\"{fam}\")~(n == {n_genomes})",
                                   fam=stringr::str_remove(Family,"f__"), 
                                   n_genomes = prettyNum(n_genomes, big.mark= " "))
-             ) %>% select(Family,label)
+             ) %>%
+               left_join(select(genome_metadata, Phylum,Family) %>% unique(),
+                         by ="Family") %>% select(Family,label, Phylum)
   ),
   tar_target(mcc_pocpu, get_mcc(all_pocpu), format = "qs"),
   tar_target(mcc_pocpu_mean, get_mcc_mean(mcc_pocpu), format = "qs"),
