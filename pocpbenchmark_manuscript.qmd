@@ -408,6 +408,10 @@ Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternat
 
 ## Genus delineation with POCP and POCPu
 
+```{r confusion_matrix}
+targets::tar_load(c(pocp_confusion,pocpu_confusion))
+```
+
 Then, we put to the test the 50%-threshold of POCP and POCPu, and evaluate how useful these metrics are to delineate bacterial genera.
 
 ::: {#fig-genus-delineation}
