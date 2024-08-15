@@ -413,6 +413,18 @@ targets::tar_load(c(pocp_confusion,pocpu_confusion))
 ```
 
 Then, we put to the test the 50%-threshold of POCP and POCPu, and evaluate how useful these metrics are to delineate bacterial genera.
+We use all the `r n_genomes` genomes (@fig-tree-phyla) and calculate POCP and POCPu with the DIAMOND_VERYSENSITIVE approach (@fig-genus-delineation).
+Optimistically, we expected two bell-shaped distributions, with the "Between genera" POCPs neatly apart from the "Within genus" POCPs by a gap around 50%.
+
+The two distributions do overlap though (@fig-genus-delineation A).
+Indeed, POCP yields a high number of false positives (FP = `r pocp_confusion["FP"]`), where the "Between genera" distribution is above 50%, especially compared to the number of true negatives (TN = `r pocp_confusion["TN"]`), where the "Between genera" distribution is below 50%.
+Thankfully, most of the "Within genus" distribution of POCP is above 50% (TP = `r pocp_confusion["TP"]`), with fewer below the threshold (FN = `r pocp_confusion["FN"]`).
+
+POCPu is closer to our expectations (@fig-genus-delineation B).
+"Between genera" POCPu follows a bimodal distribution, with the highest peak and most of the distribution below the 50% threshold (TN = `r pocpu_confusion["TN"]`).
+Still, this distribution spills above the threshold, indicating POCPu also produces false positives (FP = `r pocp_confusion["FP"]`).
+Like POCP, "Within genus" POCPu concentrate largely above the threshold of 50% (TP = `r pocpu_confusion["TP"]`), with fewer below the threshold (FN = `r pocpu_confusion["FN"]`).
+
 
 ::: {#fig-genus-delineation}
 
@@ -424,13 +436,13 @@ targets::tar_load(pocpu_group_sizes)
 targets::tar_read(p_genus_delineation)
 ```
 
-
 A data-driven evaluation of how well POCP and POCPu distinguish genera.
-Distribution of POCP (A) and POCPu (B) values for all pairwise genome comparisons: `r pocpu_group_sizes[1]` and `r pocpu_group_sizes[2]` based on GTDB taxonomy.
+Distribution of POCP (A) and POCPu (B) values for all pairwise genome comparisons: `r pocpu_group_sizes[1]` in orange and `r pocpu_group_sizes[2]` in sky blue, both based on GTDB taxonomy.
 Contrast these true categories with POCP/POCPu decisions: POCP > 50%, meaning right of the dashed line (A, B) indicates more than half of shared conserved proteins, and hence same genus.
 POCP and POCPu values are calculated with the recommended approach DIAMOND_VERYSENSITIVE (@tbl-tools-parameters).
 How well POCPu delineates genera is tested with the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020]. We show MCC values for each family where MCC of -1 and +1 indicates perfect misclassification and classification, respectively (C). Random genus delineation would give MCC = 0. The dashed line indicated the overall MCC when not splitting by family. We also highlight how many n genomes are included per family, and their phyla in the vertical facets (C).
 :::
+
 
 # References
 
