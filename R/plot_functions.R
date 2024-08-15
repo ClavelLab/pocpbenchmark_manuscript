@@ -202,7 +202,7 @@ plot_mcc <- function(mcc_df_per_family,family_label, mcc_df_global){
     geom_vline(data = mcc_df_global, aes(xintercept = mcc),
                linetype = "dashed")+
     geom_segment(aes(xend = 0, yend=label),color = "#999999")+
-    geom_point(color = "#E69F00")+
+    geom_point(color = "black")+
     scale_y_discrete(labels = function(x) as.character(x) %>% parse(text = .))+
     geom_text(aes(label = prettyNum(mcc, digits = 2)),
               hjust=-0.3, size=3)+
@@ -227,7 +227,7 @@ plot_mcc_random <- function(mcc_df_per_family,family_label, mcc_df_global){
     geom_vline(data = mcc_df_global, aes(xintercept = mcc_random),
                linetype = "dashed")+
     geom_segment(aes(xend = 0, yend=label),color = "#999999")+
-    geom_point(color = "#E69F00")+
+    geom_point(color = "black")+
     scale_y_discrete(labels = function(x) as.character(x) %>% parse(text = .))+
     geom_text(data = function(x) {x[x$mcc_random >= 0, ]},
               aes(label = prettyNum(mcc_random, digits = 2)),
