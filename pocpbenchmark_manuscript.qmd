@@ -14,14 +14,31 @@ authors:
     email: cpauvert@ukaachen.de
     affiliations:
       - ref: uka
+    roles:
+      - Conceptualization
+      - Formal analysis
+      - Investigation
+      - Software
+      - Visualization
+      - Writing - original draft
+      - Writing - review & editing
   - name: Thomas C.A. Hitch
     orcid: 0000-0003-2244-7412
     affiliations:
       - ref: uka
+    roles:
+      - Conceptualization
+      - Supervision
+      - Visualization
+      - Writing - review & editing
   - name: Thomas Clavel
     orcid: 0000-0002-7229-5595
     affiliations:
       - ref: uka
+    roles:
+      - Funding acquisition
+      - Resources
+      - Writing - review & editing
 license: "CC BY"
 bibliography: references.bib
 crossref:
