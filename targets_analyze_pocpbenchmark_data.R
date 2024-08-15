@@ -75,6 +75,7 @@ list(
   ),
   tar_target(mcc_pocpu_family, get_mcc(all_pocpu, per_family = TRUE), format = "qs"),
   tar_target(mcc_pocpu_global, get_mcc(all_pocpu, per_family = FALSE), format = "qs"),
+  tar_target(mcc_pocp_global, get_mcc(all_pocp, per_family = FALSE), format = "qs"),
   tar_target(pocpu_ridges, 
              all_pocpu %>% 
                filter(same_genus_truth) %>%

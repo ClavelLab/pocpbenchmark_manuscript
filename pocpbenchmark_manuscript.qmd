@@ -443,6 +443,18 @@ POCP and POCPu values are calculated with the recommended approach DIAMOND_VERYS
 How well POCPu delineates genera is tested with the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020]. We show MCC values for each family where MCC of -1 and +1 indicates perfect misclassification and classification, respectively (C). Random genus delineation would give MCC = 0. The dashed line indicated the overall MCC when not splitting by family. We also highlight how many n genomes are included per family, and their phyla in the vertical facets (C).
 :::
 
+```{r mcc}
+mcc_pocp <- targets::tar_read(mcc_pocp_global) %>%
+  pull(mcc) %>% prettyNum(digits = 2)
+mcc_pocpu <- targets::tar_read(mcc_pocpu_global) %>%
+  pull(mcc) %>% prettyNum(digits = 2)
+```
+
+We quantify our findings on the confusion matrix using the  Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020]
+MCC is a binary classification rate that gives a high score only when the classifier correctly predicts the majority of positive and negative cases.
+Therefore, POCPu (MCC = `r mcc_pocpu`) surpasses POCP (MCC = `r mcc_pocp`) to delineate bacterial genus.
+
+
 
 # References
 
