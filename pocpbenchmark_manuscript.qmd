@@ -395,6 +395,7 @@ We set out to evaluate whether the POCP (or POCPu) with a threshold of 50% is a 
 #| fig-width: 11
 #| fig-height: 6
 #| fig-dpi: 300
+targets::tar_load(pocpu_group_sizes)
 targets::tar_read(p_genus_delineation)
 ```
 
