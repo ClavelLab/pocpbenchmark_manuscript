@@ -408,8 +408,7 @@ Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternat
 
 ## Genus delineation with POCP and POCPu
 
-We set out to evaluate whether the POCP (or POCPu) with a threshold of 50% is a useful in delineating bacterial genus.
-
+Then, we put to the test the 50%-threshold of POCP and POCPu, and evaluate how useful these metrics are to delineate bacterial genera.
 
 ::: {#fig-genus-delineation}
 
@@ -426,7 +425,7 @@ A data-driven evaluation of how well POCP and POCPu distinguish genera.
 Distribution of POCP (A) and POCPu (B) values for all pairwise genome comparisons: `r pocpu_group_sizes[1]` and `r pocpu_group_sizes[2]` based on GTDB taxonomy.
 Contrast these true categories with POCP/POCPu decisions: POCP > 50%, meaning right of the dashed line (A, B) indicates more than half of shared conserved proteins, and hence same genus.
 POCP and POCPu values are calculated with the recommended approach DIAMOND_VERYSENSITIVE (@tbl-tools-parameters).
-How well POCPu delineates genera is tested with the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020]. We show MCC values for each family where MCC of -1 and +1 indicates perfect misclassification and classification, respectively (C). Random genus delineation would give MCC = 0. The dashed line indicated the overall MCC when not splitting by family. We also highlight how many genomes are included per family (n), and their phyla in the vertical facets (C).
+How well POCPu delineates genera is tested with the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020]. We show MCC values for each family where MCC of -1 and +1 indicates perfect misclassification and classification, respectively (C). Random genus delineation would give MCC = 0. The dashed line indicated the overall MCC when not splitting by family. We also highlight how many n genomes are included per family, and their phyla in the vertical facets (C).
 :::
 
 # References

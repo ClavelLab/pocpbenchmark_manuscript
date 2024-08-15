@@ -208,7 +208,7 @@ plot_mcc <- function(mcc_df_per_family,family_label, mcc_df_global){
               hjust=-0.3, size=3)+
     theme_cowplot(font_size = 12,rel_small = 10/14)+
     theme(legend.position = "none")+
-    labs(x = "Matthews Correlation Coefficient", y ="Bacterial families" )+
+    labs(x = "Matthews Correlation Coefficient (MCC)", y ="Bacterial families" )+
     facet_grid(rows = vars(Phylum), scales = "free_y", space = "free",switch = "y",
                labeller = as_labeller(function(x) str_remove(x,"p__")))+
     scale_x_continuous(expand = expansion(mult =  c(0,0.1)), limits = c(0,1))
