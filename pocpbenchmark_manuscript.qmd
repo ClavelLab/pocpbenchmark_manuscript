@@ -454,6 +454,13 @@ We quantify our findings on the confusion matrix using the  Matthews Correlation
 MCC is a binary classification rate that gives a high score only when the classifier correctly predicts the majority of positive and negative cases.
 Therefore, POCPu (MCC = `r mcc_pocpu`) surpasses POCP (MCC = `r mcc_pocp`) to delineate bacterial genus.
 
+But diving into the results, and separating the bacterial families indicate a different story.
+
+```{r}
+# mcc description
+tar_read(all_pocpu) %>% count(Family,class) %>% 
+filter(Family == "f__Lactobacillaceae") %>% arrange(desc(class)) %>% mutate(n = prettyNum(n,big.mark = " ")) %>% glue::glue_data("{class} = {n}") %>% glue::glue_collapse(sep = ", ", last = " and ")
+```
 
 
 # References
