@@ -150,5 +150,6 @@ list(
   tar_target(p_pocpu, plot_pocpu_density(all_pocpu), format = "qs"),
   tar_target(p_mcc, plot_mcc(mcc_pocpu_family, family_label, mcc_pocpu_global), format = "qs"),
   tar_target(p_mcc_random, plot_mcc_random(mcc_pocpu_family, family_label, mcc_pocpu_global), format = "qs"),
-  tar_target(p_genus_delineation, plot_genus_delineation(p_pocp,p_pocpu, p_mcc), format = "qs")
+  tar_target(p_genus_delineation, plot_genus_delineation(p_pocp,p_pocpu, p_mcc), format = "qs"),
+  tar_quarto(manuscript)
 )
