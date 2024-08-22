@@ -157,5 +157,11 @@ list(
   tar_target(pocpu_confusion, count(all_pocpu, class) %>% deframe() %>% prettyNum(big.mark =" "),
              format = "qs"),
   tar_target(pocpu_confusion_by_family, count(all_pocpu, Family, class), format = "qs"),
+  tar_target(lactobacillaceae,
+             get_family_confusion_matrix(pocpu_confusion_by_family, "f__Lactobacillaceae"),
+             format = "qs"),
+  tar_target(streptomycetaceae,
+             get_family_confusion_matrix(pocpu_confusion_by_family, "f__Streptomycetaceae"),
+             format = "qs"),
   tar_quarto(manuscript)
 )
