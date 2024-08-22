@@ -133,7 +133,7 @@ POCP = \dfrac{C_{QS} + C_{SQ}}{T_Q + T_S} \times 100\%
 $$ {#eq-pocp}
 
 where $C_{QS}$ represent the conserved number of proteins from $Q$ when aligned to $S$ and conversely $C_{SQ}$ represent the conserved number of proteins from $S$ when aligned to $Q$, and $T_Q + T_S$ represent the total number of proteins in the two genomes being compared, respectively [adapted from @qinProposedGenusBoundary2014].
-The range of POCP is theoretically $\left[0-100\%\right]$.
+The range of POCP is theoretically $\left[0;100\%\right]$.
 Conserved proteins are defined as protein sequences matches from the query with an e-value < $10^{−5}$, a sequence identity > 40%, and an aligned region > 50% of the query protein sequence length.
 
 
@@ -147,7 +147,7 @@ POCPu = \dfrac{C_{uQS} + C_{uSQ}}{T_Q + T_S} \times 100\%
 $$ {#eq-pocpu}
 
 where $C_{uQS}$ represent the conserved number of proteins from *the unique matches of* $Q$ when aligned to $S$ and conversely $C_{uSQ}$ represent the conserved number of proteins from *the unique matches of* $S$ when aligned to $Q$, and $T_Q + T_S$ represent the total number of proteins in the two genomes being compared, respectively.
-Thus the range of POCP is actually $\left[0-\infty\right[$ and the range of POCPu is $\left[0-100\%\right]$.
+Thus the range of POCP is actually $\left[0;\infty\right[$ and the range of POCPu is $\left[0;100\%\right]$.
 Note that the assumption regarding unique matches is made implicitly when using some POCP implementation [e.g., @holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024; @linSilentGeneBiopyBiopy2021].
 
 ## Approaches for proteins sequence alignment benchmark
