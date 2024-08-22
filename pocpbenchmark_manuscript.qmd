@@ -201,8 +201,13 @@ We did not rely on the adjusted coefficient of determination as the linear regre
 We computed classification metrics with a positive event defined as "both genomes belong to the same genus".
 Thus, for a pair of bacterial genomes with a POCP (or POCPu) > 50%, the pair is a True Positive ($TP$) if the pair belong to the same genus, or if not to False Positive ($FP$).
 Conversely, for a pair of bacterial genomes with a POCP (or POCPu) $\leq$ 50%, the pair is a False Negative ($FN$) if the pair belong to the same genus, or if not to True Negative ($TN$).
-We use the Sensitivity (${TP}/{TP+FN}$), Specificity (${TN}/{TN+FP}$), and the False-discovery rate (${FP}/{FP+TP}$) to assess the classification performance of both POCP and POCPu.
+We assess the classification performance of both POCP and POCPu with the Matthews Correlation Coefficient (MCC; @eq-mcc).
 
+$$
+MCC = \dfrac{TP \times TN - FP \times FN}{\sqrt{(TP + FP)(TP + FN)(TN + FP)(TN+FN)}}
+$$ {#eq-mcc}
+
+The coefficient has a range of $\left[-1;+1\right]$ and is only high in case of perfect classification, as a MCC of 0 indicates a random classification. Plus, the MCC compensates for unequal class sizes compared to others metrics such as accuracy or F1-score [@chiccoAdvantagesMatthewsCorrelation2020].
 
 ## Workflow implementation
 
