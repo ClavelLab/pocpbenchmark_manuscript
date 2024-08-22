@@ -2,7 +2,7 @@ library(targets)
 library(tarchetypes)
 
 tar_option_set(
-  packages = c("tidyverse", "lubridate","arrow"),
+  packages = c("tidyverse", "lubridate","arrow", "archive"),
   
 )
 
@@ -15,9 +15,13 @@ list(
   tar_files_input(prots, list.files(pattern = "benchmark-gtdb-f*"), format = "file"),
   tar_target(prot_stats, read_protein_stats(prots), pattern = map(prots),iteration = "vector"),
   tar_target(shortlist_path, "shortlisted_genomes.csv", format = "file"),
+  tar_target(gtdb_metadata_url, "https://data.gtdb.ecogenomic.org/releases/release214/214.0/bac120_metadata_r214.tar.gz",
+             format = "url"),
+  tar_target(gtdb_metadata, readr::read_tsv(archive_read(gtdb_metadata_url))),
   tar_target(genome_metadata,
              readr::read_csv(shortlist_path, show_col_types = FALSE) %>%
-               full_join(prot_stats, by = "accession")),
+               full_join(prot_stats, by = "accession") %>% 
+               left_join(gtdb_metadata %>% select(accession, genome_size), by = "accession")),
   # 1. Parquet file with Genome metadata
   tar_target(genome_metadata_parquet,
              tibble_to_parquet(genome_metadata, "pocpbenchmark_genome_metadata.parquet"),

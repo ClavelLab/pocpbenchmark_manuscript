@@ -177,6 +177,20 @@
       ],
       "Hash": "d2dcbd0459b23b43cc078e2676bd7b84"
     },
+    "archive": {
+      "Package": "archive",
+      "Version": "1.1.8",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "cli",
+        "glue",
+        "rlang",
+        "tibble"
+      ],
+      "Hash": "3b80f17eac5780126e09aa05d369a625"
+    },
     "arrow": {
       "Package": "arrow",
       "Version": "16.1.0",
