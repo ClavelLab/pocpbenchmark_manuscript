@@ -156,5 +156,6 @@ list(
              format = "qs"),
   tar_target(pocpu_confusion, count(all_pocpu, class) %>% deframe() %>% prettyNum(big.mark =" "),
              format = "qs"),
+  tar_target(pocpu_confusion_by_family, count(all_pocpu, Family, class), format = "qs"),
   tar_quarto(manuscript)
 )

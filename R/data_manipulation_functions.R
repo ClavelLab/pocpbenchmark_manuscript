@@ -87,3 +87,12 @@ get_mcc <- function(all_pocpu, per_family = TRUE){
       mcc_random = mcc_vec(truth = same_genus_truth, estimate = same_genus_random)
     )
 }
+
+# Helper function to format the count of the confusion matrix for a given Family
+get_family_confusion_matrix <- function(df, Family){
+  filter(df, Family == {{ Family }}) %>%
+    arrange(desc(class)) %>%
+    mutate(n = prettyNum(n,big.mark = " ")) %>%
+    glue::glue_data("{class} = {n}") %>%
+    glue::glue_collapse(sep = ", ", last = " and ")
+}
