@@ -264,6 +264,6 @@ plot_pocp_delta <- function(df, pocp_label, delta, delta_label){
     facet_wrap(~same_genus_truth,
                labeller = as_labeller( c("TRUE"="Within genus","FALSE"="Between genera")))+
     theme_cowplot()+
-    labs(x = {{pocp_label }},  y = {{ delta_label }},
+    labs(x = pocp_label ,  y = delta_label,
          color = "Highest density\nregions probability")
 }
