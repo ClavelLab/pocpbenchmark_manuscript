@@ -28,20 +28,24 @@ list(
              read_parquet(family_metadata_parquet), format = "parquet"),
   tar_target(total_proteins,
              setNames(genome_metadata[["num_seqs"]], genome_metadata[["accession"]])),
+  tar_target(genome_sizes,
+             setNames(genome_metadata[["genome_size"]], genome_metadata[["accession"]])),
   tar_target(all_pocp,
              dplyr::filter(pocp_values, type == "POCP" & is_recommended_tool)%>%
                mutate(
                  query_proteins = total_proteins[query],
                  subject_proteins = total_proteins[subject],
-                 delta = abs(query_proteins - subject_proteins)
+                 delta_proteome = abs(query_proteins - subject_proteins),
+                 delta_genome = abs(genome_sizes[query] - genome_sizes[subject])
                ), format = "parquet"),
   tar_target(all_pocpu,
              dplyr::filter(pocp_values, type == "POCPu" & is_recommended_tool)%>%
                mutate(
                  query_proteins = total_proteins[query],
                  subject_proteins = total_proteins[subject],
-                 delta = abs(query_proteins - subject_proteins))
-             , format = "parquet"),
+                 delta_proteome = abs(query_proteins - subject_proteins),
+                 delta_genome = abs(genome_sizes[query] - genome_sizes[subject])
+               ), format = "parquet"),
   tar_target(pocp_group_sizes,
              all_pocp %>% count(same_genus_truth) %>% 
                mutate(
@@ -163,5 +167,7 @@ list(
   tar_target(streptomycetaceae,
              get_family_confusion_matrix(pocpu_confusion_by_family, "f__Streptomycetaceae"),
              format = "qs"),
+  tar_target(fig_delta_genome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_genome, "Difference in genome size")),
+  tar_target(fig_delta_proteome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_proteome, "Difference in proteome size")),
   tar_quarto(manuscript)
 )

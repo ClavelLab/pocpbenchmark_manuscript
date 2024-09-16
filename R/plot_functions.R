@@ -256,3 +256,14 @@ plot_genus_delineation <- function(p_pocp_density, p_pocpu_density, p_mcc){
             ncol = 2, axis="b",labels = c("","C"),
             rel_widths =  c(0.4, 0.6))
 }
+
+plot_pocp_delta <- function(df, pocp_label, delta, delta_label){
+  ggplot(df, aes(x = pocp, y = {{ delta }}))+
+    ggdensity::geom_hdr_points()+
+    scale_y_continuous(labels = scales::label_number())+
+    facet_wrap(~same_genus_truth,
+               labeller = as_labeller( c("TRUE"="Within genus","FALSE"="Between genera")))+
+    theme_cowplot()+
+    labs(x = {{pocp_label }},  y = {{ delta_label }},
+         color = "Highest density\nregions probability")
+}
