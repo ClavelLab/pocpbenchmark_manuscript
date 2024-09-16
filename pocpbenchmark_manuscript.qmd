@@ -499,7 +499,7 @@ Overall, POCPu provides a useful and interpretable metric to delineate genera.
 plot_grid(
   tar_read(fig_delta_proteome_pocpu),
   tar_read(fig_delta_genome_pocpu), nrow = 2, 
-  labels = "AUTO"
+  labels = "AUTO", axis = "l"
 )
 ```
 
