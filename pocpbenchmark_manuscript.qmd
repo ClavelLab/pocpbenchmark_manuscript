@@ -486,6 +486,27 @@ The large family of _Streptomycetaceae_ (Actinomycetota), for instance, exhibits
 Not all is lost, as `r tally_mcc_thresholds["n_70"]` families out of 35 show that POCPu delineates bacterial genera accurately (MCC $\geq$ 0.7;  @fig-genus-delineation C). For instance, for all the comparisons done within the _Lactobacillaceae_ family (Bacillota), we see `r targets::tar_read(lactobacillaceae)`.
 All categories of the confusion matrix vary greatly, which underline the need to a metric that can aggregate these counts without bias, and thus show that while POCPu is not a one-size-fits-all method, it can correctly delineate genera.
 
+We even leverage our large dataset to assess claims that POCP is influenced by differences in genome size [@riescoUpdateProposedMinimal2024].
+We found no convincing patterns to support the claim in difference of genome size (@suppfig-delta A) nor in number of proteins (i.e., proteom; @suppfig-delta B).
+Overall, POCPu provides a useful and interpretable metric to delineate genera.
+
+::: {#suppfig-delta}
+
+```{r suppfigdelta}
+#| fig-width: 6
+#| fig-height: 9
+#| fig-dpi: 300
+plot_grid(
+  tar_read(fig_delta_proteome_pocpu),
+  tar_read(fig_delta_genome_pocpu), nrow = 2, 
+  labels = "AUTO"
+)
+```
+
+Absence of relationship between POCPu and differences in genome size (A) and proteome size (B). Each point represents a comparison between two GTDB genomes for which the absolute genome size were compared (A) and the total number of proteins (B).
+The colors represent the probability of finding a point within a certain region, with darker colors indicating higher probabilities. The regions shown are the smallest areas that contain 50%, 80%, 95%, 99% and 100% of the data points, and are known as Highest Density Regions (HDRs).
+:::
+
 
 # References
 
