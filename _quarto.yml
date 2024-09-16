@@ -7,9 +7,10 @@ manuscript:
   article: pocpbenchmark_manuscript.qmd
 
 format:
-  html: default
+  html:
+    embed-resources: true
   #jats: default
-  #docx: default
+  docx: default
   
   # (other formats)
   # pdf: default
