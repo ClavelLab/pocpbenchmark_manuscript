@@ -418,7 +418,7 @@ tar_read(tool_table) %>% filter(tool!="BLAST_BLASTP") %>%
 Fold change of computing metrics for the 9 approaches used in the benchmark compared to the BLAST_BLASTP approach.
 The metrics include processing time as real-time, memory usage, CPU usage and disk usage as input/output (I/O).
 A fold change below 1 means the metric is lower, whilst above 1 means it is higher, compared to the BLAST_BLASTP approach.
-The fold change values are median computed over ($n$ = `r n_processes` number of processes tracked per approach.
+The fold change values are median computed over $n$ = `r n_processes` number of processes tracked per approach.
 :::
 
 The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-blastdb and @tbl-R2) in a fraction of the time (@tbl-tools-metrics).
@@ -487,7 +487,7 @@ Not all is lost, as `r tally_mcc_thresholds["n_70"]` families out of 35 show tha
 All categories of the confusion matrix vary greatly, which underline the need to a metric that can aggregate these counts without bias, and thus show that while POCPu is not a one-size-fits-all method, it can correctly delineate genera.
 
 We even leverage our large dataset to assess claims that POCP is influenced by differences in genome size [@riescoUpdateProposedMinimal2024].
-We found no convincing patterns to support the claim in difference of genome size (@suppfig-delta A) nor in number of proteins (i.e., proteom; @suppfig-delta B).
+We found no convincing patterns to support the claim in difference of genome size (@suppfig-delta A) nor in number of proteins (i.e., proteome; @suppfig-delta B).
 Overall, POCPu provides a useful and interpretable metric to delineate genera.
 
 ::: {#suppfig-delta}

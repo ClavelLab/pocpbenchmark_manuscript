@@ -21,7 +21,7 @@ plot_pocp_vs_blast <- function(df, pocp_label, R2_table){
     facet_wrap(~ tool, nrow = 2) +
     labs(x = paste0(pocp_label, " based on BLAST_BLASTP (in %)"),
          y = paste0(pocp_label, " based on other tools (in %)"),
-         color = "Highest density\nregions probability")+
+         color = "Highest density\nregions")+
     theme_cowplot(font_size = 12)+
     theme(legend.position = "bottom", strip.text.x = element_text(size = 8))
   
@@ -61,7 +61,7 @@ plot_pocp_blastdb <- function(df, pocp_label, with_R2=TRUE){
     scale_x_continuous(limits = extremes)+
     labs(x = paste0(pocp_label, " based on BLAST_BLASTP (in %)"),
          y = paste0(pocp_label, " based on BLAST_BLASTPDB (in %)"),
-         color = "Highest density\nregions probability")+
+         color = "Highest density\nregions")+
     theme_cowplot(font_size = 12)+
     theme(legend.position = "bottom", strip.text.x = element_text(size = 8))
   
@@ -265,5 +265,5 @@ plot_pocp_delta <- function(df, pocp_label, delta, delta_label){
                labeller = as_labeller( c("TRUE"="Within genus","FALSE"="Between genera")))+
     theme_cowplot()+
     labs(x = pocp_label ,  y = delta_label,
-         color = "Highest density\nregions probability")
+         color = "Highest density\nregions")
 }
