@@ -61,7 +61,7 @@ library(cowplot)
 # Introduction
 
 In the last three years only, the number of bacterial genomes available has has by 35 000 yearly additions to the RefSeq collection, both from isolates and metagenomes [@haftRefSeqProkaryoticGenome2024]. To analyse these genomes, we need clear and quick methods to taxonomically assign genomes. 
-For species, Average Nucleotide Identity [ANI, @jainHighThroughputANI2018] has been developed and shown to delineate species almost unanimously [@parksCompleteDomaintospeciesTaxonomy2020].
+For species, Average Nucleotide Identity [ANI, @jainHighThroughputANI2018] has been developed and shown to delineate species almost unanimously [@parksCompleteDomainspeciesTaxonomy2020].
 However, ANI is unable to delineate genera [@qinProposedGenusBoundary2014].
 While no single ANI threshold has been proposed for genus delineation, family-specific thresholds have been suggested using both the ANI value and alignment fraction, however the lack of a universal threshold limits their usability [@barcoGenusDefinitionBacteria2020].
 An alternative to ANI is the Average Amino acid Identity (AAI) which uses protein sequences instead of genomic nucleic sequences [@konstantinidisGenomeBasedTaxonomyProkaryotes2005].
@@ -100,24 +100,15 @@ Cumulative number of validly published genera names according to the Internation
 
 # Methods
 
-## GTDB bacterial proteins sequences and taxonomy as gold standard
+## Standardisation of protein sequences and taxonomy via GTDB
 
-Publicly-available microbial proteins sequences from shortlisted bacteria were used for our comparison.
-The Genome Taxonomy DataBase (GTDB) is a well-maintained and metadata rich microbial resource that provides curated taxonomy along genomes and genome-derived proteins sequences [@parksGTDBOngoingCensus2022].
-We devised inclusion criteria to span a wide breadth of the phylogenetic tree while maintaining achievable comparisons with the time, human and computing resources available.
+The Genome Taxonomy DataBase (GTDB) provides curated taxonomy along with genomes and genome-derived proteins sequences [@parksGTDBOngoingCensus2022].
+We devised a set of inclusion criteria to facilitate inclusion of a diverse range of taxonomic groups, while maintaining achievable comparisons with the time, human and computing resources available.
 
-Any bacterial entry available in the GTDB (r214) was included provided (1) the bacteria has a valid name according to the LPSN, (2) the entry is a representative genome, (3) the bacteria belongs to a family with at least two genuses, and (5) it belongs to a genus with at least ten genomes.
-
-Since version r214, GTDB provides proteins sequences FASTA file (`.faa`) as compressed files (`.gz`).
-While we support the decision to save storage and network load, we had to add an extraction step before use to ensure a fair comparison as only BLAST cannot natively process compressed FASTA files.
-
-We used r214.0 and are aware that r214.1 corrected the taxonomy assignation of the genome `GB_GCA_902406375.1` to *Collinsella sp002232035*.
-This change did not impact our study as the genome in question is not part of the shortlist.
+The criteria for study of a bacterial entry within the GTDB (r214) was: (1) the bacteria has a valid name according to the LPSN, (2) the entry is a representative genome, (3) the bacteria belongs to a family with at least two genera, and (5) it belongs to a genus with at least ten genomes. Based on these criteria, the protein sequence files for the shortlisted bacteria were obtained from GTDB.
 
 The bacterial phylogenetic tree of the shortlisted genomes was constructed by trimming the bacterial tree released by GTDB using custom Python scripts and the ETE3 library [@huerta-cepasETEReconstructionAnalysis2016].
 
-
-Expected pairwise comparisons between a query sequence ($Q$) and a subject sequence ($S$) were defined by banning self-comparisons ($Q \neq S$) and considering reciprocal comparisons ($Q\text{-}S$ and $S\text{-}Q$) only within the same family to prevent exponential explosion.
 
 
 ## Definition of Percentage of Conserved Proteins (POCP)
@@ -132,6 +123,7 @@ where $C_{QS}$ represent the conserved number of proteins from $Q$ when aligned 
 The range of POCP is theoretically $\left[0;100\%\right]$.
 Conserved proteins are defined as protein sequences matches from the query with an e-value < $10^{−5}$, a sequence identity > 40%, and an aligned region > 50% of the query protein sequence length.
 
+Pairwise comparisons between a query sequence ($Q$) and a subject sequence ($S$) were defined by banning self-comparisons ($Q \neq S$) and considering reciprocal comparisons ($Q\text{-}S$ and $S\text{-}Q$) only within the same family to prevent exponential explosion.
 
 However, proteins sequences from the query can match multiple subject sequences in the case of duplicated genes.
 While briefly mentioned in the original paper that "The number of conserved proteins in each genome of strains being compared was slightly different because of the existence of duplicate genes (paralogs)" [@qinProposedGenusBoundary2014, p. 2211], the expected influence on the POCP values is lacking.
@@ -148,16 +140,14 @@ Note that the assumption regarding unique matches is made implicitly when using 
 
 ## Approaches for proteins sequence alignment benchmark
 
-Many-versus-many proteins sequences comparisons are required to assess the number of conserved proteins.
-While @qinProposedGenusBoundary2014 provided limited guidance on how to implement the computation of POCP, it is assumed that the BLASTP algorithm is the standard.
-It is the approach implemented in Protologger [@hitch_automated_2021].
-We first use the BLASTP approach v2.14.0+ [@camachoBLASTArchitectureApplications2009] using the parameters fitting @qinProposedGenusBoundary2014 procedure (@tbl-tools-parameters).
-We also considered a slightly altered BLASTP approach, named BLASTPDB where BLAST databases are first built for the two genomes considered (@tbl-tools-parameters).
+In @qinProposedGenusBoundary2014, guidance was provided on how to implement the computation of POCP, including the use of BLASTP, as implemented in Protologger [@hitch_automated_2021].
+As our 'standard' POCP implementation, we used BLASTP v2.14.0+ [@camachoBLASTArchitectureApplications2009] with parameters from @qinProposedGenusBoundary2014 (@tbl-tools-parameters).
+We also considered a modified implementation of the BLASTP approach, named BLASTPDB where BLAST databases are first built for the two genomes considered (@tbl-tools-parameters).
 This allow parallel alignments on multiple CPU, which is not possible with BLASTP.
-We then included two tools that are usually used as faster BLASTP alternatives: DIAMOND v2.1.6 [@buchfinkSensitiveProteinAlignments2021] and MMseqs2 v15.6f452 [@steineggerMMseqs2EnablesSensitive2017].
-The former is being used in @holzerPOCPnfAutomaticNextflow2024 while the latter is used in EzAAI [@kimIntroducingEzAAIPipeline2021].
+We then included two tools that were designed as faster local-protein-alignment approaches and used as alternatives to BLASTP: DIAMOND v2.1.6 [@buchfinkSensitiveProteinAlignments2021] and MMseqs2 v15.6f452 [@steineggerMMseqs2EnablesSensitive2017].
+The former is used in @holzerPOCPnfAutomaticNextflow2024 while the latter is used in EzAAI [@kimIntroducingEzAAIPipeline2021].
 Similarly to BLASTPDB, these approaches require that a protein database is built for each genome before performing the alignment (@tbl-tools-parameters).
-DIAMOND and MMseqs2 were both used with four different sensitivity thresholds (@tbl-tools-parameters) on a recent comparisons [@buchfinkSensitiveProteinAlignments2021].
+DIAMOND and MMseqs2 were both used with four different sensitivity thresholds (@tbl-tools-parameters) based on a recent comparisons [@buchfinkSensitiveProteinAlignments2021].
 
 ```{r tbl-tools-parameters}
 #| tbl-cap: "List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold."
@@ -176,18 +166,18 @@ tibble::tribble(
 ) %>% 
   mutate(
     Name = if_else(Name=="DIAMOND_VERYSENSITIVE", "**DIAMOND_VERYSENSITIVE**", Name),
-    `Needs database?` = if_else(Name == "BLAST_BLASTP", "No", "Yes"),
+    `Database creation` = if_else(Name == "BLAST_BLASTP", "No", "Yes"),
     Parameters = glue::glue("`{p}`", p=Parameters)
     ) %>%
   rename("Approach name"="Name") %>% 
-  select(`Approach name`, `Needs database?`, Parameters) %>% knitr::kable()
+  select(`Approach name`, `Database creation`, Parameters) %>% knitr::kable()
 ```
 
-All proteins matches were filtered to keep only matches with > 40 % identity to all the query sequences matches for POCP ($C_{QS}$ and $C_{SQ}$ in @eq-pocp) and only unique query sequence matches for POCPu ($C_{QS}$ and $C_{SQ}$ in @eq-pocpu).
+All proteins matches were filtered to only keep matches with > 40 % identity to all the query sequences matches for POCP ($C_{QS}$ and $C_{SQ}$ in @eq-pocp) and only unique query sequence matches for POCPu ($C_{QS}$ and $C_{SQ}$ in @eq-pocpu).
 Note that the filtering was adapted to the method as the range of percentage of identity in MMseqs2 is $[0-1]$ and $[0-100]$ for BLAST and DIAMOND.
 The total number of proteins per genomes ($T_Q$ and $T_S$ in @eq-pocp and @eq-pocpu) was computed using seqkit stats v2.2.0 [@shenSeqKitCrossPlatformUltrafast2016].
 
-Linear regressions were used in `r R.version.string` to fit the expected POCP (or POCPu) values obtained via the legacy BLAST_BLASTP approach against the others approaches considered.
+Linear regressions were implemented using `r R.version.string` to fit the expected POCP (or POCPu) values obtained via the legacy BLAST_BLASTP approach against the others approaches considered.
 The coefficient of determination R^2^ of the linear regression is used as an interpretable and bounded goodness-of-fit measure between the expected and measured values instead of others errors measurement [@chiccoCoefficientDeterminationRsquared2021].
 We did not rely on the adjusted coefficient of determination as the linear regressions had only one predictor, namely the POCP (or POCPu) values of the evaluated approach.
 
@@ -207,12 +197,12 @@ The coefficient has a range of $\left[-1;+1\right]$ and is only high in case of 
 
 ## Workflow implementation
 
-Automatic protein sequences download, data preprocessing, many-versus-many protein alignments, as well as POCP computation and delineation metrics calculations were run using the workflow tool nextflow v23.10.0 [@ditommasoNextflowEnablesReproducible2017], as well as components of nf-core [@ewelsNfcoreFrameworkCommunitycurated2020].
-On top of a workflow manager, tools used in the benchmark are shipped within Docker container [@merkelDockerLightweightLinux2014]  or bioconda [@thebiocondateamBiocondaSustainableComprehensive2018] environments to ensure reproducibility, scalability and ease future extensions of the benchmark.
+Automatic protein sequences download, data preprocessing, many-versus-many protein alignments, as well as POCP computation and delineation metrics calculations were within a nextflow v23.10.0 [@ditommasoNextflowEnablesReproducible2017] workflow, using components of nf-core [@ewelsNfcoreFrameworkCommunitycurated2020].
+Tools used are provided within Docker container [@merkelDockerLightweightLinux2014] or bioconda [@thebiocondateamBiocondaSustainableComprehensive2018] environments to ensure reproducibility, scalability and ease future extensions of the benchmark.
 
 Nextflow natively keep track of the time, CPU, memory and disk usage of each process in an execution trace log file that we used to evaluate computing resources utilization. Process duration is available as walltime and realtime, the CPU usage is reported as a percentage of usage of a unique CPU, meaning multi-threaded processes will have a value higher than 100%.
 
-Statistical analyses, data crunching and visualisation were orchestrated with the R workflow manager targets v.1.7.0 [@landauTargetsPackageDynamic2021].
+Statistical analyses and visualisation were conducted within R using targets v.1.7.0 [@landauTargetsPackageDynamic2021].
 
 
 # Results
