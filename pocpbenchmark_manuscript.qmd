@@ -60,33 +60,29 @@ library(cowplot)
 
 # Introduction
 
-Genus name occurs before species name in the binomial nomenclature, therefore genera are our first contact with the bacterial entities we are studying.
-These names open the door to existing knowledge in the form of databases entries [@reimerBacDive2022Knowledge2022; @schochNCBITaxonomyComprehensive2020] and articles [@rosonovskiEuropePMC20232024], and can help us know more about their evolutionary histories and infer ecological roles. With far more bacterial genomes from isolates or metagenomes available than previously possible [@haftRefSeqProkaryoticGenome2024], we need to clearly and quickly identify when two bacterial entities belong to the same genus or different genera, a process termed genus delineation.
-
-Whilst the Average Nucleotide Identity [ANI, @jainHighThroughputANI2018] help delineate species almost unanimously [@parksCompleteDomaintospeciesTaxonomy2020], genus delineation lacks such consensus.
-Indeed, no single appropriate ANI threshold were found to separate prokaryotic genera [@qinProposedGenusBoundary2014], but later family-based thresholds delineate genera using ANI plus alignment fraction [@barcoGenusDefinitionBacteria2020].
-Protein sequences replaced nucleic sequences to emulate the ANI with the Average Aminoacid Identity [AAI, @konstantinidisGenomeBasedTaxonomyProkaryotes2005], but without explicit threshold for genus delineation [@rodriguez-rBypassingCultivationIdentify2014]. Tentative threshold were published later [@konstantinidisUncultivatedMicrobesNeed2017], but are seldom mentioned in AAI tools implementations [@dieckmannEDGAR3ComparativeGenomics2021; @kimIntroducingEzAAIPipeline2021; @medlarAAIprofilerFastProteomewide2018].
-An alternative genus delineation method was proposed with an interpretable metric: the Percentage of Conserved Proteins (POCP) [@qinProposedGenusBoundary2014].
+In the last three years only, the number of bacterial genomes available has has by 35 000 yearly additions to the RefSeq collection, both from isolates and metagenomes [@haftRefSeqProkaryoticGenome2024]. To analyse these genomes, we need clear and quick methods to taxonomically assign genomes. 
+For species, Average Nucleotide Identity [ANI, @jainHighThroughputANI2018] has been developed and shown to delineate species almost unanimously [@parksCompleteDomaintospeciesTaxonomy2020].
+However, ANI is unable to delineate genera [@qinProposedGenusBoundary2014].
+While no single ANI threshold has been proposed for genus delineation, family-specific thresholds have been suggested using both the ANI value and alignment fraction, however the lack of a universal threshold limits their usability [@barcoGenusDefinitionBacteria2020].
+An alternative to ANI is the Average Amino acid Identity (AAI) which uses protein sequences instead of genomic nucleic sequences [@konstantinidisGenomeBasedTaxonomyProkaryotes2005].
+A genus delineation threshold was proposed based on AAI [@konstantinidisUncultivatedMicrobesNeed2017], but this approach is seldom applied [@dieckmannEDGAR3ComparativeGenomics2021; @kimIntroducingEzAAIPipeline2021; @medlarAAIprofilerFastProteomewide2018].
+Another protein sequence-based genus delineation method was proposed with an interpretable metric: the Percentage of Conserved Proteins (POCP) [@qinProposedGenusBoundary2014].
 If two bacterial entities share more than half of their conserved proteins, i.e., POCP > 50%, they belong to the same genus.
 
-POCP serves as a line of evidence within a taxonomic inquiry in the automated description of novel bacterial taxa by Protologger [@hitch_automated_2021].
-However, the number of valid genus names has nearly doubled (@suppfig-lpsn) in the ten years since the original proposition of @qinProposedGenusBoundary2014 to delineate genera. This increase warrants for scalable methods as well as a timely reevaluation of POCP with an extended dataset.
+POCP is widely used within the community to assign novel bacterial taxa to known genera, or support the proposal of novel genera [@afrizalEnhancedCulturedDiversity2022; @chaplinHydrogeniiclostidiumMannosilyticumGen2020; @gonzalezAcidiferrimicrobiumAustraleGen2020; @hitchBroadDiversityHuman2024; @wylensekCollectionBacterialIsolates2020]
+A major limitation of POCP is that the comparison of all proteins within each genome to each other is computationally demanding.
+Given that the number of valid genus names has nearly doubled (@suppfig-lpsn) since the original proposition of POCP by @qinProposedGenusBoundary2014, scalable methods as well as a timely reevaluation of the POCP is required.
 
 
-POCP calculations require many-against-many proteins alignment tools, which are computationally demanding.
-Scientists could of course invest in more hardware to scale up these computations, but this short-term solution is not sustainable. 
-Few scientists or microbiology teams have access to "20 000 GPUs" even if that would significantly speed up many-against-many proteins alignments [@selvitopiExtremeScaleManyagainstManyProtein2022].
-
-@hernandez-salmeronProgressQuicklyFinding2020 compared proteins alignment tools to find faster alternatives that are as precise. Such tools are also used in POCP calculations, but this benchmark ranked tools to identify orthologs not to calculate POCP. Recently, @holzerPOCPnfAutomaticNextflow2024 suggested to use DIAMOND with ultra-sensitive settings to compute POCP faster than with BLASTP. His approach is based on previously available script [@holzerHoelzerPocp2020], now transformed into a useful nextflow workflow [@holzerPOCPnfAutomaticNextflow2024]. However, his comparisons are based on limited set of 5 genera, each ranging from 15 to 167 genomes. 
-@riescoUpdateProposedMinimal2024 evaluated much more genomes -- 1 573 type strains -- but calculated POCP -- using Bio-Py [@linSilentGeneBiopyBiopy2021] -- only to be compared with AAI.
-However, the tools in these studies implicitly assume conserved proteins have unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021]. This discrepancy probably stems from a subjective and personal interpretation of the original implementation [@qinProposedGenusBoundary2014].
-We need a clear definition of POCP to prevent bioinformatics tools with unclear implementation to proliferate, which impedes results repeatability.
+@hernandez-salmeronProgressQuicklyFinding2020 compared proteins alignment tools to find faster alternatives, without a lose in precision, showing that DIAMOND [@buchfinkSensitiveProteinAlignments2021], when switched to sensitive parameters instead of defaults, correctly found 87% of the reciprocal best hits of BLASTP [@camachoBLASTArchitectureApplications2009] in less than 8% of the time.
+Recently, @holzerPOCPnfAutomaticNextflow2024 suggested the use of DIAMOND with ultra-sensitive settings to compute POCP faster than with BLASTP. His approach is based on previously available script [@holzerHoelzerPocp2020], implemented as a nextflow workflow [@holzerPOCPnfAutomaticNextflow2024]. However, his comparisons are based on limited set of 5 genera, each ranging from 15 to 167 genomes. 
+However, the the current implementations of POCP available as tools assume conserved proteins have unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021], differing from the original implementation of POCP which had no such limitation [@qinProposedGenusBoundary2014].
+We need a clear definition of POCP to clarify the process and ensure repeatability.
 
 
-First, we aim to identify a scalable alternative to BLASTP to compute POCP. Whilst fast and scalable, this alternative should not compromise the accuracy of the legacy approach.
-Second, we hypothesize that POCP provides an interpretable and already used metric that can delineate bacterial genera in most cases.
-Therefore, we will test our hypothesis and evaluate how well POCP can delineate correctly bacterial genera using the identified alternative.
-Eventually, we hope to provide modern microbiologists with a best-practice tool they can confidently use in their workflow to assess whether their isolates belong to a novel genus.
+To achieve this, we aimed to identify a scalable alternative to BLASTP to compute POCP. Whilst fast and scalable, this alternative should not compromise the accuracy of the original approach.
+Second, as POCP provides an interpretable and used metric that can delineate bacterial genera, we will evaluate the ability of POCP to correctly delineate bacterial genera using the optimised implementation.
+Based on these findings, we hope to provide microbiologists with a best-practice tool they can confidently use in their workflow to determine the genus assignment of a genome.
 
 ::: {#suppfig-lpsn}
 
