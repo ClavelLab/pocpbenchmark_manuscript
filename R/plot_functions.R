@@ -174,7 +174,8 @@ plot_pocp_density <- function(df){
              color="black", arrow=arrow(type= "closed", length = unit(0.05, "in"))
     )+
     annotate("text",x = 45, y=0.029, hjust=1, vjust=-0.85,
-             label="Different\ngenera")
+             label="Different\ngenera")+
+    theme(legend.position = "bottom")
 }
 
 plot_pocpu_density <- function(df){
@@ -184,11 +185,8 @@ plot_pocpu_density <- function(df){
     theme_cowplot(font_size = 12, rel_small = 10/14)+
     scale_fill_okabe_ito(labels = c("TRUE"="Within genus","FALSE"="Between genera"))+
     geom_vline(xintercept = 50, linetype="dashed")+
-    theme(legend.position = "right")+
     labs(x="POCPu", fill = "True category",y = "Density")+
-    theme(legend.position = "bottom",
-          legend.title = element_text(size = 9, 
-                                      margin = margin(r = 0.5, unit = "cm")))+
+    theme(legend.position = "bottom")+
     scale_y_continuous(expand = expansion(mult = c(0,0.01)))
 }
 

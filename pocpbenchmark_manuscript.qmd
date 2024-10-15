@@ -60,7 +60,7 @@ library(cowplot)
 
 # Introduction
 
-In the last three years only, the number of bacterial genomes available has has by 35 000 yearly additions to the RefSeq collection, both from isolates and metagenomes [@haftRefSeqProkaryoticGenome2024]. To analyse these genomes, we need clear and quick methods to taxonomically assign genomes. 
+In the last three years only, the number of bacterial genomes in the RefSeq collection has increased by 35 000 yearly, both from isolates and metagenomes [@haftRefSeqProkaryoticGenome2024]. To analyse these genomes, we need clear and quick methods to taxonomically assign genomes.
 For species, Average Nucleotide Identity [ANI, @jainHighThroughputANI2018] has been developed and shown to delineate species almost unanimously [@parksCompleteDomainspeciesTaxonomy2020].
 However, ANI is unable to delineate genera [@qinProposedGenusBoundary2014].
 While no single ANI threshold has been proposed for genus delineation, family-specific thresholds have been suggested using both the ANI value and alignment fraction, however the lack of a universal threshold limits their usability [@barcoGenusDefinitionBacteria2020].
@@ -207,7 +207,7 @@ Statistical analyses and visualisation were conducted within R using targets v.1
 
 # Results
 
-We evaluated ten proteins alignment approaches based on three tools for improved genus delineation using the Percentage Of Conserved Proteins (POCP) using publicly-available data from the GTDB [@parksGTDBOngoingCensus2022].
+We evaluated the use of ten proteins alignment approaches based on three tools for calculation of the Percentage Of Conserved Proteins (POCP). For this, genomes from the GTDB were used [@parksGTDBOngoingCensus2022].
 
 
 ```{r funnel}
@@ -221,46 +221,59 @@ funnel <- c(
 funnel_text <- funnel %>% prettyNum(big.mark=" ") %>% as.list() %>% 
   glue::glue_data(
     "Out of a total of {GTDB_Genomes} GTDB bacterial genomes",
-    "{Representatives} are representative genomes with proper taxonomy",
+    "{Representatives} are representative genomes",
     "{Valid_names} have valid names",
     "{More_10_species_per_genus} belongs to a genus with at least ten genomes",
     "and {More_1_genus_per_family} belongs to a family with at least two genera", .sep = ", "
     )
 phyla_count_text <- tar_read(tree_metadata) %>%
-  count(Phylum) %>% arrange(desc(n)) %>%
-  glue::glue_data("{Phylum} (n = {n})",
-                  n = prettyNum(n, big.mark=" ")) %>%
+  select(Phylum:Species) %>%
+  group_by(Phylum) %>%
+  summarise(across(everything(),n_distinct)) %>%
+  arrange(desc(Species)) %>%
+  glue::glue_data(
+    "{Phylum} ({Family} families, {Genus} genera, {Species} species)",
+    Species = prettyNum(Species, big.mark=" ")) %>%
   glue::glue_collapse(sep = ", ", last = " and ")
 ```
 
 
-
-`r funnel_text`.
-This thousand-genomes shortlist provides a representative sample of bacterial phylogenetic diversity (@fig-tree-phyla A) that is divided between four phyla: `r phyla_count_text`.
-
-
 ```{r cpu_hours}
-overall_stats <- tar_read(family_metadata) %>%
+stats_by_type <- tar_read(family_metadata) %>%
   select(Family,benchmark_type, n_genomes,CPU_hours) %>%
+  group_by(benchmark_type) %>% 
   mutate(
     n_comparisons_planned=n_genomes*(n_genomes-1),
     n_comparisons_realized=if_else(benchmark_type=="full",
                           n_comparisons_planned*10, n_comparisons_planned)
                           ) %>%
   summarise(
+    n_families = n(),
+    n_genomes = sum(n_genomes),
     n_planned = sum(n_comparisons_planned*10),
     n_realized = sum(n_comparisons_realized),
-    total_hours = sum(CPU_hours) %>% round(),
+    total_hours = sum(CPU_hours)
+    )
+overall_stats <- stats_by_type %>% 
+  summarise(across(!benchmark_type,sum)) %>% 
+  mutate(
+    total_hours = round(total_hours),
     total_years = as.period(total_hours, unit = "hours") %>% as.numeric("years")
-  ) %>% mutate(across(n_realized:total_years, ~prettyNum(.x,big.mark = " ", digits=2)))
-n_planned_print <- prettyunits::pretty_num(overall_stats$n_planned, style = "nopad")
+  ) %>% mutate(across(everything(), ~prettyNum(.x,big.mark = " ", digits=2)))
+stats_by_type_text <- stats_by_type %>%
+  mutate(across(everything(), ~prettyNum(.x,big.mark = " ", digits=2))) %>% 
+  glue::glue_data(
+    "({n_families} families, {n_genomes} genomes, {n_realized} comparisons)"
+    )
 ```
 
 
-This should have resulted in `r n_planned_print` pairwise comparisons to be run for each of the ten approaches considered (@tbl-tools-parameters) totalizing > 10 millions processes.
-However, early results from the first 17 out of 35 families to be ran were so compelling that we decided to save human and computing resources by splitting the families into two benchmark group: the full benchmark using all ten approaches or using only the recommended approach.
-Genomes from all around the tree are included in the two groups (@fig-tree-phyla A) and in all the four phyla (@fig-tree-phyla B).
-Still, this study needed `r overall_stats$n_realized` pairwise comparisons for a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).
+`r funnel_text`.
+This shortlist of `r overall_stats$n_genomes` genomes covers a wide range of bacterial phylogenetic diversity across four phyla: `r phyla_count_text`.
+
+The families were split into two benchmark group: the full benchmark using all ten approaches `r stats_by_type_text[1]`, or using only the recommended approach `r stats_by_type_text[2]`. 
+
+In total, this study conducted `r overall_stats$n_realized` pairwise comparisons with a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).
 
 ::: {#fig-tree-phyla}
 
@@ -283,13 +296,13 @@ plot_grid(
 Overview of the phylogenetic diversity of the genomes shortlisted for the benchmark. The `r n_genomes` genomes are placed on the phylogenetic tree of the GTDB (A) and colored depending whether the genomes were included in the benchmark with all approaches (shamrock green) or only with the recommended approach (sky magenta). The distribution of genomes by Phyla is indicated for each benchmark type (B).
 :::
 
+
+
 ## Comparison with the BLAST_BLASTP legacy approach
 
 ```{r genomes-in-full}
-n_genomes_in_full <- targets::tar_read(tree_metadata) %>%
-  count(benchmark_type) %>%
-  deframe() %>%
-  .[["All approaches"]] %>%
+n_genomes_in_full <- stats_by_type %>% 
+  filter(benchmark_type=="full") %>% pull(n_genomes) %>% 
   prettyNum(big.mark = " ")
 ```
 
