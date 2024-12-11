@@ -14,12 +14,9 @@ tar_source(c("R/data_manipulation_functions.R",
 
 # End this file with a list of target objects.
 list(
-  tar_target(pocp_values_parquet,
-             "pocpbenchmark_pocp_values.parquet", format = "file"),
-  tar_target(genome_metadata_parquet,
-             "pocpbenchmark_genome_metadata.parquet", format = "file"),
-  tar_target(family_metadata_parquet,
-             "pocpbenchmark_family_metadata.parquet", format = "file"),
+  tar_file(pocp_values_parquet, "pocpbenchmark_pocp_values.parquet"),
+  tar_file(genome_metadata_parquet, "pocpbenchmark_genome_metadata.parquet"),
+  tar_file(family_metadata_parquet, "pocpbenchmark_family_metadata.parquet"),
   tar_target(pocp_values,
              read_parquet(pocp_values_parquet), format = "parquet"),
   tar_target(genome_metadata,
@@ -118,7 +115,7 @@ list(
                         blast_vs_all_pocpu %>% arrange(desc(pocp)) %>% 
                           plot_pocp_blastdb("POCPu"),
                         ncol = 2, labels = "AUTO"), format = "qs"),
-  tar_target(tree_file, "shorlisted_genomes.newick", format = "file"),
+  tar_file(tree_file, "shorlisted_genomes.newick"),
   tar_target(shortlisted_tree, treeio::read.tree(file = tree_file), format = "qs"),
   tar_target(tree_metadata,
              genome_metadata %>% select(accession,Domain:Species) %>% 
@@ -135,7 +132,7 @@ list(
              format = "qs"),
   tar_target(fig_tree, plot_tree(shortlisted_tree,tree_metadata), format = "qs"),
   tar_target(fig_phyla_count, plot_phyla_count(tree_metadata), format = "qs"),
-  tar_target(lpsn_stats_file, "lpsn30.json", format = "file"),
+  tar_file(lpsn_stats_file, "lpsn30.json"),
   tar_target(lpsn_stats, parse_lpsn_stats(lpsn_stats_file), format = "qs"),
   tar_target(fig_lpsn_stats, plot_lpsn_stats(lpsn_stats), format = "qs"),
   tar_file(computing_metrics_parquet, "pocpbenchmark_computing_metrics.parquet"),
