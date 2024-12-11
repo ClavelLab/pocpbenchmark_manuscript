@@ -79,7 +79,6 @@ list(
                mutate(Family = glue::glue("italic(\"{Family}\")") %>% as_factor(),
                       Family = fct_reorder(Family, pocp))
   ),
-  tar_quarto(slides_retreat, "2024-07-10_RetreatSlidesPOCP.qmd"),
   tar_parquet(blast_vs_all_pocp, pivot_pocp(pocp_values,family_metadata, type = "POCP")),
   tar_parquet(blast_vs_all_pocpu, pivot_pocp(pocp_values,family_metadata, type = "POCPu")),
   tar_target(blast_vs_all_pocp_R2, get_lm_R2(blast_vs_all_pocp, type = "POCP")),
