@@ -299,13 +299,10 @@ We first made sure that the database approach to BLAST_BLASTP (@tbl-tools-parame
 
 ::: {#suppfig-blastdb}
 ```{r blastdb}
-#| fig-width: 9
-#| fig-height: 5
-#| fig-dpi: 300
 n_blastdb_comparisons <- tar_read(blast_vs_all_pocpu) %>%
   count(tool) %>% pull(n) %>%
   unique() %>% prettyNum(big.mark=" ")
-tar_read(fig_blast_vs_blastdb)
+knitr::include_graphics(tar_read(fig_blast_vs_blastdb_png))
 ```
 
 Adequacy between POCP (A) and POCPu (B) values computed with the legacy BLAST_BLASTP against the BLAST_BLASTPDB approach that build databases before alignment.
