@@ -133,7 +133,6 @@ plot_phyla_count<-function(tree_metadata){
 plot_tree_phyla_count <- function(tree,phyla_count,genome_metadata){
   library(ggtree)
   leg<-cowplot::get_legend(phyla_count)
-  n_genomes <- nrow(genome_metadata) %>% prettyNum(big.mark=" ")
   plot_grid(
     ggtree::rotate_tree(tree, 20),
     phyla_count+theme(legend.position = "none"),

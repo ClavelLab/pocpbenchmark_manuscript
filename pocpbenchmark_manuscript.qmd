@@ -275,6 +275,7 @@ In total, this study conducted `r overall_stats$n_realized` pairwise comparisons
 ::: {#fig-tree-phyla}
 
 ```{r tree-phyla}
+n_genomes <- nrow(tar_read(genome_metadata)) %>% prettyNum(big.mark=" ")
 tar_read(fig_tree_phyla_count_png)
 ```
 
