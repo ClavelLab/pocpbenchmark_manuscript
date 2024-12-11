@@ -150,5 +150,5 @@ list(
              ),
   tar_target(fig_delta_genome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_genome, "Difference in genome size")),
   tar_target(fig_delta_proteome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_proteome, "Difference in proteome size")),
-  tar_quarto(manuscript)
+  tar_quarto(manuscript, quiet = FALSE)
 )
