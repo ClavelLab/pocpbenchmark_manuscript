@@ -430,8 +430,8 @@ Like POCP, "Within genus" POCPu concentrate largely above the threshold of 50% (
 #| fig-width: 11
 #| fig-height: 6
 #| fig-dpi: 300
-targets::tar_load(pocpu_group_sizes)
-targets::tar_read(p_genus_delineation)
+tar_load(pocpu_group_sizes)
+knitr::include_graphics(tar_read(p_genus_delineation_png))
 ```
 
 A data-driven evaluation of how well POCP and POCPu distinguish genera.
