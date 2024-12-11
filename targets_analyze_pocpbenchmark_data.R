@@ -17,32 +17,29 @@ list(
   tar_file(pocp_values_parquet, "pocpbenchmark_pocp_values.parquet"),
   tar_file(genome_metadata_parquet, "pocpbenchmark_genome_metadata.parquet"),
   tar_file(family_metadata_parquet, "pocpbenchmark_family_metadata.parquet"),
-  tar_target(pocp_values,
-             read_parquet(pocp_values_parquet), format = "parquet"),
-  tar_target(genome_metadata,
-             read_parquet(genome_metadata_parquet), format = "parquet"),
-  tar_target(family_metadata,
-             read_parquet(family_metadata_parquet), format = "parquet"),
+  tar_parquet(pocp_values, read_parquet(pocp_values_parquet)),
+  tar_parquet(genome_metadata, read_parquet(genome_metadata_parquet)),
+  tar_parquet(family_metadata, read_parquet(family_metadata_parquet)),
   tar_target(total_proteins,
              setNames(genome_metadata[["num_seqs"]], genome_metadata[["accession"]])),
   tar_target(genome_sizes,
              setNames(genome_metadata[["genome_size"]], genome_metadata[["accession"]])),
-  tar_target(all_pocp,
+  tar_parquet(all_pocp,
              dplyr::filter(pocp_values, type == "POCP" & is_recommended_tool)%>%
                mutate(
                  query_proteins = total_proteins[query],
                  subject_proteins = total_proteins[subject],
                  delta_proteome = abs(query_proteins - subject_proteins),
                  delta_genome = abs(genome_sizes[query] - genome_sizes[subject])
-               ), format = "parquet"),
-  tar_target(all_pocpu,
+               )),
+  tar_parquet(all_pocpu,
              dplyr::filter(pocp_values, type == "POCPu" & is_recommended_tool)%>%
                mutate(
                  query_proteins = total_proteins[query],
                  subject_proteins = total_proteins[subject],
                  delta_proteome = abs(query_proteins - subject_proteins),
                  delta_genome = abs(genome_sizes[query] - genome_sizes[subject])
-               ), format = "parquet"),
+               )),
   tar_target(pocp_group_sizes,
              all_pocp %>% count(same_genus_truth) %>% 
                mutate(
@@ -85,14 +82,8 @@ list(
                       Family = fct_reorder(Family, pocp))
   ),
   tar_quarto(slides_retreat, "2024-07-10_RetreatSlidesPOCP.qmd"),
-  tar_target(blast_vs_all_pocp,
-             pivot_pocp(pocp_values,family_metadata, type = "POCP"),
-             format = "parquet"
-  ),
-  tar_target(blast_vs_all_pocpu,
-             pivot_pocp(pocp_values,family_metadata, type = "POCPu"),
-             format = "parquet"
-  ),
+  tar_parquet(blast_vs_all_pocp, pivot_pocp(pocp_values,family_metadata, type = "POCP")),
+  tar_parquet(blast_vs_all_pocpu, pivot_pocp(pocp_values)),
   tar_target(blast_vs_all_pocp_R2, get_lm_R2(blast_vs_all_pocp, type = "POCP"),
              format = "qs"),
   tar_target(blast_vs_all_pocpu_R2, get_lm_R2(blast_vs_all_pocpu, type = "POCPu"),
@@ -136,12 +127,11 @@ list(
   tar_target(lpsn_stats, parse_lpsn_stats(lpsn_stats_file), format = "qs"),
   tar_target(fig_lpsn_stats, plot_lpsn_stats(lpsn_stats), format = "qs"),
   tar_file(computing_metrics_parquet, "pocpbenchmark_computing_metrics.parquet"),
-  tar_target(computing_metrics, read_parquet(computing_metrics_parquet), format = "parquet"),
-  tar_target(computing_metrics_fullbenchmark,
+  tar_parquet(computing_metrics, read_parquet(computing_metrics_parquet)),
+  tar_parquet(computing_metrics_fullbenchmark,
              computing_metrics %>% left_join(
                select(family_metadata, Family, benchmark_type), by = "Family"
-             ) %>% filter(benchmark_type == "full") %>% select(-benchmark_type),
-             format = "parquet"),
+             ) %>% filter(benchmark_type == "full") %>% select(-benchmark_type)),
   tar_target(db_parsed, get_db_parsed_stats(computing_metrics_fullbenchmark), format = "qs"),
   tar_target(tool_parsed, get_tool_parsed_stats(computing_metrics_fullbenchmark), format = "qs"),
   tar_target(median_db, generate_table_db(db_parsed), format = "qs"),
