@@ -1,22 +1,15 @@
 project:
   type: manuscript
-  render: 
-    - pocpbenchmark_manuscript.qmd
-
-manuscript:
-  article: pocpbenchmark_manuscript.qmd
 
 format:
   html:
     embed-resources: true
   #jats: default
-  docx: default
+  #docx: default
   
   # (other formats)
   # pdf: default
 
 execute:
-  freeze: true
-  cache: true
-
+  freeze: auto
 
