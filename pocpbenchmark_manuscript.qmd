@@ -137,7 +137,7 @@ Note that the assumption regarding unique matches is made implicitly when using 
 
 ## Approaches for proteins sequence alignment benchmark
 
-In @qinProposedGenusBoundary2014, guidance was provided on how to implement the computation of POCP, including the use of BLASTP, as implemented in Protologger [@hitch_automated_2021].
+In @qinProposedGenusBoundary2014, guidance was provided on how to implement the computation of POCP, including the use of BLASTP, as implemented in Protologger [@hitchAutomatedAnalysisGenomic2021].
 As our 'standard' POCP implementation, we used BLASTP v2.14.0+ [@camachoBLASTArchitectureApplications2009] with parameters from @qinProposedGenusBoundary2014 (@tbl-tools-parameters).
 We also considered a modified implementation of the BLASTP approach, named BLASTPDB where BLAST databases are first built for the two genomes considered (@tbl-tools-parameters).
 This allow parallel alignments on multiple CPU, which is not possible with BLASTP.
