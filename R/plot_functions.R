@@ -3,6 +3,7 @@
 
 # Save ggplot2 plots for file, a wrapper around cowplot::ggsave2 w/ sensible defaults
 save_png <- function(plot, filename, width, height){
+  fs::dir_create("figures")
   cowplot::ggsave2(filename = filename,
                    plot = plot, width = width, height = height,
                    units = "in", dpi = 300, device = grDevices::png)
