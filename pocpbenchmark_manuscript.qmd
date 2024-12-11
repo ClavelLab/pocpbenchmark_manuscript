@@ -87,10 +87,7 @@ Based on these findings, we hope to provide microbiologists with a best-practice
 ::: {#suppfig-lpsn}
 
 ```{r suppfiglpsn}
-#| fig-width: 6
-#| fig-height: 9
-#| fig-dpi: 300
-tar_read(fig_lpsn_stats)
+tar_read(fig_lpsn_stats_png)
 ```
 
 Cumulative number of validly published genera names according to the International Code of Nomenclature of Prokaryotes (ICNP). The year 2014 is highlighted as it corresponds to the year of publication of the paper by Qin et al. (doi: 10.1128/JB.01688-14) describing the Percentage of Conserved Proteins (POCP) to delineate genus. The number of valid genera is highlighted ten years later. The data was accessed on 2024-07-19 at the List of Prokaryotic names with Standing in Nomenclature.
