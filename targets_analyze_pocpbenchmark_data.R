@@ -81,7 +81,7 @@ list(
   ),
   tar_quarto(slides_retreat, "2024-07-10_RetreatSlidesPOCP.qmd"),
   tar_parquet(blast_vs_all_pocp, pivot_pocp(pocp_values,family_metadata, type = "POCP")),
-  tar_parquet(blast_vs_all_pocpu, pivot_pocp(pocp_values)),
+  tar_parquet(blast_vs_all_pocpu, pivot_pocp(pocp_values,family_metadata, type = "POCPu")),
   tar_target(blast_vs_all_pocp_R2, get_lm_R2(blast_vs_all_pocp, type = "POCP")),
   tar_target(blast_vs_all_pocpu_R2, get_lm_R2(blast_vs_all_pocpu, type = "POCPu")),
   tar_target(R2_table, format_R2_table(blast_vs_all_pocp_R2,blast_vs_all_pocpu_R2)),
