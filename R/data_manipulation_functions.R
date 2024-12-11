@@ -62,11 +62,15 @@ parse_computing_metrics <- function(computing_metrics){
 }
 
 # From the figure <https://lpsn.dsmz.de/statistics/figure/30>
-# the data used can be guessed to be at <https://lpsn.dsmz.de/data/figure/30>
-# downloaded and manually fixed of broken strings to get valid json to be parsed
-# for genera stats
+# the data used can be guessed to be at <https://lpsn.dsmz.de/statistics/data/30>
+# downloaded manually and fix json to be parse correctly for genera stats
+# Cannot use tarchetypes::tar_download as the LPSN does not provide a
+# ETag or Last-Modified for url
+# see: https://github.com/ropensci/tarchetypes/discussions/114
 parse_lpsn_stats <- function(lpsn_json){
-  jsonlite::fromJSON(readLines(lpsn_json)) %>%
+  readLines(lpsn_json) %>% 
+    paste0(collapse = " ") %>% # fix broken strings to get valid json to be parsed
+    jsonlite::fromJSON() %>%
     select(amount_is,grouping,subgroup,amount) %>% 
     arrange(grouping) %>% 
     filter(subgroup == "genus") %>% 
