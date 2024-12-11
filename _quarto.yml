@@ -15,6 +15,3 @@ format:
   # (other formats)
   # pdf: default
 
-execute:
-  freeze: auto
-
