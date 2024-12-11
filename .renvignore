@@ -1,5 +1,5 @@
 benchmark-gtdb*
-old_R
+old_R/
 *.html
 # ignore targets stores
 _targets/
@@ -8,5 +8,7 @@ prepare_pocpbenchmark_data/
 # Quarto folder rendering
 *_cache/
 /.quarto/
-_manuscript
+_manuscript/
 _freeze
+*_files/
+_extensions/
