@@ -344,13 +344,10 @@ It should be noted that the reported POCP values exceed the supposed POCP upper 
 ::: {#fig-blast-vs-all-pocp}
 
 ```{r blast_vs_all_pocp}
-#| fig-width: 9
-#| fig-height: 5
-#| fig-dpi: 300
 n_blast_comparisons <- tar_read(blast_vs_all_pocp) %>%
   count(tool) %>% pull(n) %>%
   unique() %>% prettyNum(big.mark=" ")
-tar_read(fig_blast_vs_all_pocp)
+knitr::include_graphics(tar_read(fig_blast_vs_all_pocp_png))
 ```
 
 Adequacy between POCP values computed with the legacy BLAST_BLASTP against flavors of faster alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].
