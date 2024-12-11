@@ -129,6 +129,18 @@ plot_phyla_count<-function(tree_metadata){
     theme_cowplot()
 }
 
+plot_tree_phyla_count <- function(tree,phyla_count,genome_metadata){
+  library(ggtree)
+  leg<-cowplot::get_legend(phyla_count)
+  n_genomes <- nrow(genome_metadata) %>% prettyNum(big.mark=" ")
+  plot_grid(
+    ggtree::rotate_tree(tree, 20),
+    phyla_count+theme(legend.position = "none"),
+    nrow = 2, labels = "AUTO",
+    rel_heights = c(0.7,0.3)
+  )+draw_plot(leg, x=0.65,y=-0.15)
+}
+
 plot_lpsn_stats <- function(lpsn_stats){
   p_lpsn <- ggplot(lpsn_stats, aes(x = grouping, y = n))+
     geom_segment(

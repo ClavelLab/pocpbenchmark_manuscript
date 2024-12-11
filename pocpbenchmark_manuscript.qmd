@@ -275,19 +275,7 @@ In total, this study conducted `r overall_stats$n_realized` pairwise comparisons
 ::: {#fig-tree-phyla}
 
 ```{r tree-phyla}
-#| fig-width: 7
-#| fig-height: 10
-#| fig-dpi: 300
-library(ggtree)
-tar_load(c(fig_phyla_count, fig_tree))
-leg<-cowplot::get_legend(fig_phyla_count)
-n_genomes <- nrow(tar_read(genome_metadata)) %>% prettyNum(big.mark=" ")
-plot_grid(
-  ggtree::rotate_tree(fig_tree, 20),
-  fig_phyla_count+theme(legend.position = "none"),
-  nrow = 2, labels = "AUTO",
-  rel_heights = c(0.7,0.3)
-)+draw_plot(leg, x=0.65,y=-0.15)
+tar_read(fig_tree_phyla_count_png)
 ```
 
 Overview of the phylogenetic diversity of the genomes shortlisted for the benchmark. The `r n_genomes` genomes are placed on the phylogenetic tree of the GTDB (A) and colored depending whether the genomes were included in the benchmark with all approaches (shamrock green) or only with the recommended approach (sky magenta). The distribution of genomes by Phyla is indicated for each benchmark type (B).
