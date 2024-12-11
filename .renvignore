@@ -1,6 +1,11 @@
 benchmark-gtdb*
 old_R/
 *.html
+*.csv
+*.tsv
+*.docx
+*.zip
+*.gz
 # ignore targets stores
 _targets/
 analyze_pocpbenchmark_data/
