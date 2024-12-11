@@ -31,7 +31,9 @@ plot_pocp_vs_blast <- function(df, pocp_label, R2_table){
          y = paste0(pocp_label, " based on other tools (in %)"),
          color = "Highest density\nregions")+
     theme_cowplot(font_size = 12)+
-    theme(legend.position = "bottom", strip.text.x = element_text(size = 8))
+    theme(legend.position = "bottom", strip.text.x = element_text(size = 8))+
+    # add bigger points for color legend
+    guides(color = guide_legend(override.aes = list(size = 5)))
   
   
   df_R2 <- R2_table %>% filter(tool != "BLAST_BLASTPDB") %>% 
