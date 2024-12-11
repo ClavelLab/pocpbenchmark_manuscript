@@ -5,11 +5,11 @@ tar_option_set(
   packages = c("tidyverse", "lubridate", "arrow","ggdensity",
                "ggplot2", "cowplot", "ggokabeito", "treeio", "ggtree",
                "jsonlite", "broom", "magrittr", "gt", "yardstick"),
-  
+  format = "qs"
 )
 
 tar_source(c("R/data_manipulation_functions.R",
-           "R/plot_functions.R", 
+           "R/plot_functions.R",
            "R/table_functions.R"))
 
 # End this file with a list of target objects.
@@ -48,8 +48,7 @@ list(
                    type = if_else(same_genus_truth, "Within genus","Between genera"),
                    n = prettyNum(n, big.mark =" ")
                  )
-               ) %>% select(-n) %>% deframe(),
-             format = "qs"
+               ) %>% select(-n) %>% deframe() 
              ),
   tar_target(pocpu_group_sizes,
              all_pocpu %>% count(same_genus_truth) %>% 
@@ -59,8 +58,7 @@ list(
                    type = if_else(same_genus_truth, "Within genus","Between genera"),
                    n = prettyNum(n, big.mark =" ")
                  )
-               ) %>% select(-n) %>% deframe(),
-             format = "qs"
+               ) %>% select(-n) %>% deframe() 
   ),
   tar_target(family_label, 
              family_metadata %>% mutate(
@@ -71,10 +69,10 @@ list(
                left_join(select(genome_metadata, Phylum,Family) %>% unique(),
                          by ="Family") %>% select(Family,label, Phylum)
   ),
-  tar_target(mcc_pocpu_family, get_mcc(all_pocpu, per_family = TRUE), format = "qs"),
-  tar_target(mcc_pocpu_global, get_mcc(all_pocpu, per_family = FALSE), format = "qs"),
-  tar_target(mcc_pocp_global, get_mcc(all_pocp, per_family = FALSE), format = "qs"),
-  tar_target(pocpu_ridges, 
+  tar_target(mcc_pocpu_family, get_mcc(all_pocpu, per_family = TRUE)),
+  tar_target(mcc_pocpu_global, get_mcc(all_pocpu, per_family = FALSE)),
+  tar_target(mcc_pocp_global, get_mcc(all_pocp, per_family = FALSE)),
+  tar_target(pocpu_ridges,
              all_pocpu %>% 
                filter(same_genus_truth) %>%
                left_join(genome_metadata %>% select(Phylum,Family) %>% unique(), by ="Family") %>%
@@ -84,30 +82,25 @@ list(
   tar_quarto(slides_retreat, "2024-07-10_RetreatSlidesPOCP.qmd"),
   tar_parquet(blast_vs_all_pocp, pivot_pocp(pocp_values,family_metadata, type = "POCP")),
   tar_parquet(blast_vs_all_pocpu, pivot_pocp(pocp_values)),
-  tar_target(blast_vs_all_pocp_R2, get_lm_R2(blast_vs_all_pocp, type = "POCP"),
-             format = "qs"),
-  tar_target(blast_vs_all_pocpu_R2, get_lm_R2(blast_vs_all_pocpu, type = "POCPu"),
-             format = "qs"),
-  tar_target(R2_table, format_R2_table(blast_vs_all_pocp_R2,blast_vs_all_pocpu_R2),
-             format = "qs"),
+  tar_target(blast_vs_all_pocp_R2, get_lm_R2(blast_vs_all_pocp, type = "POCP")),
+  tar_target(blast_vs_all_pocpu_R2, get_lm_R2(blast_vs_all_pocpu, type = "POCPu")),
+  tar_target(R2_table, format_R2_table(blast_vs_all_pocp_R2,blast_vs_all_pocpu_R2)),
   tar_target(fig_blast_vs_all_pocp,
                     blast_vs_all_pocp %>% arrange(desc(pocp)) %>% 
-                      plot_pocp_vs_blast("POCP", R2_table),
-             format = "qs"
+                      plot_pocp_vs_blast("POCP", R2_table)
   ),
   tar_target(fig_blast_vs_all_pocpu,
                     blast_vs_all_pocpu %>% arrange(desc(pocp)) %>% 
-                      plot_pocp_vs_blast("POCPu", R2_table),
-             format = "qs"
+                      plot_pocp_vs_blast("POCPu", R2_table) 
   ),
   tar_target(fig_blast_vs_blastdb,
              plot_grid( blast_vs_all_pocp %>% arrange(desc(pocp)) %>% 
                           plot_pocp_blastdb("POCP"),
                         blast_vs_all_pocpu %>% arrange(desc(pocp)) %>% 
                           plot_pocp_blastdb("POCPu"),
-                        ncol = 2, labels = "AUTO"), format = "qs"),
+                        ncol = 2, labels = "AUTO")),
   tar_file(tree_file, "shorlisted_genomes.newick"),
-  tar_target(shortlisted_tree, treeio::read.tree(file = tree_file), format = "qs"),
+  tar_target(shortlisted_tree, treeio::read.tree(file = tree_file)),
   tar_target(tree_metadata,
              genome_metadata %>% select(accession,Domain:Species) %>% 
              left_join(
@@ -120,40 +113,38 @@ list(
                         ),
                       across(Domain:Species, ~ str_remove(.x, "[dpcofgs]__"))
                       ),
-             format = "qs"),
-  tar_target(fig_tree, plot_tree(shortlisted_tree,tree_metadata), format = "qs"),
-  tar_target(fig_phyla_count, plot_phyla_count(tree_metadata), format = "qs"),
+             ),
+  tar_target(fig_tree, plot_tree(shortlisted_tree,tree_metadata)),
+  tar_target(fig_phyla_count, plot_phyla_count(tree_metadata)),
   tar_file(lpsn_stats_file, "lpsn30.json"),
-  tar_target(lpsn_stats, parse_lpsn_stats(lpsn_stats_file), format = "qs"),
-  tar_target(fig_lpsn_stats, plot_lpsn_stats(lpsn_stats), format = "qs"),
+  tar_target(lpsn_stats, parse_lpsn_stats(lpsn_stats_file)),
+  tar_target(fig_lpsn_stats, plot_lpsn_stats(lpsn_stats)),
   tar_file(computing_metrics_parquet, "pocpbenchmark_computing_metrics.parquet"),
   tar_parquet(computing_metrics, read_parquet(computing_metrics_parquet)),
   tar_parquet(computing_metrics_fullbenchmark,
              computing_metrics %>% left_join(
                select(family_metadata, Family, benchmark_type), by = "Family"
              ) %>% filter(benchmark_type == "full") %>% select(-benchmark_type)),
-  tar_target(db_parsed, get_db_parsed_stats(computing_metrics_fullbenchmark), format = "qs"),
-  tar_target(tool_parsed, get_tool_parsed_stats(computing_metrics_fullbenchmark), format = "qs"),
-  tar_target(median_db, generate_table_db(db_parsed), format = "qs"),
-  tar_target(median_tool, generate_table_tool(tool_parsed), format = "qs"),
-  tar_target(db_table, format_db_table(median_db), format = "qs"),
-  tar_target(tool_table, format_tool_table(median_tool), format = "qs"),
-  tar_target(p_pocp, plot_pocp_density(all_pocp), format = "qs"),
-  tar_target(p_pocpu, plot_pocpu_density(all_pocpu), format = "qs"),
-  tar_target(p_mcc, plot_mcc(mcc_pocpu_family, family_label, mcc_pocpu_global), format = "qs"),
-  tar_target(p_mcc_random, plot_mcc_random(mcc_pocpu_family, family_label, mcc_pocpu_global), format = "qs"),
-  tar_target(p_genus_delineation, plot_genus_delineation(p_pocp,p_pocpu, p_mcc), format = "qs"),
-  tar_target(pocp_confusion, count(all_pocp, class) %>% deframe() %>% prettyNum(big.mark =" "),
-             format = "qs"),
-  tar_target(pocpu_confusion, count(all_pocpu, class) %>% deframe() %>% prettyNum(big.mark =" "),
-             format = "qs"),
-  tar_target(pocpu_confusion_by_family, count(all_pocpu, Family, class), format = "qs"),
+  tar_target(db_parsed, get_db_parsed_stats(computing_metrics_fullbenchmark)),
+  tar_target(tool_parsed, get_tool_parsed_stats(computing_metrics_fullbenchmark)),
+  tar_target(median_db, generate_table_db(db_parsed)),
+  tar_target(median_tool, generate_table_tool(tool_parsed)),
+  tar_target(db_table, format_db_table(median_db)),
+  tar_target(tool_table, format_tool_table(median_tool)),
+  tar_target(p_pocp, plot_pocp_density(all_pocp)),
+  tar_target(p_pocpu, plot_pocpu_density(all_pocpu)),
+  tar_target(p_mcc, plot_mcc(mcc_pocpu_family, family_label, mcc_pocpu_global)),
+  tar_target(p_mcc_random, plot_mcc_random(mcc_pocpu_family, family_label, mcc_pocpu_global)),
+  tar_target(p_genus_delineation, plot_genus_delineation(p_pocp,p_pocpu, p_mcc)),
+  tar_target(pocp_confusion, count(all_pocp, class) %>% deframe() %>% prettyNum(big.mark =" ")),
+  tar_target(pocpu_confusion, count(all_pocpu, class) %>% deframe() %>% prettyNum(big.mark =" ")),
+  tar_target(pocpu_confusion_by_family, count(all_pocpu, Family, class)),
   tar_target(lactobacillaceae,
              get_family_confusion_matrix(pocpu_confusion_by_family, "f__Lactobacillaceae"),
-             format = "qs"),
+             ),
   tar_target(streptomycetaceae,
              get_family_confusion_matrix(pocpu_confusion_by_family, "f__Streptomycetaceae"),
-             format = "qs"),
+             ),
   tar_target(fig_delta_genome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_genome, "Difference in genome size")),
   tar_target(fig_delta_proteome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_proteome, "Difference in proteome size")),
   tar_quarto(manuscript)
