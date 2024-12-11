@@ -158,5 +158,12 @@ list(
              ),
   tar_target(fig_delta_genome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_genome, "Difference in genome size")),
   tar_target(fig_delta_proteome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_proteome, "Difference in proteome size")),
+  tar_file(fig_delta_proteome_genome_png,
+           save_png(
+             plot_grid(fig_delta_proteome_pocpu,
+                       fig_delta_genome_pocpu,
+                       nrow = 2, labels = "AUTO", axis = "l"),
+             "figures/fig_delta_proteome_genome.png", 6, 9),
+  ),
   tar_quarto(manuscript, quiet = FALSE)
 )

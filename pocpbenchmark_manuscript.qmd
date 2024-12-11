@@ -469,14 +469,7 @@ Overall, POCPu provides a useful and interpretable metric to delineate genera.
 ::: {#suppfig-delta}
 
 ```{r suppfigdelta}
-#| fig-width: 6
-#| fig-height: 9
-#| fig-dpi: 300
-plot_grid(
-  tar_read(fig_delta_proteome_pocpu),
-  tar_read(fig_delta_genome_pocpu), nrow = 2, 
-  labels = "AUTO", axis = "l"
-)
+knitr::include_graphics(tar_read(fig_delta_proteome_genome_png))
 ```
 
 Absence of relationship between POCPu and differences in genome size (A) and proteome size (B). Each point represents a comparison between two GTDB genomes for which the absolute genome size were compared (A) and the total number of proteins (B).
