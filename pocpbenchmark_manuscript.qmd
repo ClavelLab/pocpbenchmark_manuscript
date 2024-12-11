@@ -87,7 +87,7 @@ Based on these findings, we hope to provide microbiologists with a best-practice
 ::: {#suppfig-lpsn}
 
 ```{r suppfiglpsn}
-tar_read(fig_lpsn_stats_png)
+knitr::include_graphics(tar_read(fig_lpsn_stats_png))
 ```
 
 Cumulative number of validly published genera names according to the International Code of Nomenclature of Prokaryotes (ICNP). The year 2014 is highlighted as it corresponds to the year of publication of the paper by Qin et al. (doi: 10.1128/JB.01688-14) describing the Percentage of Conserved Proteins (POCP) to delineate genus. The number of valid genera is highlighted ten years later. The data was accessed on 2024-07-19 at the List of Prokaryotic names with Standing in Nomenclature.
@@ -276,7 +276,7 @@ In total, this study conducted `r overall_stats$n_realized` pairwise comparisons
 
 ```{r tree-phyla}
 n_genomes <- nrow(tar_read(genome_metadata)) %>% prettyNum(big.mark=" ")
-tar_read(fig_tree_phyla_count_png)
+knitr::include_graphics(tar_read(fig_tree_phyla_count_png))
 ```
 
 Overview of the phylogenetic diversity of the genomes shortlisted for the benchmark. The `r n_genomes` genomes are placed on the phylogenetic tree of the GTDB (A) and colored depending whether the genomes were included in the benchmark with all approaches (shamrock green) or only with the recommended approach (sky magenta). The distribution of genomes by Phyla is indicated for each benchmark type (B).
