@@ -165,5 +165,9 @@ list(
                        nrow = 2, labels = "AUTO", axis = "l"),
              "figures/fig_delta_proteome_genome.png", 6, 9),
   ),
-  tar_quarto(manuscript, quiet = FALSE)
+  # Need to include debug = TRUE for the moment while an epic is run at quarto
+  # to solve:
+  # https://github.com/quarto-dev/quarto-cli/issues/6518
+  # https://github.com/quarto-dev/quarto-cli/issues/9078
+  tar_quarto(manuscript, quiet = FALSE, debug = TRUE)
 )
