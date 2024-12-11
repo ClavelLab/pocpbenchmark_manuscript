@@ -360,13 +360,10 @@ Coefficient of determination ($R^2$) and associated $p$-value are shown on top o
 ::: {#fig-blast-vs-all-pocpu}
 
 ```{r blast_vs_all_pocpu}
-#| fig-width: 9
-#| fig-height: 5
-#| fig-dpi: 300
 n_blast_comparisons_pocpu <- tar_read(blast_vs_all_pocpu) %>%
   count(tool) %>% pull(n) %>%
   unique() %>% prettyNum(big.mark=" ")
-tar_read(fig_blast_vs_all_pocpu)
+knitr::include_graphics(tar_read(fig_blast_vs_all_pocpu_png))
 ```
 
 Adequacy between POCPu values computed with the legacy BLAST_BLASTP against flavors of faster alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].

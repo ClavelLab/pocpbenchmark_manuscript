@@ -94,6 +94,8 @@ list(
                     blast_vs_all_pocpu %>% arrange(desc(pocp)) %>% 
                       plot_pocp_vs_blast("POCPu", R2_table) 
   ),
+  tar_file(fig_blast_vs_all_pocpu_png, save_png(fig_blast_vs_all_pocpu,
+                                               "figures/fig_blast_vs_all_pocpu.png", 9, 5)),
   tar_target(fig_blast_vs_blastdb,
              plot_grid( blast_vs_all_pocp %>% arrange(desc(pocp)) %>% 
                           plot_pocp_blastdb("POCP"),
