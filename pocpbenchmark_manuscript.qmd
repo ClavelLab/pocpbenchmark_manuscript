@@ -457,9 +457,9 @@ MCC is a binary classification rate that gives a high score only when the classi
 Therefore, POCPu (MCC = `r mcc_pocpu`) surpasses POCP (MCC = `r mcc_pocp`) to delineate bacterial genus.
 
 When we consider the bacterial families separately, another pattern emerge (@fig-genus-delineation C).
-In `r tally_mcc_thresholds["n_25"]` families out of 35, POCPu is clearly not adequate to delineate genus with low MCC (MCC $\leq$ 0.25; @fig-genus-delineation C).
+In `r tally_mcc_thresholds[["n_25"]]` families out of 35, POCPu is clearly not adequate to delineate genus with low MCC (MCC $\leq$ 0.25; @fig-genus-delineation C).
 The large family of _Streptomycetaceae_ (Actinomycetota), for instance, exhibits many `r targets::tar_read(streptomycetaceae)`.
-Not all is lost, as `r tally_mcc_thresholds["n_70"]` families out of 35 show that POCPu delineates bacterial genera accurately (MCC $\geq$ 0.7;  @fig-genus-delineation C). For instance, for all the comparisons done within the _Lactobacillaceae_ family (Bacillota), we see `r targets::tar_read(lactobacillaceae)`.
+Not all is lost, as `r tally_mcc_thresholds[["n_70"]]` families out of 35 show that POCPu delineates bacterial genera accurately (MCC $\geq$ 0.7;  @fig-genus-delineation C). For instance, for all the comparisons done within the _Lactobacillaceae_ family (Bacillota), we see `r targets::tar_read(lactobacillaceae)`.
 All categories of the confusion matrix vary greatly, which underline the need to a metric that can aggregate these counts without bias, and thus show that while POCPu is not a one-size-fits-all method, it can correctly delineate genera.
 
 We even leverage our large dataset to assess claims that POCP is influenced by differences in genome size [@riescoUpdateProposedMinimal2024].
