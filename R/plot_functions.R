@@ -63,22 +63,28 @@ plot_pocp_blastdb <- function(df, pocp_label, with_R2=TRUE){
   # Get the min max values to set up matching x and y axes intervals
   extremes<- df %>%
     summarise(
-      min = min(BLAST_BLASTP, pocp),
-      max = max(BLAST_BLASTP, pocp)) %>%
+      min = min(BLAST_BLASTP, pocp)*0.95,
+      max = max(BLAST_BLASTP, pocp)*1.05) %>%
     as_vector()
   
   p <- df %>%
     ggplot(aes(x = BLAST_BLASTP, y = pocp)) +
-    ggdensity::geom_hdr_points(size=0.5) +
-    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +
+    geom_hex(colour = "white", linewidth=0.1)+
+    scale_fill_viridis_b(name = "viridis")+
+    guides(fill = guide_coloursteps(
+      title = "Data points per hexagon",
+      show.limits = TRUE))+
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed",
+                color = "black", alpha=0.5) +
     coord_fixed()+
     scale_y_continuous(limits = extremes)+
     scale_x_continuous(limits = extremes)+
     labs(x = paste0(pocp_label, " based on BLAST_BLASTP (in %)"),
-         y = paste0(pocp_label, " based on BLAST_BLASTPDB (in %)"),
-         color = "Highest density\nregions")+
+         y = paste0(pocp_label, " based on BLAST_BLASTPDB (in %)"))+
     theme_cowplot(font_size = 12)+
-    theme(legend.position = "bottom", strip.text.x = element_text(size = 8))
+    theme(legend.position = "bottom", strip.text.x = element_text(size = 8),
+          legend.key.height = unit(1, "lines"),
+          legend.key.width = unit(2, "lines"))
   
   if(with_R2){
     df_R2 <- df %>% group_by(tool) %>%
