@@ -84,7 +84,7 @@ plot_pocp_blastdb <- function(df, pocp_label, with_R2=TRUE){
     theme_cowplot(font_size = 12)+
     theme(legend.position = "bottom", strip.text.x = element_text(size = 8),
           legend.key.height = unit(1, "lines"),
-          legend.key.width = unit(2, "lines"))
+          legend.key.width = unit(1.75, "lines"))
   
   if(with_R2){
     df_R2 <- df %>% group_by(tool) %>%
