@@ -60,6 +60,12 @@ list(
                  )
                ) %>% select(-n) %>% deframe() 
   ),
+  tar_target(pocp_range,   pull(all_pocp, pocp) %>%
+               range() %>% round(digits = 1) %>% 
+               glue::glue_collapse(" to ") %>% glue::glue("{range} for POCP", range=.)),
+  tar_target(pocpu_range, pull(all_pocpu, pocp) %>%
+               range() %>% round(digits = 1) %>% 
+               glue::glue_collapse(" to ") %>% glue::glue("{range} for POCPu", range=.)),
   tar_target(family_label, 
              family_metadata %>% mutate(
                label = glue::glue("italic(\"{fam}\")~(n == {n_genomes})",
@@ -142,6 +148,9 @@ list(
   tar_target(tool_table, format_tool_table(median_tool)),
   tar_target(p_pocp, plot_pocp_density(all_pocp)),
   tar_target(p_pocpu, plot_pocpu_density(all_pocpu)),
+  tar_target(p_pocp_pocpu_densities, plot_pocp_pocpu_densities(p_pocp, p_pocpu)),
+  tar_file(fig_pocp_pocpu_densities_png, save_png(p_pocp_pocpu_densities,
+                                              "figures/fig_pocp_pocpu_densities.png", 5, 6)),
   tar_target(p_mcc, plot_mcc(mcc_pocpu_family, family_label, mcc_pocpu_global)),
   tar_target(p_mcc_random, plot_mcc_random(mcc_pocpu_family, family_label, mcc_pocpu_global)),
   tar_target(p_genus_delineation, plot_genus_delineation(p_pocp,p_pocpu, p_mcc)),

@@ -275,6 +275,15 @@ plot_mcc_random <- function(mcc_df_per_family,family_label, mcc_df_global){
   return(p)
 }
 
+plot_pocp_pocpu_densities <- function(p_pocp_density, p_pocpu_density){
+  plot_grid(
+    p_pocp_density+theme(legend.position = "none"),
+    p_pocpu_density,
+    nrow = 2,
+    labels = c("A","B")
+  )
+}
+
 plot_genus_delineation <- function(p_pocp_density, p_pocpu_density, p_mcc){
   p_densities <- plot_grid(
     p_pocp_density+theme(legend.position = "none"),

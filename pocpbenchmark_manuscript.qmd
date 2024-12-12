@@ -424,20 +424,27 @@ Still, this distribution spills above the threshold, indicating POCPu also produ
 Like POCP, "Within genus" POCPu concentrate largely above the threshold of 50% (TP = `r pocpu_confusion["TP"]`), with fewer below the threshold (FN = `r pocpu_confusion["FN"]`).
 
 
+::: {#fig-pocp-pocpu-densities}
+
+```{r pocp-pocpu-densities}
+tar_load(c(pocpu_group_sizes, pocp_range, pocpu_range))
+knitr::include_graphics(tar_read(fig_pocp_pocpu_densities_png))
+```
+
+Distribution of POCP (A) and POCPu (B) values for all pairwise genome comparisons: `r pocpu_group_sizes[1]` in orange and `r pocpu_group_sizes[2]` in sky blue, both based on GTDB taxonomy.
+Contrast these true categories with POCP/POCPu decisions: POCP > 50%, meaning right of the dashed line (A, B) indicates more than half of shared conserved proteins, and hence same genus.
+POCP and POCPu values are calculated with the recommended approach DIAMOND_VERYSENSITIVE (@tbl-tools-parameters) and they range from `r pocp_range` and `r pocpu_range`.
+:::
+
+
 ::: {#fig-genus-delineation}
 
 ```{r genus-delineation}
-#| fig-width: 11
-#| fig-height: 6
-#| fig-dpi: 300
-tar_load(pocpu_group_sizes)
+tar_load(c(pocpu_group_sizes, pocp_range, pocpu_range))
 knitr::include_graphics(tar_read(p_genus_delineation_png))
 ```
 
-A data-driven evaluation of how well POCP and POCPu distinguish genera.
-Distribution of POCP (A) and POCPu (B) values for all pairwise genome comparisons: `r pocpu_group_sizes[1]` in orange and `r pocpu_group_sizes[2]` in sky blue, both based on GTDB taxonomy.
-Contrast these true categories with POCP/POCPu decisions: POCP > 50%, meaning right of the dashed line (A, B) indicates more than half of shared conserved proteins, and hence same genus.
-POCP and POCPu values are calculated with the recommended approach DIAMOND_VERYSENSITIVE (@tbl-tools-parameters).
+
 How well POCPu delineates genera is tested with the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020]. We show MCC values for each family where MCC of -1 and +1 indicates perfect misclassification and classification, respectively (C). Random genus delineation would give MCC = 0. The dashed line indicated the overall MCC when not splitting by family. We also highlight how many n genomes are included per family, and their phyla in the vertical facets (C).
 :::
 
