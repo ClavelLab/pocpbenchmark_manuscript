@@ -307,7 +307,7 @@ knitr::include_graphics(tar_read(fig_blast_vs_blastdb_png))
 
 Adequacy between POCP (A) and POCPu (B) values computed with the legacy BLAST_BLASTP against the BLAST_BLASTPDB approach that build databases before alignment.
 Each point ($n$ = `r n_blastdb_comparisons` per tool) represents a POCP/POCPu value between two genomes (see @eq-pocp and @eq-pocpu).
-The colors represent the probability of finding a point within a certain region, with darker colors indicating higher probabilities. The regions shown are the smallest areas that contain 50%, 80%, 95%, 99% and 100% of the data points, and are known as Highest Density Regions (HDRs).
+The colors represent the number of data points binned together in hexagons to avoid over-plotting.
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
 
@@ -352,7 +352,7 @@ knitr::include_graphics(tar_read(fig_blast_vs_all_pocp_png))
 
 Adequacy between POCP values computed with the legacy BLAST_BLASTP against flavors of faster alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].
 Each point ($n$ = `r n_blast_comparisons` per tool) represents a POCP value between two genomes (see @eq-pocp).
-The colors represent the probability of finding a point within a certain region, with darker colors indicating higher probabilities. The regions shown are the smallest areas that contain 50%, 80%, 95%, 99% and 100% of the data points, and are known as Highest Density Regions (HDRs).
+The colors represent the number of data points binned together in hexagons to avoid over-plotting.
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
 
@@ -368,7 +368,7 @@ knitr::include_graphics(tar_read(fig_blast_vs_all_pocpu_png))
 
 Adequacy between POCPu values computed with the legacy BLAST_BLASTP against flavors of faster alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].
 Each point ($n$ = `r n_blast_comparisons_pocpu` per tool) represents a POCPu value between two genomes (see @eq-pocpu).
-The colors represent the probability of finding a point within a certain region, with darker colors indicating higher probabilities. The regions shown are the smallest areas that contain 50%, 80%, 95%, 99% and 100% of the data points, and are known as Highest Density Regions (HDRs).
+The colors represent the number of data points binned together in hexagons to avoid over-plotting.
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
 
