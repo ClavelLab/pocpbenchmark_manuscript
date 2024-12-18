@@ -10,7 +10,8 @@ tar_option_set(
 
 tar_source(c("R/data_manipulation_functions.R",
            "R/plot_functions.R",
-           "R/table_functions.R"))
+           "R/table_functions.R",
+           "R/optimization_functions.R"))
 
 # End this file with a list of target objects.
 list(
@@ -180,6 +181,7 @@ list(
                        ncol = 2, labels = "AUTO", axis = "b"),
              "figures/fig_delta_proteome_genome.png", 9, 7),
   ),
+  tar_target(optimized_pocpu, get_optimized_pocp_threshold(all_pocpu, mcc_pocpu_family, family_label)),
   # Need to include debug = TRUE for the moment while an epic is run at quarto
   # to solve:
   # https://github.com/quarto-dev/quarto-cli/issues/6518
