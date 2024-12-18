@@ -314,3 +314,31 @@ plot_pocp_delta <- function(df, pocp_label, delta, delta_label){
           legend.key.width = unit(2, "lines"),
           legend.text = element_text(size = 11))
 }
+
+# Plot a selection of family specific POCPu densities
+#  depending on their MCC for illustration purposes
+# Specify the families and their label as follow in mcc_examples
+# c("Low"="f__Streptomycetaceae",
+#   "Mid"="f__Lactobacillaceae",
+#   "High"="f__Xanthobacteraceae")
+plot_mcc_examples <- function(df, mcc_df_per_family, mcc_examples){
+  pocpu_mcc <- df %>%
+    filter(Family %in% mcc_examples) %>% 
+    left_join(mcc_df_per_family, by = "Family") %>%
+    mutate(
+      Family = forcats::as_factor(Family) %>% forcats::fct_reorder(mcc),
+      rank = forcats::fct_recode(Family, !!!mcc_examples ),
+      label = glue::glue("{rank} MCC ({mcc})", mcc = round(mcc, digits = 2))
+      )
+  
+  p <- plot_pocpu_density(pocpu_mcc)+
+    theme(legend.position="bottom",
+          legend.title.position = "top",
+          strip.text = element_text(face = "italic"))+
+    facet_wrap(~Family, nrow = 3,
+               labeller = as_labeller(function(x) str_remove(x,"f__")))+
+    geom_text(data=function(x){distinct(x, Family, rank, label)},
+              aes(label=label, fill=NULL), x = 80, y=0.20)
+  rm(pocpu_mcc)
+  return(p)
+}
