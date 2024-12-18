@@ -284,15 +284,9 @@ plot_pocp_pocpu_densities <- function(p_pocp_density, p_pocpu_density){
   )
 }
 
-plot_genus_delineation <- function(p_pocp_density, p_pocpu_density, p_mcc){
-  p_densities <- plot_grid(
-    p_pocp_density+theme(legend.position = "none"),
-    p_pocpu_density,
-    nrow = 2,
-    labels = c("A","B")
-  )
-  plot_grid(p_densities, p_mcc,
-            ncol = 2, axis="b",labels = c("","C"),
+plot_genus_delineation <- function(p_mcc_examples, p_mcc){
+  plot_grid(p_mcc_examples, p_mcc,
+            ncol = 2, axis="b",labels = "AUTO",
             rel_widths =  c(0.4, 0.6))
 }
 
