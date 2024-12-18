@@ -287,7 +287,7 @@ plot_pocp_pocpu_densities <- function(p_pocp_density, p_pocpu_density){
 plot_genus_delineation <- function(p_mcc_examples, p_mcc){
   plot_grid(p_mcc_examples, p_mcc,
             ncol = 2, axis="b",labels = "AUTO",
-            rel_widths =  c(0.4, 0.6))
+            rel_widths =  c(0.3, 0.7))
 }
 
 plot_pocp_delta <- function(df, pocp_label, delta, delta_label){

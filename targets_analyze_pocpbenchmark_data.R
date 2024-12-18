@@ -161,7 +161,7 @@ list(
                                  "High"="f__Xanthobacteraceae"))),
   tar_target(fig_genus_delineation, plot_genus_delineation(p_mcc_examples, p_mcc)),
   tar_file(fig_genus_delineation_png, save_png(fig_genus_delineation,
-                                             "figures/fig_genus_delineation.png", 11, 6)),
+                                             "figures/fig_genus_delineation.png", 10, 6)),
   tar_target(pocp_confusion, count(all_pocp, class) %>% deframe() %>% prettyNum(big.mark =" ")),
   tar_target(pocpu_confusion, count(all_pocpu, class) %>% deframe() %>% prettyNum(big.mark =" ")),
   tar_target(pocpu_confusion_by_family, count(all_pocpu, Family, class)),
