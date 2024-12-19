@@ -97,3 +97,36 @@ format_R2_table <- function(pocp_table, pocpu_table){
     rename_R2_table(pocpu_table),
     by = "tool")
 }
+
+format_optimized_pocp_table <- function(optim_df){
+  optim_df %>% 
+    arrange(optimized_threshold) %>% 
+    mutate(
+      across(Phylum:Family, ~ str_remove(.x, "[p|f]__"))
+      ) %>% 
+    gt::gt() %>% 
+    fmt_tf(
+      columns = improved_classification,
+      tf_style = "check-mark"
+    ) %>% 
+    fmt_number(
+      columns = ends_with("mcc"), decimals = 2,
+    ) %>%
+    fmt_number(
+      columns = optimized_threshold, decimals = 1
+    ) %>% 
+    tab_style(
+      style = cell_text(style = "italic"),
+      locations = cells_body(columns = c(Phylum, Family))
+    ) %>% 
+    cols_label(
+      mcc_change = md("$\\Delta$MCC"), 
+      mcc = "MCC",maximum_mcc="Max. MCC",
+      improved_classification = "",
+      optimized_threshold = md("Threshold")
+    ) %>%
+    tab_options(column_labels.font.weight = "bold") %>% 
+    cols_hide(threshold_change) %>% 
+    cols_move_to_start(improved_classification)
+}
+

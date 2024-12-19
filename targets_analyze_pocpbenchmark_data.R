@@ -172,6 +172,7 @@ list(
   tar_target(streptomycetaceae,
              get_family_confusion_matrix(pocpu_confusion_by_family, "f__Streptomycetaceae"),
              ),
+  tar_target(optimized_pocpu_table, format_optimized_pocp_table(optimized_pocpu)),
   tar_target(fig_delta_genome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_genome, "Difference in genome size")),
   tar_target(fig_delta_proteome_pocpu, plot_pocp_delta(all_pocpu, "POCPu", delta_proteome, "Difference in proteome size")),
   tar_file(fig_delta_proteome_genome_png,

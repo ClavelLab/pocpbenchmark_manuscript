@@ -474,6 +474,22 @@ We even leverage our large dataset to assess claims that POCP is influenced by d
 We found no convincing patterns to support the claim in difference of genome size (@suppfig-delta A) nor in number of proteins (i.e., proteome; @suppfig-delta B).
 Overall, POCPu provides a useful and interpretable metric to delineate genera.
 
+::: {#tbl-optimized_threshold}
+
+
+```{r optimized_threshold}
+#| html-table-processing: none
+#| classes: plain
+library(gt)
+tar_read(optimized_pocpu_table)
+```
+
+
+Tentative family-specific POCPu thresholds for genus delineation.
+The thresholds were obtained after maximizing the MCC value via optimization.
+Ticks indicate that MCC value change was greater than 0.1 with the optimized threshold, and highlights potential family-specific threshold worth considering to replace the default of 50%. Crosses indicate families for which such optimization was deemed unecessary.
+:::
+
 ::: {#suppfig-delta}
 
 ```{r suppfigdelta}
