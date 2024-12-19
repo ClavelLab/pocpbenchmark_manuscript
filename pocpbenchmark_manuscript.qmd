@@ -316,6 +316,7 @@ Coefficient of determination ($R^2$) and associated $p$-value are shown on top o
 ::: {#tbl-R2}
 
 ```{r R2}
+#| html-table-processing: none
 #| classes: plain
 library(gt)
 tar_load(R2_table)
