@@ -222,6 +222,34 @@ plot_pocpu_density <- function(df){
     scale_y_continuous(expand = expansion(mult = c(0,0.01)))
 }
 
+# Split the POCPu density plots by family and indicates optimized thresholds
+plot_pocpu_density_family <- function(df, optimal){
+  optimal_df <- optimal %>%
+    mutate(
+      default_threshold = 50,
+      optimized_threshold = if_else(improved_classification, optimized_threshold,default_threshold)
+    ) %>%
+    select(Family, ends_with("threshold") ) %>%
+    pivot_longer(!Family, names_to = "POCPu Threshold") %>% 
+    mutate(`POCPu Threshold` = str_remove(`POCPu Threshold`, "_threshold") %>% str_to_title())
+  p <- df %>% 
+    ggplot(aes(x = pocp, fill = same_genus_truth))+
+    geom_density(alpha = 0.5)+
+    theme_cowplot(font_size = 12, rel_small = 10/14)+
+    scale_fill_okabe_ito(labels = c("TRUE"="Within genus","FALSE"="Between genera"))+
+    geom_vline(aes(linetype=`POCPu Threshold`, xintercept = value), data = optimal_df, alpha=0.5)+
+    labs(x="POCPu", fill = "True category",y = "Density")+
+    scale_y_continuous(expand = expansion(mult = c(0,0.01)))+
+    scale_x_continuous(limits = c(0,100))+
+    scale_linetype_manual(values = c("Default"="dashed", "Optimized"="solid"))+
+    facet_wrap(vars(Family), nrow = 7, scales = "free_y",strip.position = "top", axes = "all_x",
+               labeller = as_labeller(function(x) str_remove(x,"f__")))+
+    theme(legend.position = "bottom",strip.background = element_blank(), strip.placement = "outside",
+          strip.text = element_text(size = 6, face = "bold.italic"))
+  rm(optimal_df)
+  return(p)
+}
+
 plot_mcc <- function(mcc_df_per_family,family_label, mcc_df_global){
   mcc_df_per_family <- mcc_df_per_family %>%
     left_join(family_label, by = "Family") %>% 
