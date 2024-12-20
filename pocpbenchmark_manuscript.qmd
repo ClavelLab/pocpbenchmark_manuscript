@@ -74,14 +74,14 @@ A major limitation of POCP is that the comparison of all proteins within each ge
 Given that the number of valid genus names has nearly doubled (@suppfig-lpsn) since the original proposition of POCP by @qinProposedGenusBoundary2014, scalable methods as well as a timely reevaluation of the POCP is required.
 
 
-@hernandez-salmeronProgressQuicklyFinding2020 compared proteins alignment tools to find faster alternatives, without a lose in precision, showing that DIAMOND [@buchfinkSensitiveProteinAlignments2021], when switched to sensitive parameters instead of defaults, correctly found 87% of the reciprocal best hits of BLASTP [@camachoBLASTArchitectureApplications2009] in less than 8% of the time.
+@hernandez-salmeronProgressQuicklyFinding2020 compared proteins alignment tools to find faster alternatives, without a loss in precision, showing that DIAMOND [@buchfinkSensitiveProteinAlignments2021], when switched to sensitive parameters instead of defaults, correctly found 87% of the reciprocal best hits of BLASTP [@camachoBLASTArchitectureApplications2009] in less than 8% of the time.
 Recently, @holzerPOCPnfAutomaticNextflow2024 suggested the use of DIAMOND with ultra-sensitive settings to compute POCP faster than with BLASTP. His approach is based on previously available script [@holzerHoelzerPocp2020], implemented as a nextflow workflow [@holzerPOCPnfAutomaticNextflow2024]. However, his comparisons are based on limited set of 5 genera, each ranging from 15 to 167 genomes. 
 However, the the current implementations of POCP available as tools assume conserved proteins have unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021], differing from the original implementation of POCP which had no such limitation [@qinProposedGenusBoundary2014].
 We need a clear definition of POCP to clarify the process and ensure repeatability.
 
 
 To achieve this, we aimed to identify a scalable alternative to BLASTP to compute POCP. Whilst fast and scalable, this alternative should not compromise the accuracy of the original approach.
-Second, as POCP provides an interpretable and used metric that can delineate bacterial genera, we will evaluate the ability of POCP to correctly delineate bacterial genera using the optimised implementation.
+Second, as POCP provides an interpretable and used metric that can delineate bacterial genera, we will evaluate the ability of POCP to correctly delineate bacterial genera using the optimized implementation.
 Based on these findings, we hope to provide microbiologists with a best-practice tool they can confidently use in their workflow to determine the genus assignment of a genome.
 
 ::: {#suppfig-lpsn}
@@ -208,7 +208,7 @@ Tools used are provided within Docker container [@merkelDockerLightweightLinux20
 
 Nextflow natively keep track of the time, CPU, memory and disk usage of each process in an execution trace log file that we used to evaluate computing resources utilization. Process duration is available as walltime and realtime, the CPU usage is reported as a percentage of usage of a unique CPU, meaning multi-threaded processes will have a value higher than 100%.
 
-Statistical analyses and visualisation were conducted within R using targets v.1.7.0 [@landauTargetsPackageDynamic2021].
+Statistical analyses and visualization were conducted within R using targets v.1.7.0 [@landauTargetsPackageDynamic2021].
 
 
 # Results
@@ -337,14 +337,14 @@ R2_table %>% arrange(desc(POCPu_R2)) %>%
 Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r ` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
 :::
 
-BLASTPDB produced exactly similar POCP values to BLASTP (@suppfig-blastdb A). The other approaches do no perfom as well.
+BLASTPDB produced exactly similar POCP values to BLASTP (@suppfig-blastdb A). The other approaches do not perform as well.
 All flavors of DIAMOND have a coefficient of determination ($R^2$) above 0.99 when matching their POCP values with the original from BLASTP, with the exception of the DIAMOND_FAST approach that deviates more from the expected values (@fig-blast-vs-all-pocp and @tbl-R2).
 This deviation is exacerbated when using the MMSEQS2_S1DOT0 approach, but is somehow rescued with the others MMSEQS2 approaches, though they perform worse than the DIAMOND approaches and should therefore not be used as BLASTP alternatives for POCP.
 
 What happens when POCP values deviate between the alternative and BLASTP?
 If the alternative underestimate POCP -- i.e., with values under the dashed line in @fig-blast-vs-all-pocp --, the alternative will split genus and tend to assign genomes to different genera when they are from the same genus.
 Conversely, if the alternative overestimate POCP -- i.e., with values over the dashed line in @fig-blast-vs-all-pocp --, the alternative will lump genera together and tend to assign genomes to the same genus when they are not.
-DIAMOND approaches show underestimation, especially DIAMOND_FAST, but not overestimation (@fig-blast-vs-all-pocp), whilst MMSEQS2 approaches tend to overestimate more than underestimate, with more deviation alltogether.
+DIAMOND approaches show underestimation, especially DIAMOND_FAST, but not overestimation (@fig-blast-vs-all-pocp), whilst MMSEQS2 approaches tend to overestimate more than underestimate, with more deviation altogether.
 All in all, DIAMOND-based approaches, especially with increased sensitivity gives POCP as accurate as BLASTP for a fraction of the time.
 
 
@@ -433,7 +433,7 @@ Indeed, POCP yields a high number of false positives (FP = `r pocp_confusion["FP
 Thankfully, most of the "Within genus" distribution of POCP is above 50% (TP = `r pocp_confusion["TP"]`), with fewer below the threshold (FN = `r pocp_confusion["FN"]`).
 
 POCPu is closer to our expectations (@fig-pocp-pocpu-densities B).
-"Between genera" POCPu follows a bimodal distribution, with the highest peak and most of the distribution below the 50% threshold (TN = `r pocpu_confusion["TN"]`).
+"Between genera" POCPu follows a bi-modal distribution, with the highest peak and most of the distribution below the 50% threshold (TN = `r pocpu_confusion["TN"]`).
 Still, this distribution spills above the threshold, indicating POCPu also produces false positives (FP = `r pocp_confusion["FP"]`).
 Like POCP, "Within genus" POCPu concentrate largely above the threshold of 50% (TP = `r pocpu_confusion["TP"]`), with fewer below the threshold (FN = `r pocpu_confusion["FN"]`).
 All in all, we put forward that considering only unique matches enhances genus delineation.
@@ -529,7 +529,7 @@ tar_read(optimized_pocpu_table)
 
 Tentative family-specific POCPu thresholds for genus delineation.
 The thresholds were obtained after maximizing the MCC value via optimization.
-Ticks indicate that MCC value change was greater than 0.1 with the optimized threshold, and highlights potential family-specific threshold worth considering to replace the default of 50%. Crosses indicate families for which such optimization was deemed unecessary.
+Ticks indicate that MCC value change was greater than 0.1 with the optimized threshold, and highlights potential family-specific threshold worth considering to replace the default of 50%. Crosses indicate families for which such optimization was deemed unnecessary.
 :::
 
 
