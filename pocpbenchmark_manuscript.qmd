@@ -104,6 +104,27 @@ We devised a set of inclusion criteria to facilitate inclusion of a diverse rang
 
 The criteria for study of a bacterial entry within the GTDB (r214) was: (1) the bacteria has a valid name according to the LPSN, (2) the entry is a representative genome, (3) the bacteria belongs to a family with at least two genera, and (5) it belongs to a genus with at least ten genomes. Based on these criteria, the protein sequence files for the shortlisted bacteria were obtained from GTDB.
 
+
+```{r funnel}
+funnel <- c(
+  "GTDB_Genomes" = 394932,
+  "Representatives" = 80789,
+  "Valid_names" = 11699,
+  "More_10_species_per_genus" = 5904,
+  "More_1_genus_per_family" = 4767
+)
+funnel_text <- funnel %>% prettyNum(big.mark=" ") %>% as.list() %>% 
+  glue::glue_data(
+    "Out of a total of {GTDB_Genomes} GTDB bacterial genomes",
+    "{Representatives} are representative genomes",
+    "{Valid_names} have valid names",
+    "{More_10_species_per_genus} belongs to a genus with at least ten genomes",
+    "and {More_1_genus_per_family} belongs to a family with at least two genera", .sep = ", "
+    )
+```
+
+`r funnel_text`.
+
 The bacterial phylogenetic tree of the shortlisted genomes was constructed by trimming the bacterial tree released by GTDB using custom Python scripts and the ETE3 library [@huerta-cepasETEReconstructionAnalysis2016].
 
 
@@ -122,18 +143,6 @@ Conserved proteins are defined as protein sequences matches from the query with 
 
 Pairwise comparisons between a query sequence ($Q$) and a subject sequence ($S$) were defined by banning self-comparisons ($Q \neq S$) and considering reciprocal comparisons ($Q\text{-}S$ and $S\text{-}Q$) only within the same family to prevent exponential explosion.
 
-However, proteins sequences from the query can match multiple subject sequences in the case of duplicated genes.
-While briefly mentioned in the original paper that "The number of conserved proteins in each genome of strains being compared was slightly different because of the existence of duplicate genes (paralogs)" [@qinProposedGenusBoundary2014, p. 2211], the expected influence on the POCP values is lacking.
-In our experience, this results in POCP values above the theoretical upper bound of 100%.
-Therefore, we defined the POCP with unique matches (POCPu) between two genomes $Q$ and $S$ as:
-
-$$
-POCPu = \dfrac{C_{uQS} + C_{uSQ}}{T_Q + T_S} \times 100\%
-$$ {#eq-pocpu}
-
-where $C_{uQS}$ represent the conserved number of proteins from *the unique matches of* $Q$ when aligned to $S$ and conversely $C_{uSQ}$ represent the conserved number of proteins from *the unique matches of* $S$ when aligned to $Q$, and $T_Q + T_S$ represent the total number of proteins in the two genomes being compared, respectively.
-Thus the range of POCP is actually $\left[0;\infty\right[$ and the range of POCPu is $\left[0;100\%\right]$.
-Note that the assumption regarding unique matches is made implicitly when using some POCP implementation [e.g., @holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024; @linSilentGeneBiopyBiopy2021].
 
 ## Approaches for proteins sequence alignment benchmark
 
@@ -204,26 +213,14 @@ Statistical analyses and visualisation were conducted within R using targets v.1
 
 # Results
 
-We evaluated the use of ten proteins alignment approaches based on three tools for calculation of the Percentage Of Conserved Proteins (POCP). For this, genomes from the GTDB were used [@parksGTDBOngoingCensus2022].
+## Finding a BLASTP alternative for POCP
 
 
-```{r funnel}
-funnel <- c(
-  "GTDB_Genomes" = 394932,
-  "Representatives" = 80789,
-  "Valid_names" = 11699,
-  "More_10_species_per_genus" = 5904,
-  "More_1_genus_per_family" = 4767
-)
-funnel_text <- funnel %>% prettyNum(big.mark=" ") %>% as.list() %>% 
-  glue::glue_data(
-    "Out of a total of {GTDB_Genomes} GTDB bacterial genomes",
-    "{Representatives} are representative genomes",
-    "{Valid_names} have valid names",
-    "{More_10_species_per_genus} belongs to a genus with at least ten genomes",
-    "and {More_1_genus_per_family} belongs to a family with at least two genera", .sep = ", "
-    )
-phyla_count_text <- tar_read(tree_metadata) %>%
+First, we set out to identify a scalable alternative to BLASTP to compute the Percentage Of Conserved Proteins (POCP) to delineate genera.
+We evaluated ten proteins alignment approaches (@tbl-tools-parameters) based on three tools -- BLASTP [@camachoBLASTArchitectureApplications2009], DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMseqs2 [@steineggerMMseqs2EnablesSensitive2017].
+
+```{r benchmark_all_text}
+phyla_count_text <- tar_read(tree_metadata) %>% filter(benchmark_type=="All approaches") %>% 
   select(Phylum:Species) %>%
   group_by(Phylum) %>%
   summarise(across(everything(),n_distinct)) %>%
@@ -251,7 +248,7 @@ stats_by_type <- tar_read(family_metadata) %>%
     n_realized = sum(n_comparisons_realized),
     total_hours = sum(CPU_hours)
     )
-overall_stats <- stats_by_type %>% 
+overall_stats <- stats_by_type %>% filter(benchmark_type=="full") %>% 
   summarise(across(!benchmark_type,sum)) %>% 
   mutate(
     total_hours = round(total_hours),
@@ -265,27 +262,6 @@ stats_by_type_text <- stats_by_type %>%
 ```
 
 
-`r funnel_text`.
-This shortlist of `r overall_stats$n_genomes` genomes covers a wide range of bacterial phylogenetic diversity across four phyla: `r phyla_count_text`.
-
-The families were split into two benchmark group: the full benchmark using all ten approaches `r stats_by_type_text[1]`, or using only the recommended approach `r stats_by_type_text[2]`. 
-
-In total, this study conducted `r overall_stats$n_realized` pairwise comparisons with a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).
-
-::: {#fig-tree-phyla}
-
-```{r tree-phyla}
-n_genomes <- nrow(tar_read(genome_metadata)) %>% prettyNum(big.mark=" ")
-knitr::include_graphics(tar_read(fig_tree_phyla_count_png))
-```
-
-Overview of the phylogenetic diversity of the genomes shortlisted for the benchmark. The `r n_genomes` genomes are placed on the phylogenetic tree of the GTDB (A) and colored depending whether the genomes were included in the benchmark with all approaches (shamrock green) or only with the recommended approach (sky magenta). The distribution of genomes by Phyla is indicated for each benchmark type (B).
-:::
-
-
-
-## Comparison with the BLAST_BLASTP legacy approach
-
 ```{r genomes-in-full}
 n_genomes_in_full <- stats_by_type %>% 
   filter(benchmark_type=="full") %>% pull(n_genomes) %>% 
@@ -293,9 +269,34 @@ n_genomes_in_full <- stats_by_type %>%
 ```
 
 
-Using the `r n_genomes_in_full` genomes from the full benchmark (@fig-tree-phyla), we evaluate whether the accuracy of the POCP calculation is not sacrificed in the name of computational performance.
+::: {#tbl-tools-metrics}
 
-We first made sure that the database approach to BLAST_BLASTP (@tbl-tools-parameters), that allows for parallel computations produced similar POCP values to the BLAST_BLASTP approach (@suppfig-blastdb A).
+```{r tools-metrics}
+n_processes <- tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")
+tar_read(tool_table) %>% filter(tool!="BLAST_BLASTP") %>%
+  select(-n) %>%
+  rename("Approach name" = "tool",
+         "Time"="time_fold", "Memory"="memory_fold",
+         "CPU"="cpu_fold", "Disk usage (I/O)"="io_fold") %>% 
+  knitr::kable(digits = 3)
+```
+
+Fold change of computing metrics for the 9 approaches used in the benchmark compared to the BLAST_BLASTP approach.
+The metrics include processing time as real-time, memory usage, CPU usage and disk usage as input/output (I/O).
+A fold change below 1 means the metric is lower, whilst above 1 means it is higher, compared to the BLAST_BLASTP approach.
+The fold change values are median computed over $n$ = `r n_processes` number of processes tracked per approach.
+:::
+
+
+To do so, we used GTDB genomes from a wide range of bacterial phylogenetic diversity across four phyla: `r phyla_count_text`. 
+We processed these `r n_genomes_in_full` genomes and conducted `r overall_stats$n_realized` pairwise comparisons with a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).
+All the approaches tested are faster than our control BLASTP (@tbl-tools-metrics).
+BLASTPDB, the database approach to BLASTP (@tbl-tools-parameters) that allows for parallel computations, was only half the time of BLASTP on average, but DIAMOND and MMSEQS2 based approaches were ran in a fraction of the time of BLASTP.
+Such speed-up does not come without a price: all approaches are obviously using more memory and more CPU (@tbl-tools-metrics), plus, they also read and write more to the disk. We confirmed, as one would expect, the trend that more sensitive approaches consume more resources in general.
+
+However, a more important criteria for a BLASTP alternative is to evaluate whether the accuracy of the POCP calculation is not sacrificed in the name of computational performance.
+
+### DIAMOND gives POCP as accurate as BLASTP
 
 ::: {#suppfig-blastdb}
 ```{r blastdb}
@@ -333,13 +334,18 @@ R2_table %>% arrange(desc(POCPu_R2)) %>%
   tab_options(column_labels.font.weight = "bold")
 ```
 
-Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r n_comparisons_in_lm` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
+Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r ` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
 :::
 
+BLASTPDB produced exactly similar POCP values to BLASTP (@suppfig-blastdb A). The other approaches do no perfom as well.
+All flavors of DIAMOND have a coefficient of determination ($R^2$) above 0.99 when matching their POCP values with the original from BLASTP, with the exception of the DIAMOND_FAST approach that deviates more from the expected values (@fig-blast-vs-all-pocp and @tbl-R2).
+This deviation is exacerbated when using the MMSEQS2_S1DOT0 approach, but is somehow rescued with the others MMSEQS2 approaches, though they perform worse than the DIAMOND approaches and should therefore not be used as BLASTP alternatives for POCP.
 
-All flavors of DIAMOND have a coefficient of determination ($R^2$) above 0.99 when matching their POCP values with the original from BLAST_BLASTP, with the exception of the DIAMOND_FAST approach that deviates more from the expected values (@fig-blast-vs-all-pocp and @tbl-R2).
-This deviation is exacerbated when using the MMSEQS2_S1DOT0 approach, but is somehow rescued with the others MMSEQS2 approaches, though they perform worse than the DIAMOND approaches.
-It should be noted that the reported POCP values exceed the supposed POCP upper bound of 100% (@fig-blast-vs-all-pocp).
+What happens when POCP values deviate between the alternative and BLASTP?
+If the alternative underestimate POCP -- i.e., with values under the dashed line in @fig-blast-vs-all-pocp --, the alternative will split genus and tend to assign genomes to different genera when they are from the same genus.
+Conversely, if the alternative overestimate POCP -- i.e., with values over the dashed line in @fig-blast-vs-all-pocp --, the alternative will lump genera together and tend to assign genomes to the same genus when they are not.
+DIAMOND approaches show underestimation, especially DIAMOND_FAST, but not overestimation (@fig-blast-vs-all-pocp), whilst MMSEQS2 approaches tend to overestimate more than underestimate, with more deviation alltogether.
+All in all, DIAMOND-based approaches, especially with increased sensitivity gives POCP as accurate as BLASTP for a fraction of the time.
 
 
 ::: {#fig-blast-vs-all-pocp}
@@ -357,6 +363,19 @@ The colors represent the number of data points binned together in hexagons to av
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
 
+### Towards a clearer POCP definition
+
+Yet, all approaches have POCP values over 100% (@fig-blast-vs-all-pocp). Surprised as we were to see percentages exceed their supposed upper bound, we sought to investigate and eventually suggest a clearer definition of POCP, that we termed POCPu.
+
+During the alignment process, proteins sequences from the query can match multiple subject sequences in the case of duplicated genes.
+While briefly mentioned in the original paper that "The number of conserved proteins in each genome of strains being compared was slightly different because of the existence of duplicate genes (paralogs)" [@qinProposedGenusBoundary2014, p. 2211], the expected influence on the POCP values is lacking. Therefore, we defined the POCP with unique matches (POCPu) between two genomes $Q$ and $S$ as:
+
+$$
+POCPu = \dfrac{C_{uQS} + C_{uSQ}}{T_Q + T_S} \times 100\%
+$$ {#eq-pocpu}
+
+where $C_{uQS}$ represent the conserved number of proteins from *the unique matches of* $Q$ when aligned to $S$ and conversely $C_{uSQ}$ represent the conserved number of proteins from *the unique matches of* $S$ when aligned to $Q$, and $T_Q + T_S$ represent the total number of proteins in the two genomes being compared, respectively.
+
 
 ::: {#fig-blast-vs-all-pocpu}
 
@@ -373,30 +392,11 @@ The colors represent the number of data points binned together in hexagons to av
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
 
-
 These higher-than-100% POCP values disappears when using the POCPu (@fig-blast-vs-all-pocpu and @suppfig-blastdb B).
 Otherwise, the same patterns observed for POCP hold for POCPu, though with higher values of coefficient of determination (@fig-blast-vs-all-pocpu and @tbl-R2).
-The 3 different sensitive approaches of DIAMOND produce POCPu values that match perfectly the ones produce by the legacy approach BLAST_BLASTP.
+The 3 different sensitive approaches of DIAMOND produce POCPu values that match perfectly the ones produce by the legacy approach BLAST_BLASTP, with no underestimation as in the case of POCP previously.
 However, the MMSEQS2 approaches, whilst better with POCPu than POCP, still tend to underestimate POCPu values.
-For all tools, two clusters of yellow points are visible (@fig-blast-vs-all-pocpu). They indicate regions where at least 50% of the data points are located, with the first and second regions being below and above 50% on the x-axis BLAST_BLASTP POCPu, respectively. 
-
-::: {#tbl-tools-metrics}
-
-```{r tools-metrics}
-n_processes <- tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")
-tar_read(tool_table) %>% filter(tool!="BLAST_BLASTP") %>%
-  select(-n) %>%
-  rename("Approach name" = "tool",
-         "Time"="time_fold", "Memory"="memory_fold",
-         "CPU"="cpu_fold", "Disk usage (I/O)"="io_fold") %>% 
-  knitr::kable(digits = 3)
-```
-
-Fold change of computing metrics for the 9 approaches used in the benchmark compared to the BLAST_BLASTP approach.
-The metrics include processing time as real-time, memory usage, CPU usage and disk usage as input/output (I/O).
-A fold change below 1 means the metric is lower, whilst above 1 means it is higher, compared to the BLAST_BLASTP approach.
-The fold change values are median computed over $n$ = `r n_processes` number of processes tracked per approach.
-:::
+All in all, POCPu is closer to BLASTP than POCP (@fig-blast-vs-all-pocpu) thus guiding our choices to an accurate BLASTP alternative.
 
 The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-blastdb and @tbl-R2) in a fraction of the time (@tbl-tools-metrics).
 Still, DIAMOND-based sensitive approaches are way faster with excellent adequacy with BLAST_BLASTP approach, especially for POCPu (@tbl-R2).
@@ -409,6 +409,7 @@ Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternat
 
 ```{r confusion_matrix}
 targets::tar_load(c(pocp_confusion,pocpu_confusion))
+n_genomes <- sum(stats_by_type$n_genomes) %>% prettyNum(big.mark = " ")
 ```
 
 Then, we put to the test the 50%-threshold of POCP and POCPu, and evaluate how useful these metrics are to delineate bacterial genera.
