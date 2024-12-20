@@ -318,23 +318,16 @@ plot_genus_delineation <- function(p_mcc_examples, p_mcc){
             rel_widths =  c(0.3, 0.7))
 }
 
-plot_pocp_delta <- function(df, pocp_label, delta, delta_label){
-  ggplot(df, aes(x = pocp, y = {{ delta }}))+
-    geom_hex(colour = "white", linewidth=0.1)+
-    scale_fill_viridis_b(name = "viridis")+
-    guides(fill = guide_coloursteps(
-      title = "Data points\nper hexagon",
-      show.limits = TRUE))+
-    scale_y_continuous(labels = scales::label_number(scale_cut = scales::cut_long_scale()))+
-    facet_wrap(~same_genus_truth,as.table = FALSE,
-               labeller = as_labeller( c("TRUE"="Within genus","FALSE"="Between genera")),
-              nrow = 2)+
+plot_pocp_delta <- function(df, optim_df, delta, delta_label){
+  df %>% left_join(optim_df, by = "Family") %>% 
+  ggplot(aes(x = {{ delta }}, linetype = improved_classification))+
+    geom_density(alpha = 0.5)+
+    scale_x_continuous(labels = scales::label_number(scale_cut = scales::cut_long_scale()))+
+    scale_linetype_manual(labels = c("FALSE"="Default", "TRUE"="Optimized"),
+                          values = c("FALSE"="dashed", "TRUE"="solid"))+
     theme_cowplot()+
-    labs(x = pocp_label ,  y = delta_label)+
-    theme(legend.position = "bottom",
-          legend.key.height = unit(1, "lines"),
-          legend.key.width = unit(2, "lines"),
-          legend.text = element_text(size = 11))
+    labs(x = delta_label, y = "Density", linetype = "POCPu Threshold")+
+    theme(legend.position = "bottom")
 }
 
 # Plot a selection of family specific POCPu densities

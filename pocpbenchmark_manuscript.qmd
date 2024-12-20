@@ -438,6 +438,18 @@ Still, this distribution spills above the threshold, indicating POCPu also produ
 Like POCP, "Within genus" POCPu concentrate largely above the threshold of 50% (TP = `r pocpu_confusion["TP"]`), with fewer below the threshold (FN = `r pocpu_confusion["FN"]`).
 All in all, we put forward that considering only unique matches enhances genus delineation.
 
+
+```{r mcc}
+mcc_pocp <- targets::tar_read(mcc_pocp_global) %>%
+  pull(mcc) %>% prettyNum(digits = 2)
+mcc_pocpu <- targets::tar_read(mcc_pocpu_global) %>%
+  pull(mcc) %>% prettyNum(digits = 2)
+tally_mcc_thresholds <- summarise(
+  tar_read(mcc_pocpu_family), 
+  total = n(), n_70 = sum(mcc >= 0.7), n_25 = sum(mcc <= 0.25)
+)
+```
+
 We quantify our findings on the confusion matrix using the  Matthews Correlation Coefficient (@eq-mcc).
 MCC is a binary classification rate that gives a high score only when the classifier correctly predicts the majority of positive and negative cases.
 Therefore, POCPu (MCC = `r mcc_pocpu`) surpasses POCP (MCC = `r mcc_pocp`) to delineate bacterial genus, which quantitatively confirm our visual findings (@fig-pocp-pocpu-densities).
@@ -467,17 +479,6 @@ Three representative examples of family-specific genus delineation capacity (A) 
 These scenarios can be quantified with the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020]. We show MCC values for each family where MCC of -1 and +1 indicates perfect misclassification and classification, respectively (B). Random genus delineation would give MCC = 0. The dashed line in B indicates the overall MCC when not splitting by family. We also highlight how many $n$ genomes are included per family, and their phyla in the vertical facets (B). The POCPu distributions for all families are drawn in @suppfig-pocpu-by-family.
 :::
 
-```{r mcc}
-mcc_pocp <- targets::tar_read(mcc_pocp_global) %>%
-  pull(mcc) %>% prettyNum(digits = 2)
-mcc_pocpu <- targets::tar_read(mcc_pocpu_global) %>%
-  pull(mcc) %>% prettyNum(digits = 2)
-tally_mcc_thresholds <- summarise(
-  tar_read(mcc_pocpu_family), 
-  total = n(), n_70 = sum(mcc >= 0.7), n_25 = sum(mcc <= 0.25)
-)
-```
-
 ### Family-specific POCPu thresholds for a clearer delineation
 
 
@@ -496,7 +497,7 @@ optimized_pocpu <- tar_read(optimized_pocpu) %>%
     category = if_else(optimized_threshold <= 50, "decrease","increase")
          ) 
 n_tentative <- optimized_pocpu %>% count(rescued) %>% deframe()
-n_category <- optimized_pocpu %>% count(rescued) %>% deframe()
+n_category <- optimized_pocpu %>% count(category) %>% deframe()
 n_decrease_family<- optimized_pocpu %>%
   filter(category=="decrease") %>%
   mutate(across(Phylum:Family, ~ str_remove(.x, "[p|f]__"))) %>% 
@@ -511,8 +512,8 @@ Overall, for `r sum(n_tentative)` families out of the `r sum(stats_by_type$n_fam
 Interestingly, in only `r n_category[["decrease"]]` cases, an optimal POCPu threshold had to be lowered: `r n_decrease_family` .
 In  `r n_category[["increase"]]` cases, a larger-than-half fraction of conserved proteins better separate genomes from within genus and between genera (@tbl-optimized_threshold).
 
-We even leverage our large dataset to assess claims that POCP is influenced by differences in genome size [@riescoUpdateProposedMinimal2024].
-We found no convincing patterns to support the claim in difference of genome size (@suppfig-delta A) nor in number of proteins (i.e., proteome; @suppfig-delta B).
+We even leverage our large dataset to assess claims that POCP is influenced by differences in genome size [@riescoUpdateProposedMinimal2024]. If POCPu is influenced, we reason that its genus delineation power should also be influenced, therefore we expect stronger genome size differences in the families for which an alternative POCPu threshold was found.
+We found no convincing patterns to support the claim that differences in genome size (@suppfig-delta A) nor in number of proteins (i.e., proteome; @suppfig-delta B) influenced POCPu.
 Overall, POCPu provides a useful and interpretable metric to delineate genera.
 
 ::: {#tbl-optimized_threshold}
@@ -548,8 +549,7 @@ Distributions of POCPu values as in @fig-pocp-pocpu-densities broken down per ba
 knitr::include_graphics(tar_read(fig_delta_proteome_genome_png))
 ```
 
-Absence of relationship between POCPu and differences in genome size (A) and proteome size (B). Each point represents a comparison between two GTDB genomes for which the absolute genome size were compared (A) and the total number of proteins (B).
-The colors represent the number of data points binned together in hexagons to avoid over-plotting.
+Distributions of differences in genome size (A) and proteome size (B) for families using default threshold or optimized thresholds. We expected families using optimized threshold to have a shift in their differences distributions, which would have indicated that genome size and proteome size influence genus delineation. POCPu thresholds type were taken from @tbl-optimized_threshold.
 :::
 
 
