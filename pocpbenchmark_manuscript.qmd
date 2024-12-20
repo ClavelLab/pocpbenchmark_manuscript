@@ -1,5 +1,5 @@
 ---
-title: Clearer, better, faster, reproducible bacterial genus delineation procedure
+title: Clear and fast genome-based delineation of bacterial genera
 affiliations:
   - id: uka
     name: University Hospital of RWTH Aachen
