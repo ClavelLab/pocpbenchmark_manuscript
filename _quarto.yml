@@ -10,7 +10,7 @@ format:
   html:
     embed-resources: true
   #jats: default
-  #docx: default
+  docx: default
   
   # (other formats)
   # pdf: default
