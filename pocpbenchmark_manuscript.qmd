@@ -76,7 +76,7 @@ Given that the number of valid genus names has nearly doubled (@suppfig-lpsn) si
 
 @hernandez-salmeronProgressQuicklyFinding2020 compared proteins alignment tools to find faster alternatives, without a loss in precision, showing that DIAMOND [@buchfinkSensitiveProteinAlignments2021], when switched to sensitive parameters instead of defaults, correctly found 87% of the reciprocal best hits of BLASTP [@camachoBLASTArchitectureApplications2009] in less than 8% of the time.
 Recently, @holzerPOCPnfAutomaticNextflow2024 suggested the use of DIAMOND with ultra-sensitive settings to compute POCP faster than with BLASTP. His approach is based on previously available script [@holzerHoelzerPocp2020], implemented as a nextflow workflow [@holzerPOCPnfAutomaticNextflow2024]. However, his comparisons are based on limited set of 5 genera, each ranging from 15 to 167 genomes. 
-However, the the current implementations of POCP available as tools assume conserved proteins have unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021], differing from the original implementation of POCP which had no such limitation [@qinProposedGenusBoundary2014].
+However, the current implementations of POCP available as tools assume conserved proteins have unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021], differing from the original implementation of POCP which had no such limitation [@qinProposedGenusBoundary2014].
 We need a clear definition of POCP to clarify the process and ensure repeatability.
 
 
@@ -551,6 +551,44 @@ knitr::include_graphics(tar_read(fig_delta_proteome_genome_png))
 
 Distributions of differences in genome size (A) and proteome size (B) for families using default threshold or optimized thresholds. We expected families using optimized threshold to have a shift in their differences distributions, which would have indicated that genome size and proteome size influence genus delineation. POCPu thresholds type were taken from @tbl-optimized_threshold.
 :::
+
+# Discussion
+
+```{r stats_total}
+total_stats <- stats_by_type %>% 
+  summarise(across(!benchmark_type,sum)) %>% 
+  mutate(
+    total_hours = round(total_hours),
+    total_years = as.period(total_hours, unit = "hours") %>% as.numeric("years")
+  ) %>% mutate(across(everything(), ~prettyNum(.x,big.mark = " ", digits=2)))
+n_genera <- tar_read(genome_metadata) %>% pull(Genus) %>% n_distinct()
+```
+
+
+Ten years after @qinProposedGenusBoundary2014 suggested to separate bacterial genera using the Percentage of Conserved Proteins (POCP), we set out to reevaluate their claims in this much richer data landscape. 
+Using `r total_stats$n_genomes` genomes from `r n_genera` genera and `r total_stats$n_families` families, our infrastructure compared `r total_stats$n_realized` unique pairs of genomes combinations meaning it ran for `r total_stats$total_hours` CPU-Hours (`r total_stats$total_years` in years).
+We showed that DIAMOND_VERYSENSITIVE could reliably replace BLASTP for scaled-up POCP computations.
+We more specifically addressed an implicit assumption made in POCP implementations [e.g., @holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024; @linSilentGeneBiopyBiopy2021], and explicitly defined an alternative POCP metric -- POCPu -- and thus demonstrated that using only unique matches enhances genus delineation.
+
+
+We acknowledge that our selection of genomes might miss important taxonomical groups to the readers, and that we could have included more taxa as well.
+Who chooses has to give up as the saying goes. Indeed, we carefully curated which taxa to include in order to end up with enough data points per taxa to ensure statistically robust patterns in our data-driven approach.
+Previous works on many-vs-many proteins alignment comparison used much less phylogenetically strong signals: 4 genomes from 4 genera in @hernandez-salmeronProgressQuicklyFinding2020, maximum 167 genomes from 5 genera in @holzerPOCPnfAutomaticNextflow2024.
+@riescoUpdateProposedMinimal2024 evaluated much more genomes -- 1 573 type strains -- but calculated POCP -- using Bio-Py [@linSilentGeneBiopyBiopy2021] -- only to be compared with AAI and not to evaluate genus delineation.
+We also relied on the GTDB as our ground truth taxonomy, which is limited to bacteria and also that include non valid names, that we filtered.
+Therefore, despite these limitations, our data-driven approach use a wide range of taxa and an extensive number of high-quality genomes to bring forth useful findings for the modern taxonomist. 
+
+In an effort to improve genus delineation, we sought to find optimized thresholds per family.
+However, we also believe that one of the strength of the POCP is its interpretability. So, one should only deviate from the straightforward threshold of 50% if the benefits are much greater.
+We provided tentative thresholds for a few families where this was the case.
+
+
+Genus name occurs before species name in the binomial nomenclature, therefore genera are our first contact with the bacterial entities we are studying. These names are key to existing knowledge in  databases or articles and hint already towards their evolutionary histories and ecological roles [@reimerBacDive2022Knowledge2022; @rosonovskiEuropePMC20232024; @schochNCBITaxonomyComprehensive2020]. Therefore, how to assign bacterial genus to a genome is fundamental to ensure the reliability of this knowledge.
+Then it was important that we made our findings available as a best-practice tool for microbiologists to delineate genera from genomes: <https://github.com/clavelLab/consprot>.
+Especially, we were able to underline that not all set of tools and parameters are suitable to speed up BLASTP. Some combinations, while extremely fast, under- or overestimate POCP which consequently will erroneously split or lump genera respectively.
+
+Threshold-based approaches are always a matter of compromises, where no one-size-fits-all exist. In that regards, @parksGTDBOngoingCensus2022  put it well for the species delineation problem: "The use of ANI to delineate species despite the lack of clear evidence for discrete species boundaries in the GTDB dataset is a pragmatic approach for organizing the rapidly growing biodiversity being discovered with metagenomic approaches".
+We share their vision and propose to adopt the POCPu to delineate genera as an interpretable and  pragmatic approach to organize rapidly and transparently this data deluge.
 
 
 # References
