@@ -253,7 +253,7 @@ overall_stats <- stats_by_type %>% filter(benchmark_type=="full") %>%
   mutate(
     total_hours = round(total_hours),
     total_years = as.period(total_hours, unit = "hours") %>% as.numeric("years")
-  ) %>% mutate(across(everything(), ~prettyNum(.x,big.mark,= ",", digits=2)))
+  ) %>% mutate(across(everything(), ~prettyNum(.x,big.mark = ",", digits=2)))
 stats_by_type_text <- stats_by_type %>%
   mutate(across(everything(), ~prettyNum(.x,big.mark = ",", digits=2))) %>% 
   glue::glue_data(
