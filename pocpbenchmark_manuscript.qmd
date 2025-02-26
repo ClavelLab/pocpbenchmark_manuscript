@@ -113,7 +113,7 @@ funnel <- c(
   "More_10_species_per_genus" = 5904,
   "More_1_genus_per_family" = 4767
 )
-funnel_text <- funnel %>% prettyNum(big.mark=" ") %>% as.list() %>% 
+funnel_text <- funnel %>% prettyNum(big.mark=",") %>% as.list() %>% 
   glue::glue_data(
     "Out of a total of {GTDB_Genomes} GTDB bacterial genomes",
     "{Representatives} are representative genomes",
@@ -227,7 +227,7 @@ phyla_count_text <- tar_read(tree_metadata) %>% filter(benchmark_type=="All appr
   arrange(desc(Species)) %>%
   glue::glue_data(
     "{Phylum} ({Family} families, {Genus} genera, {Species} species)",
-    Species = prettyNum(Species, big.mark=" ")) %>%
+    Species = prettyNum(Species, big.mark=",")) %>%
   glue::glue_collapse(sep = ", ", last = " and ")
 ```
 
@@ -253,9 +253,9 @@ overall_stats <- stats_by_type %>% filter(benchmark_type=="full") %>%
   mutate(
     total_hours = round(total_hours),
     total_years = as.period(total_hours, unit = "hours") %>% as.numeric("years")
-  ) %>% mutate(across(everything(), ~prettyNum(.x,big.mark = " ", digits=2)))
+  ) %>% mutate(across(everything(), ~prettyNum(.x,big.mark,= ",", digits=2)))
 stats_by_type_text <- stats_by_type %>%
-  mutate(across(everything(), ~prettyNum(.x,big.mark = " ", digits=2))) %>% 
+  mutate(across(everything(), ~prettyNum(.x,big.mark = ",", digits=2))) %>% 
   glue::glue_data(
     "({n_families} families, {n_genomes} genomes, {n_realized} comparisons)"
     )
@@ -265,14 +265,14 @@ stats_by_type_text <- stats_by_type %>%
 ```{r genomes-in-full}
 n_genomes_in_full <- stats_by_type %>% 
   filter(benchmark_type=="full") %>% pull(n_genomes) %>% 
-  prettyNum(big.mark = " ")
+  prettyNum(big.mark = ",")
 ```
 
 
 ::: {#tbl-tools-metrics}
 
 ```{r tools-metrics}
-n_processes <- tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=" ")
+n_processes <- tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=",")
 tar_read(tool_table) %>% filter(tool!="BLAST_BLASTP") %>%
   select(-n) %>%
   rename("Approach name" = "tool",
@@ -302,7 +302,7 @@ However, a more important criteria for a BLASTP alternative is to evaluate wheth
 ```{r blastdb}
 n_blastdb_comparisons <- tar_read(blast_vs_all_pocpu) %>%
   count(tool) %>% pull(n) %>%
-  unique() %>% prettyNum(big.mark=" ")
+  unique() %>% prettyNum(big.mark=",")
 knitr::include_graphics(tar_read(fig_blast_vs_blastdb_png))
 ```
 
@@ -321,7 +321,7 @@ Coefficient of determination ($R^2$) and associated $p$-value are shown on top o
 #| classes: plain
 library(gt)
 tar_load(R2_table)
-n_comparisons_in_lm <- unique(R2_table$POCP_nobs) %>% prettyNum(big.mark = " ")
+n_comparisons_in_lm <- unique(R2_table$POCP_nobs) %>% prettyNum(big.mark = ",")
 R2_table %>% arrange(desc(POCPu_R2)) %>%
     gt::gt(rowname_col = "tool") %>%
     tab_stubhead("Approach name") %>% cols_align(align = "left", columns = "tool") %>%
@@ -353,7 +353,7 @@ All in all, DIAMOND-based approaches, especially with increased sensitivity give
 ```{r blast_vs_all_pocp}
 n_blast_comparisons <- tar_read(blast_vs_all_pocp) %>%
   count(tool) %>% pull(n) %>%
-  unique() %>% prettyNum(big.mark=" ")
+  unique() %>% prettyNum(big.mark=",")
 knitr::include_graphics(tar_read(fig_blast_vs_all_pocp_png))
 ```
 
@@ -382,7 +382,7 @@ where $C_{uQS}$ represent the conserved number of proteins from *the unique matc
 ```{r blast_vs_all_pocpu}
 n_blast_comparisons_pocpu <- tar_read(blast_vs_all_pocpu) %>%
   count(tool) %>% pull(n) %>%
-  unique() %>% prettyNum(big.mark=" ")
+  unique() %>% prettyNum(big.mark=",")
 knitr::include_graphics(tar_read(fig_blast_vs_all_pocpu_png))
 ```
 
@@ -409,7 +409,7 @@ Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternat
 
 ```{r confusion_matrix}
 targets::tar_load(c(pocp_confusion,pocpu_confusion))
-n_genomes <- sum(stats_by_type$n_genomes) %>% prettyNum(big.mark = " ")
+n_genomes <- sum(stats_by_type$n_genomes) %>% prettyNum(big.mark = ",")
 phyla_count_total_text <- tar_read(tree_metadata) %>% 
   select(Phylum:Species) %>%
   group_by(Phylum) %>%
@@ -417,7 +417,7 @@ phyla_count_total_text <- tar_read(tree_metadata) %>%
   arrange(desc(Species)) %>%
   glue::glue_data(
     "{Phylum} ({Family} families, {Genus} genera, {Species} species)",
-    Species = prettyNum(Species, big.mark=" ")) %>%
+    Species = prettyNum(Species, big.mark=",")) %>%
   glue::glue_collapse(sep = ", ", last = " and ")
 ```
 
@@ -560,7 +560,7 @@ total_stats <- stats_by_type %>%
   mutate(
     total_hours = round(total_hours),
     total_years = as.period(total_hours, unit = "hours") %>% as.numeric("years")
-  ) %>% mutate(across(everything(), ~prettyNum(.x,big.mark = " ", digits=2)))
+  ) %>% mutate(across(everything(), ~prettyNum(.x,big.mark = ",", digits=2)))
 n_genera <- tar_read(genome_metadata) %>% pull(Genus) %>% n_distinct()
 ```
 

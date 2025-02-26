@@ -96,7 +96,7 @@ get_mcc <- function(all_pocpu, per_family = TRUE){
 get_family_confusion_matrix <- function(df, Family){
   filter(df, Family == {{ Family }}) %>%
     arrange(desc(class)) %>%
-    mutate(n = prettyNum(n,big.mark = " ")) %>%
+    mutate(n = prettyNum(n,big.mark = ",")) %>%
     glue::glue_data("{class} = {n}") %>%
     glue::glue_collapse(sep = ", ", last = " and ")
 }

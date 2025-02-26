@@ -47,7 +47,7 @@ list(
                  label = glue::glue(
                    "{type} (n = {n})",
                    type = if_else(same_genus_truth, "Within genus","Between genera"),
-                   n = prettyNum(n, big.mark =" ")
+                   n = prettyNum(n, big.mark =",")
                  )
                ) %>% select(-n) %>% deframe() 
              ),
@@ -57,7 +57,7 @@ list(
                  label = glue::glue(
                    "{type} (n = {n})",
                    type = if_else(same_genus_truth, "Within genus","Between genera"),
-                   n = prettyNum(n, big.mark =" ")
+                   n = prettyNum(n, big.mark =",")
                  )
                ) %>% select(-n) %>% deframe() 
   ),
@@ -71,7 +71,7 @@ list(
              family_metadata %>% mutate(
                label = glue::glue("italic(\"{fam}\")~(n == {n_genomes})",
                                   fam=stringr::str_remove(Family,"f__"), 
-                                  n_genomes = prettyNum(n_genomes, big.mark= " "))
+                                  n_genomes = prettyNum(n_genomes, big.mark= ","))
              ) %>%
                left_join(select(genome_metadata, Phylum,Family) %>% unique(),
                          by ="Family") %>% select(Family,label, Phylum)
@@ -163,8 +163,8 @@ list(
   tar_target(fig_genus_delineation, plot_genus_delineation(p_mcc_examples, p_mcc)),
   tar_file(fig_genus_delineation_png, save_png(fig_genus_delineation,
                                              "figures/fig_genus_delineation.png", 10, 6)),
-  tar_target(pocp_confusion, count(all_pocp, class) %>% deframe() %>% prettyNum(big.mark =" ")),
-  tar_target(pocpu_confusion, count(all_pocpu, class) %>% deframe() %>% prettyNum(big.mark =" ")),
+  tar_target(pocp_confusion, count(all_pocp, class) %>% deframe() %>% prettyNum(big.mark =",")),
+  tar_target(pocpu_confusion, count(all_pocpu, class) %>% deframe() %>% prettyNum(big.mark =",")),
   tar_target(pocpu_confusion_by_family, count(all_pocpu, Family, class)),
   tar_target(lactobacillaceae,
              get_family_confusion_matrix(pocpu_confusion_by_family, "f__Lactobacillaceae"),

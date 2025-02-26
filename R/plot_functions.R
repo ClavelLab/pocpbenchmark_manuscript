@@ -175,7 +175,7 @@ plot_lpsn_stats <- function(lpsn_stats){
     select(grouping,n) %>% 
     mutate(label = glue::glue(
       "n = {n}\n  genera",
-      n = prettyNum(n, big.mark = " ")
+      n = prettyNum(n, big.mark = ",")
     )
     )
   
