@@ -334,7 +334,7 @@ R2_table %>% arrange(desc(POCPu_R2)) %>%
   tab_options(column_labels.font.weight = "bold")
 ```
 
-Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r ` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
+Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r n_comparisons_in_lm` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
 :::
 
 BLASTPDB produced exactly similar POCP values to BLASTP (@suppfig-blastdb A). The other approaches do not perform as well.
