@@ -341,7 +341,7 @@ plot_mcc_examples <- function(df, mcc_df_per_family, mcc_examples){
     filter(Family %in% mcc_examples) %>% 
     left_join(mcc_df_per_family, by = "Family") %>%
     mutate(
-      Family = forcats::as_factor(Family) %>% forcats::fct_reorder(mcc),
+      Family = forcats::as_factor(Family) %>% forcats::fct_reorder(mcc, .desc = TRUE),
       rank = forcats::fct_recode(Family, !!!mcc_examples ),
       label = glue::glue("{rank} MCC ({mcc})", mcc = round(mcc, digits = 2))
       )

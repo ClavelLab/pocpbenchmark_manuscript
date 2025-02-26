@@ -475,7 +475,7 @@ knitr::include_graphics(tar_read(fig_genus_delineation_png))
 
 
 POCPu delineates bacterial genera in a family-specific manner.
-Three representative examples of family-specific genus delineation capacity (A) where POCPu distributions can overlap and hamper genus delineation (A; _Streptomycetaceae_), or be neatly distinct and allow for genus delineation (A; _Xanthobacteraceae_), or any in between scenario (A; _Lactobacillaceae_).
+Three representative examples of family-specific genus delineation capacity (A) where POCPu distributions can be neatly distinct and allow for genus delineation (A; _Xanthobacteraceae_), or overlap and hamper genus delineation (A; _Streptomycetaceae_), or any in between scenario (A; _Lactobacillaceae_).
 These scenarios can be quantified with the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020]. We show MCC values for each family where MCC of -1 and +1 indicates perfect misclassification and classification, respectively (B). Random genus delineation would give MCC = 0. The dashed line in B indicates the overall MCC when not splitting by family. We also highlight how many $n$ genomes are included per family, and their phyla in the vertical facets (B). The POCPu distributions for all families are drawn in @suppfig-pocpu-by-family.
 :::
 
