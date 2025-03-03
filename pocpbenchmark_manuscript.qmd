@@ -226,7 +226,7 @@ phyla_count_text <- tar_read(tree_metadata) %>% filter(benchmark_type=="All appr
   summarise(across(everything(),n_distinct)) %>%
   arrange(desc(Species)) %>%
   glue::glue_data(
-    "{Phylum} ({Family} families, {Genus} genera, {Species} species)",
+    "_{Phylum}_ ({Family} families, {Genus} genera, {Species} species)",
     Species = prettyNum(Species, big.mark=",")) %>%
   glue::glue_collapse(sep = ", ", last = " and ")
 ```
@@ -416,7 +416,7 @@ phyla_count_total_text <- tar_read(tree_metadata) %>%
   summarise(across(everything(),n_distinct)) %>%
   arrange(desc(Species)) %>%
   glue::glue_data(
-    "{Phylum} ({Family} families, {Genus} genera, {Species} species)",
+    "_{Phylum}_ ({Family} families, {Genus} genera, {Species} species)",
     Species = prettyNum(Species, big.mark=",")) %>%
   glue::glue_collapse(sep = ", ", last = " and ")
 ```
