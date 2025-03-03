@@ -298,16 +298,16 @@ However, a more important criteria for a BLASTP alternative is to evaluate wheth
 
 ### DIAMOND gives POCP as accurate as BLASTP
 
-::: {#suppfig-blastdb}
-```{r blastdb}
+::: {#suppfig-pocp-blastdb}
+```{r pocp_blastdb}
 n_blastdb_comparisons <- tar_read(blast_vs_all_pocpu) %>%
   count(tool) %>% pull(n) %>%
   unique() %>% prettyNum(big.mark=",")
-knitr::include_graphics(tar_read(fig_blast_vs_blastdb_png))
+knitr::include_graphics(tar_read(fig_blast_vs_blastdb_pocp_png))
 ```
 
-Adequacy between POCP (A) and POCPu (B) values computed with the legacy BLAST_BLASTP against the BLAST_BLASTPDB approach that build databases before alignment.
-Each point ($n$ = `r n_blastdb_comparisons` per tool) represents a POCP/POCPu value between two genomes (see @eq-pocp and @eq-pocpu).
+Adequacy between POCP values computed with the legacy BLAST_BLASTP against the BLAST_BLASTPDB approach that build databases before alignment.
+Each point ($n$ = `r n_blastdb_comparisons`) represents a POCP value between two genomes (see @eq-pocp).
 The colors represent the number of data points binned together in hexagons to avoid over-plotting.
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
@@ -337,7 +337,7 @@ R2_table %>% arrange(desc(POCPu_R2)) %>%
 Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r n_comparisons_in_lm` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
 :::
 
-BLASTPDB produced exactly similar POCP values to BLASTP (@suppfig-blastdb A). The other approaches do not perform as well.
+BLASTPDB produced exactly similar POCP values to BLASTP (@suppfig-pocp-blastdb). The other approaches do not perform as well.
 All flavors of DIAMOND have a coefficient of determination ($R^2$) above 0.99 when matching their POCP values with the original from BLASTP, with the exception of the DIAMOND_FAST approach that deviates more from the expected values (@fig-blast-vs-all-pocp and @tbl-R2).
 This deviation is exacerbated when using the MMSEQS2_S1DOT0 approach, but is somehow rescued with the others MMSEQS2 approaches, though they perform worse than the DIAMOND approaches and should therefore not be used as BLASTP alternatives for POCP.
 
@@ -377,6 +377,17 @@ $$ {#eq-pocpu}
 where $C_{uQS}$ represent the conserved number of proteins from *the unique matches of* $Q$ when aligned to $S$ and conversely $C_{uSQ}$ represent the conserved number of proteins from *the unique matches of* $S$ when aligned to $Q$, and $T_Q + T_S$ represent the total number of proteins in the two genomes being compared, respectively.
 
 
+::: {#suppfig-pocpu-blastdb}
+```{r pocpu_blastdb}
+knitr::include_graphics(tar_read(fig_blast_vs_blastdb_pocpu_png))
+```
+
+Adequacy between POCPu values computed with the legacy BLAST_BLASTP against the BLAST_BLASTPDB approach that build databases before alignment.
+Each point ($n$ = `r n_blastdb_comparisons`) represents a POCPu value between two genomes (see @eq-pocpu).
+The colors represent the number of data points binned together in hexagons to avoid over-plotting.
+Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
+:::
+
 ::: {#fig-blast-vs-all-pocpu}
 
 ```{r blast_vs_all_pocpu}
@@ -392,13 +403,13 @@ The colors represent the number of data points binned together in hexagons to av
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
 
-These higher-than-100% POCP values disappears when using the POCPu (@fig-blast-vs-all-pocpu and @suppfig-blastdb B).
+These higher-than-100% POCP values disappears when using the POCPu (@fig-blast-vs-all-pocpu and @suppfig-pocpu-blastdb).
 Otherwise, the same patterns observed for POCP hold for POCPu, though with higher values of coefficient of determination (@fig-blast-vs-all-pocpu and @tbl-R2).
 The 3 different sensitive approaches of DIAMOND produce POCPu values that match perfectly the ones produce by the legacy approach BLAST_BLASTP, with no underestimation as in the case of POCP previously.
 However, the MMSEQS2 approaches, whilst better with POCPu than POCP, still tend to underestimate POCPu values.
 All in all, POCPu is closer to BLASTP than POCP (@fig-blast-vs-all-pocpu) thus guiding our choices to an accurate BLASTP alternative.
 
-The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-blastdb and @tbl-R2) in a fraction of the time (@tbl-tools-metrics).
+The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-pocp-blastdb, @suppfig-pocpu-blastdb and @tbl-R2) in a fraction of the time (@tbl-tools-metrics).
 Still, DIAMOND-based sensitive approaches are way faster with excellent adequacy with BLAST_BLASTP approach, especially for POCPu (@tbl-R2).
 Whilst DIAMOND_ULTRASENSITIVE would have the highest $R^2$ value using POCPu (@tbl-R2), it has the highest memory consumption and disk usage of the tested approaches (@tbl-tools-metrics).
 A more sustainable alternative would be DIAMOND_VERYSENSITIVE that performs 10 times faster than BLAST_BLASTPDB, in less than $1/20^{th}$ of the time of BLAST_BLASTP, while still maintaining reasonable usage of the resources (@tbl-tools-metrics).
