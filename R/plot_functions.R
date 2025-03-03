@@ -106,7 +106,7 @@ plot_pocp_blastdb <- function(df, pocp_label, with_R2=TRUE){
     p <- p + 
       geom_text(data = df_R2,
                 aes(x = extremes[1], y=0.75*extremes[2], label = label),
-                size=3, hjust=0, vjust=0,parse = TRUE)
+                size=5, hjust=0, vjust=0,parse = TRUE)
   }
   return(p)
 }
