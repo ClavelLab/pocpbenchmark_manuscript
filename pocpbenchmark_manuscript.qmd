@@ -201,6 +201,9 @@ $$ {#eq-mcc}
 
 The coefficient has a range of $\left[-1;+1\right]$ and is only high in case of perfect classification, as a MCC of 0 indicates a random classification. Plus, the MCC compensates for unequal class sizes compared to others metrics such as accuracy or F1-score [@chiccoAdvantagesMatthewsCorrelation2020].
 
+We used one dimensional optimization [@brentAlgorithmsMinimizationDerivatives1972] to find family-specific POCPu thresholds maximizing MCC values and separating "Between genera" from "Within genera" distributions. 
+The optimization was run using the `optimize()` function from the R `stats` package [@rcoreteamLanguageEnvironmentStatistical2023].
+
 ## Workflow implementation
 
 Automatic protein sequences download, data preprocessing, many-versus-many protein alignments, as well as POCP computation and delineation metrics calculations were within a nextflow v23.10.0 [@ditommasoNextflowEnablesReproducible2017] workflow, using components of nf-core [@ewelsNfcoreFrameworkCommunitycurated2020].
@@ -209,6 +212,7 @@ Tools used are provided within Docker container [@merkelDockerLightweightLinux20
 Nextflow natively keep track of the time, CPU, memory and disk usage of each process in an execution trace log file that we used to evaluate computing resources utilization. Process duration is available as walltime and realtime, the CPU usage is reported as a percentage of usage of a unique CPU, meaning multi-threaded processes will have a value higher than 100%.
 
 Statistical analyses and visualization were conducted within R using targets v.1.7.0 [@landauTargetsPackageDynamic2021].
+
 
 
 # Results
