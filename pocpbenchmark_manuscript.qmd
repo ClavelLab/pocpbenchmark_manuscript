@@ -513,18 +513,45 @@ optimized_pocpu <- tar_read(optimized_pocpu) %>%
          ) 
 n_tentative <- optimized_pocpu %>% count(rescued) %>% deframe()
 n_category <- optimized_pocpu %>% count(category) %>% deframe()
-n_decrease_family<- optimized_pocpu %>%
+improved_families <- optimized_pocpu %>%
+    filter(rescued=="improved") %>%
+    mutate(across(Phylum:Family, ~ str_remove(.x, "[p|f]__"))) %>%
+  group_by(Phylum) %>%
+  summarise(
+    fam = glue::glue("_{Family}_") %>%
+      glue::glue_collapse(", ", last = " and ")
+    ) %>%
+  glue::glue_data("{Phylum}: {fam}") %>%
+  glue::glue_collapse("; ", last = "")
+
+rescued_families <- optimized_pocpu %>%
+    filter(rescued=="rescued") %>%
+    mutate(across(Phylum:Family, ~ str_remove(.x, "[p|f]__"))) %>%
+  group_by(Phylum) %>%
+  summarise(
+    fam = glue::glue("_{Family}_") %>%
+      glue::glue_collapse(", ", last = " and ")
+    ) %>%
+  glue::glue_data("{Phylum}: {fam}") %>%
+  glue::glue_collapse("; ", last = "")
+
+decrease_family<- optimized_pocpu %>%
   filter(category=="decrease") %>%
-  mutate(across(Phylum:Family, ~ str_remove(.x, "[p|f]__"))) %>% 
-  glue::glue_data("_{Family}_ ({Phylum})") %>%
-  glue::glue_collapse(" and ",last = " families")
+    mutate(across(Phylum:Family, ~ str_remove(.x, "[p|f]__"))) %>%
+  group_by(Phylum) %>%
+  summarise(
+    fam = glue::glue("_{Family}_") %>%
+      glue::glue_collapse(", ", last = " and ")
+    ) %>%
+  glue::glue_data("{Phylum}: {fam}") %>%
+  glue::glue_collapse("; ", last = "")
 ```
 
 
 What is a standard without its exception we asked ourselves, and we looked for family-specific POCPu thresholds by maximizing MCC to improve genus delineation (@suppfig-pocpu-by-family and @tbl-optimized_threshold).
-With this procedure, the genus delineation of `r n_tentative[["improved"]]` families was improved, with at least 0.1 point increase in MCC, and for `r n_tentative[["rescued"]]` additional families it was even rescued with a maximum MCC above 0.7.
+With this procedure, the genus delineation of `r n_tentative[["improved"]]` families (`r improved_families`) was improved, with at least 0.1 point increase in MCC, and for `r n_tentative[["rescued"]]` additional families (`r rescued_families`) it was even rescued with a maximum MCC above 0.7.
 Overall, for `r sum(n_tentative)` families out of the `r sum(stats_by_type$n_families)` families, thresholds distinct from the default 50% enhance the classification.
-Interestingly, in only `r n_category[["decrease"]]` cases, an optimal POCPu threshold had to be lowered: `r n_decrease_family` .
+Interestingly, in only `r n_category[["decrease"]]` cases, an optimal POCPu threshold had to be lowered (`r decrease_family`).
 In  `r n_category[["increase"]]` cases, a larger-than-half fraction of conserved proteins better separate genomes from within genus and between genera (@tbl-optimized_threshold).
 
 We even leverage our large dataset to assess claims that POCP is influenced by differences in genome size [@riescoUpdateProposedMinimal2024]. If POCPu is influenced, we reason that its genus delineation power should also be influenced, therefore we expect stronger genome size differences in the families for which an alternative POCPu threshold was found.
