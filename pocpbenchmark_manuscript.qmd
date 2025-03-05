@@ -291,11 +291,24 @@ A fold change below 1 means the metric is lower, whilst above 1 means it is high
 The fold change values are median computed over $n$ = `r n_processes` number of processes tracked per approach.
 :::
 
+```{r fraction_time}
+time_fraction_category <- tar_read(tool_table) %>% 
+  filter(tool != "BLAST_BLASTP") %>% 
+  separate_wider_delim(tool, "_", names = c("category", "parameter")) %>% 
+  group_by(category) %>% 
+  summarise(
+    fraction = median(time_fold) %>% MASS::fractions(cycles = 1),
+    fraction = as.character(fraction),
+    fraction = if_else(fraction == "1/2", "half",
+                       glue::glue("$(fraction)^{th}$", .open = "(", .close = ")"))
+  ) %>% deframe()
+```
+
 
 To do so, we used GTDB genomes from a wide range of bacterial phylogenetic diversity across four phyla: `r phyla_count_text`. 
 We processed these `r n_genomes_in_full` genomes and conducted `r overall_stats$n_realized` pairwise comparisons with a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).
 All the approaches tested are faster than our control BLASTP (@tbl-tools-metrics).
-BLASTPDB, the database approach to BLASTP (@tbl-tools-parameters) that allows for parallel computations, was only half the time of BLASTP on average, but DIAMOND and MMSEQS2 based approaches were ran in a fraction of the time of BLASTP.
+BLASTPDB, the database approach to BLASTP (@tbl-tools-parameters) that allows for parallel computations, was only half the time of BLASTP on average, but DIAMOND and MMSEQS2 based approaches were respectively ran in a `r time_fraction_category[["DIAMOND"]]` and `r time_fraction_category[["MMSEQS2"]]` of the time of BLASTP.
 Such speed-up does not come without a price: all approaches are obviously using more memory and more CPU (@tbl-tools-metrics), plus, they also read and write more to the disk. We confirmed, as one would expect, the trend that more sensitive approaches consume more resources in general.
 
 However, a more important criteria for a BLASTP alternative is to evaluate whether the accuracy of the POCP calculation is not sacrificed in the name of computational performance.
@@ -413,7 +426,7 @@ The 3 different sensitive approaches of DIAMOND produce POCPu values that match 
 However, the MMSEQS2 approaches, whilst better with POCPu than POCP, still tend to underestimate POCPu values.
 All in all, POCPu is closer to BLASTP than POCP (@fig-blast-vs-all-pocpu) thus guiding our choices to an accurate BLASTP alternative.
 
-The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-pocp-blastdb, @suppfig-pocpu-blastdb and @tbl-R2) in a fraction of the time (@tbl-tools-metrics).
+The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-pocp-blastdb, @suppfig-pocpu-blastdb and @tbl-R2) in `r time_fraction_category[["BLAST"]]` of the time (@tbl-tools-metrics).
 Still, DIAMOND-based sensitive approaches are way faster with excellent adequacy with BLAST_BLASTP approach, especially for POCPu (@tbl-R2).
 Whilst DIAMOND_ULTRASENSITIVE would have the highest $R^2$ value using POCPu (@tbl-R2), it has the highest memory consumption and disk usage of the tested approaches (@tbl-tools-metrics).
 A more sustainable alternative would be DIAMOND_VERYSENSITIVE that performs 10 times faster than BLAST_BLASTPDB, in less than $1/20^{th}$ of the time of BLAST_BLASTP, while still maintaining reasonable usage of the resources (@tbl-tools-metrics).
