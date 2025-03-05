@@ -100,7 +100,7 @@ format_R2_table <- function(pocp_table, pocpu_table){
 
 format_optimized_pocp_table <- function(optim_df){
   optim_df %>% 
-    arrange(optimized_threshold) %>% 
+    arrange(Phylum, desc(mcc)) %>% 
     mutate(
       across(Phylum:Family, ~ str_remove(.x, "[p|f]__"))
       ) %>% 
