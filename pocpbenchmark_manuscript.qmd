@@ -79,9 +79,33 @@ Recently, @holzerPOCPnfAutomaticNextflow2024 suggested the use of DIAMOND with u
 However, the current implementations of POCP available as tools assume conserved proteins have unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021], differing from the original implementation of POCP which had no such limitation [@qinProposedGenusBoundary2014].
 We need a clear definition of POCP to clarify the process and ensure repeatability.
 
+```{r overall_stats_cpu_hours}
+stats_by_type <- tar_read(family_metadata) %>%
+  select(Family,benchmark_type, n_genomes,CPU_hours) %>%
+  group_by(benchmark_type) %>% 
+  mutate(
+    n_comparisons_planned=n_genomes*(n_genomes-1),
+    n_comparisons_realized=if_else(benchmark_type=="full",
+                          n_comparisons_planned*10, n_comparisons_planned)
+                          ) %>%
+  summarise(
+    n_families = n(),
+    n_genomes = sum(n_genomes),
+    n_planned = sum(n_comparisons_planned*10),
+    n_realized = sum(n_comparisons_realized),
+    total_hours = sum(CPU_hours)
+    )
+overall_stats <- stats_by_type %>% 
+  summarise(across(!benchmark_type,sum)) %>% 
+  mutate(
+    total_hours = round(total_hours),
+    total_years = as.period(total_hours, unit = "hours") %>% as.numeric("years")
+  ) %>% mutate(across(everything(), ~prettyNum(.x,big.mark = ",", digits=2)))
+```
+
 
 To achieve this, we aimed to identify a scalable alternative to BLASTP to compute POCP. Whilst fast and scalable, this alternative should not compromise the accuracy of the original approach.
-Second, as POCP provides an interpretable and used metric that can delineate bacterial genera, we will evaluate the ability of POCP to correctly delineate bacterial genera using the optimized implementation.
+Second, as POCP provides an interpretable and used metric that can delineate bacterial genera, we will evaluate the ability of POCP to correctly delineate bacterial genera based on `r overall_stats[["n_realized"]]` pairwise comparisons of `r overall_stats[["n_genomes"]]` genomes across `r overall_stats[["n_families"]]` families.
 Based on these findings, we hope to provide microbiologists with a best-practice tool they can confidently use in their workflow to determine the genus assignment of a genome.
 
 ::: {#suppfig-lpsn}
@@ -237,22 +261,7 @@ phyla_count_text <- tar_read(tree_metadata) %>% filter(benchmark_type=="All appr
 
 
 ```{r cpu_hours}
-stats_by_type <- tar_read(family_metadata) %>%
-  select(Family,benchmark_type, n_genomes,CPU_hours) %>%
-  group_by(benchmark_type) %>% 
-  mutate(
-    n_comparisons_planned=n_genomes*(n_genomes-1),
-    n_comparisons_realized=if_else(benchmark_type=="full",
-                          n_comparisons_planned*10, n_comparisons_planned)
-                          ) %>%
-  summarise(
-    n_families = n(),
-    n_genomes = sum(n_genomes),
-    n_planned = sum(n_comparisons_planned*10),
-    n_realized = sum(n_comparisons_realized),
-    total_hours = sum(CPU_hours)
-    )
-overall_stats <- stats_by_type %>% filter(benchmark_type=="full") %>% 
+full_benchmark_stats <- stats_by_type %>% filter(benchmark_type=="full") %>% 
   summarise(across(!benchmark_type,sum)) %>% 
   mutate(
     total_hours = round(total_hours),
@@ -297,16 +306,15 @@ time_fraction_category <- tar_read(tool_table) %>%
   separate_wider_delim(tool, "_", names = c("category", "parameter")) %>% 
   group_by(category) %>% 
   summarise(
-    fraction = median(time_fold) %>% MASS::fractions(cycles = 1),
-    fraction = as.character(fraction),
-    fraction = if_else(fraction == "1/2", "half",
-                       glue::glue("$(fraction)^{th}$", .open = "(", .close = ")"))
+    fraction = median(1/time_fold) %>% round(),
+    fraction = if_else(fraction == 2, "twice",
+                       glue::glue("{fraction}×"))
   ) %>% deframe()
 ```
 
 
 To do so, we used GTDB genomes from a wide range of bacterial phylogenetic diversity across four phyla: `r phyla_count_text`. 
-We processed these `r n_genomes_in_full` genomes and conducted `r overall_stats$n_realized` pairwise comparisons with a total of `r overall_stats$total_hours` CPU-Hours (`r overall_stats$total_years` in years).
+We processed these `r n_genomes_in_full` genomes and conducted `r full_benchmark_stats$n_realized` pairwise comparisons with a total of `r full_benchmark_stats$total_hours` CPU-Hours (`r full_benchmark_stats$total_years` in years).
 All the approaches tested are faster than our control BLASTP (@tbl-tools-metrics).
 BLASTPDB, the database approach to BLASTP (@tbl-tools-parameters) that allows for parallel computations, was only half the time of BLASTP on average, but DIAMOND and MMSEQS2 based approaches were respectively ran in a `r time_fraction_category[["DIAMOND"]]` and `r time_fraction_category[["MMSEQS2"]]` of the time of BLASTP.
 Such speed-up does not come without a price: all approaches are obviously using more memory and more CPU (@tbl-tools-metrics), plus, they also read and write more to the disk. We confirmed, as one would expect, the trend that more sensitive approaches consume more resources in general.
@@ -429,7 +437,7 @@ All in all, POCPu is closer to BLASTP than POCP (@fig-blast-vs-all-pocpu) thus g
 The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-pocp-blastdb, @suppfig-pocpu-blastdb and @tbl-R2) in `r time_fraction_category[["BLAST"]]` of the time (@tbl-tools-metrics).
 Still, DIAMOND-based sensitive approaches are way faster with excellent adequacy with BLAST_BLASTP approach, especially for POCPu (@tbl-R2).
 Whilst DIAMOND_ULTRASENSITIVE would have the highest $R^2$ value using POCPu (@tbl-R2), it has the highest memory consumption and disk usage of the tested approaches (@tbl-tools-metrics).
-A more sustainable alternative would be DIAMOND_VERYSENSITIVE that performs 10 times faster than BLAST_BLASTPDB, in less than $1/20^{th}$ of the time of BLAST_BLASTP, while still maintaining reasonable usage of the resources (@tbl-tools-metrics).
+A more sustainable alternative would be DIAMOND_VERYSENSITIVE that performs respectively 10x and faster than BLAST_BLASTPDB,  BLAST_BLASTP, while still maintaining reasonable usage of the resources (@tbl-tools-metrics).
 More importantly, DIAMOND_VERYSENSITIVE POCPu provides extremely similar results to the legacy approach BLAST_BLASTP (@fig-blast-vs-all-pocpu and @tbl-R2) and is essentially identical to DIAMOND_ULTRASENSITIVE POCPu $R^2$ up to 5 digits (@tbl-R2).
 Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternative to BLAST_BLASTP for POCP/POCPu computations.
 
@@ -451,9 +459,19 @@ phyla_count_total_text <- tar_read(tree_metadata) %>%
 
 ### Considering only unique matches enhances genus delineation
 
+```{r pairwise_counts_for_recommended_approach}
+pairs_for_recommended <- stats_by_type %>% 
+  dplyr::select(benchmark_type, n_realized) %>% 
+  mutate(n_realized=if_else(
+    benchmark_type == "full", n_realized/10, n_realized)
+  ) %>% pull(n_realized) %>% sum() %>% 
+  prettyNum(big.mark=",")
+```
+
+
 Then, we tested the 50%-threshold of POCP and POCPu, and evaluate how useful these metrics are to delineate bacterial genera.
 Using additional genomes, this dataset covers even more bacterial phylogenetic diversity: `r phyla_count_total_text`.
-We use all the `r n_genomes` genomes and calculate POCP and POCPu with the DIAMOND_VERYSENSITIVE approach (@fig-pocp-pocpu-densities).
+We use all the `r n_genomes` genomes and calculate POCP and POCPu for `r pairs_for_recommended` pairwise comparisons with the DIAMOND_VERYSENSITIVE approach (@fig-pocp-pocpu-densities).
 Optimistically, we expected two bell-shaped distributions, with the "Between genera" POCPs neatly apart from the "Within genus" POCPs by a gap around 50%.
 
 The two distributions do overlap though (@fig-pocp-pocpu-densities A).
