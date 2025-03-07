@@ -664,6 +664,25 @@ Threshold-based approaches are always a matter of compromises, where no one-size
 We share their vision and propose to adopt the POCPu to delineate genera as an interpretable and  pragmatic approach to organize rapidly and transparently this data deluge.
 
 
+# Data availability
+
+All the proteins sequences used in the analysis were downloaded from the GTDB (r214): <https://data.gtdb.ecogenomic.org/releases/release214/214.0/genomic_files_reps/gtdb_proteins_aa_reps_r214.tar.gz>, along with the associated metadata: <https://data.gtdb.ecogenomic.org/releases/release214/214.0/bac120_metadata_r214.tar.gz>. The list of valid bacteria names was obtained from: <https://github.com/thh32/Protologger/blob/0731adf80f1bbc5f8ee1904c8e9648ef45b13303/DSMZ-latest.tab>.
+Raw output files from the workflow are deposited at <https://doi.org/10.5281/zenodo.14974869>. Cleaned and formatted POCP/POCPu values and metadata tables for analysis are deposited at <https://doi.org/10.5281/zenodo.14975029>.
+
+
+# Code availability
+
+The Nextflow workflow used for the benchmark is available at <https://github.com/ClavelLab/pocpbenchmark>. Code for the analyses, figures and manuscript is available at <https://github.com/ClavelLab/pocpbenchmark_manuscript>.
+
+# Funding
+
+CP and TC received funding from the German Research Foundation (DFG): project no. 460129525 (NFDI4Microbiota), and project no. 445552570.
+
+# Acknowledgments
+
+The authors are grateful to Christian Schudoma, Daniel Podlesny and Mahdi Robbani for their help in fixing issues with an earlier version of the Nextflow workflow.
+CP thanks all members of the Clavel Lab for constructive feedback on the figures at the lab retreat 2024.
+
 # References
 
 ::: {#refs}
