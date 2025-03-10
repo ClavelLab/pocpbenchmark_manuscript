@@ -102,13 +102,25 @@ format_optimized_pocp_table <- function(optim_df){
   optim_df %>% 
     arrange(Phylum, desc(mcc)) %>% 
     mutate(
-      across(Phylum:Family, ~ str_remove(.x, "[p|f]__"))
+      across(Phylum:Family, ~ str_remove(.x, "[p|f]__")),
+      need_increase = if_else(improved_classification,
+                              if_else(optimized_threshold == 50,
+                                      NA, optimized_threshold > 50),
+                              NA),
+      is_rescued = if_else(improved_classification,
+                           mcc <0.7 & maximum_mcc>0.7,
+                           NA)
       ) %>% 
+    group_by(Phylum) %>% 
     gt::gt() %>% 
     fmt_tf(
-      columns = improved_classification,
-      tf_style = "check-mark"
-    ) %>% 
+      columns = need_increase,
+      tf_style = "arrows", na_val = ""
+    ) %>%
+    fmt_tf(
+      columns = is_rescued,
+      tf_style = "squares", na_val = ""
+    ) %>%
     fmt_number(
       columns = ends_with("mcc"), decimals = 2,
     ) %>%
@@ -118,15 +130,21 @@ format_optimized_pocp_table <- function(optim_df){
     tab_style(
       style = cell_text(style = "italic"),
       locations = cells_body(columns = c(Phylum, Family))
+    ) %>%
+    tab_style(
+      style = cell_text(style = "italic"),
+      locations = cells_row_groups()
     ) %>% 
     cols_label(
       mcc_change = md("$\\Delta$MCC"), 
       mcc = "MCC",maximum_mcc="Max. MCC",
-      improved_classification = "",
+      need_increase = "",
+      is_rescued = "",
       optimized_threshold = md("Threshold")
     ) %>%
     tab_options(column_labels.font.weight = "bold") %>% 
-    cols_hide(threshold_change) %>% 
-    cols_move_to_start(improved_classification)
+    cols_hide(c(threshold_change,improved_classification)) %>%
+    cols_move(need_increase, after = optimized_threshold) %>% 
+    cols_move_to_start(is_rescued)
 }
 

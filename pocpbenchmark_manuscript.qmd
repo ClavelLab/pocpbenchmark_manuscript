@@ -599,10 +599,10 @@ library(gt)
 tar_read(optimized_pocpu_table)
 ```
 
-
-Tentative family-specific POCPu thresholds for genus delineation.
-The thresholds were obtained after maximizing the MCC value via optimization.
-Ticks indicate that MCC value change was greater than 0.1 with the optimized threshold, and highlights potential family-specific threshold worth considering to replace the default of 50%. Crosses indicate families for which such optimization was deemed unnecessary.
+Proposal of family-specific POCPu thresholds for genus delineation. The thresholds were obtained after maximizing the MCC value to separate between-genera from within-genera distributions.
+Squares indicate that MCC value change was greater than 0.1 with the optimized threshold, filled squares denote rescued families from MCC < 0.7 to MCC > 0.7, whilst empty squares indicate improved genus delineation.
+Arrows highlight potential family-specific threshold worth considering to replace the default of 50% with the direction of change.
+Families without squares already delineate genera correctly with the default of 50%.
 :::
 
 
