@@ -286,15 +286,10 @@ n_genomes_in_full <- stats_by_type %>%
 
 ```{r tools-metrics}
 n_processes <- tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=",")
-tar_read(tool_table) %>% filter(tool!="BLAST_BLASTP") %>%
-  select(-n) %>%
-  rename("Approach name" = "tool",
-         "Time"="time_fold", "Memory"="memory_fold",
-         "CPU"="cpu_fold", "Disk usage (I/O)"="io_fold") %>% 
-  knitr::kable(digits = 3)
+tar_read(metrics_table)
 ```
 
-Fold change of computing metrics for the 9 approaches used in the benchmark compared to the BLAST_BLASTP approach.
+Fold change of computing metrics for the 10 approaches used in the benchmark compared to the BLAST_BLASTP approach.
 The metrics include processing time as real-time, memory usage, CPU usage and disk usage as input/output (I/O).
 A fold change below 1 means the metric is lower, whilst above 1 means it is higher, compared to the BLAST_BLASTP approach.
 The fold change values are median computed over $n$ = `r n_processes` number of processes tracked per approach.

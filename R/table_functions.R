@@ -148,3 +148,37 @@ format_optimized_pocp_table <- function(optim_df){
     cols_move_to_start(is_rescued)
 }
 
+format_metrics_table <- function(tbl){
+  tbl %>%
+    mutate(category = str_remove(tool, "_.*")) %>% 
+    group_by(category) %>% 
+    gt::gt() %>% 
+    cols_hide(n) %>% 
+    fmt_number(
+      columns = gt::ends_with("fold"), decimals = 3
+    ) %>% 
+    cols_label(
+      tool = "Approach name",
+      time_fold =  "Time",
+      memory_fold = "Memory",
+      cpu_fold = "CPU",
+      io_fold = "Disk usage (I/O)") %>% 
+    cols_align(align = "left", columns = tool) %>% 
+    tab_style_body(
+      cell_text(weight = "bold"),
+      values = "DIAMOND_VERYSENSITIVE",
+      targets = "row"
+    ) %>% 
+    tab_footnote(
+      footnote = md("@camachoBLASTArchitectureApplications2009"),
+      locations = cells_row_groups("BLAST")
+    ) %>% 
+    tab_footnote(
+      footnote = md("@buchfinkSensitiveProteinAlignments2021"),
+      locations = cells_row_groups("DIAMOND")
+    ) %>% 
+    tab_footnote(
+      footnote = md("@steineggerMMseqs2EnablesSensitive2017"),
+      locations = cells_row_groups("MMSEQS2")
+    )
+}

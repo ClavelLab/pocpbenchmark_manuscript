@@ -145,6 +145,7 @@ list(
   tar_target(median_tool, generate_table_tool(tool_parsed)),
   tar_target(db_table, format_db_table(median_db)),
   tar_target(tool_table, format_tool_table(median_tool)),
+  tar_target(metrics_table, format_metrics_table(tool_table)),
   tar_target(p_pocp, plot_pocp_density(all_pocp)),
   tar_target(p_pocpu, plot_pocpu_density(all_pocpu)),
   tar_target(p_pocp_pocpu_densities, plot_pocp_pocpu_densities(p_pocp, p_pocpu)),
