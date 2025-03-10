@@ -6,6 +6,8 @@ old_R/
 *.docx
 *.zip
 *.gz
+*.ipynb
+*.md
 # ignore targets stores
 _targets/
 analyze_pocpbenchmark_data/
