@@ -179,8 +179,9 @@ The former is used in @holzerPOCPnfAutomaticNextflow2024 while the latter is use
 Similarly to BLASTPDB, these approaches require that a protein database is built for each genome before performing the alignment (@tbl-tools-parameters).
 DIAMOND and MMseqs2 were both used with four different sensitivity thresholds (@tbl-tools-parameters) based on a recent comparisons [@buchfinkSensitiveProteinAlignments2021].
 
+:::{#tbl-tools-parameters}
+
 ```{r tbl-tools-parameters}
-#| tbl-cap: "List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold."
 tibble::tribble(
   ~Name, ~Parameters,
   "BLAST_BLASTP","--evalue 0.00001 --qcov_hsp_perc 50.0",
@@ -195,13 +196,24 @@ tibble::tribble(
   "MMSEQS2_S7DOT5","--e-profile 0.00001 --cov-mode 1 -c 0.50 -s 7.5"
 ) %>% 
   mutate(
-    Name = if_else(Name=="DIAMOND_VERYSENSITIVE", "**DIAMOND_VERYSENSITIVE**", Name),
     `Database creation` = if_else(Name == "BLAST_BLASTP", "No", "Yes"),
-    Parameters = glue::glue("`{p}`", p=Parameters)
-    ) %>%
-  rename("Approach name"="Name") %>% 
-  select(`Approach name`, `Database creation`, Parameters) %>% knitr::kable()
+    category = str_remove(Name, "_.*")
+  ) %>% group_by(category) %>%
+  gt::gt() %>%
+  tab_style(
+    style = cell_text(font = system_fonts(name = "monospace-code")),
+    locations = cells_body(columns = "Parameters")
+  ) %>%
+  tab_style_body(
+    cell_text(weight = "bold"),
+    values = "DIAMOND_VERYSENSITIVE",
+    targets = "row"
+  ) %>% 
+  cols_move_to_end("Parameters")
 ```
+
+List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold.
+:::
 
 All proteins matches were filtered to only keep matches with > 40 % identity to all the query sequences matches for POCP ($C_{QS}$ and $C_{SQ}$ in @eq-pocp) and only unique query sequence matches for POCPu ($C_{QS}$ and $C_{SQ}$ in @eq-pocpu).
 Note that the filtering was adapted to the method as the range of percentage of identity in MMseqs2 is $[0-1]$ and $[0-100]$ for BLAST and DIAMOND.
