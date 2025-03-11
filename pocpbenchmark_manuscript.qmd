@@ -333,32 +333,8 @@ Coefficient of determination ($R^2$) and associated $p$-value are shown on top o
 :::
 
 
-
-::: {#tbl-R2}
-
-```{r R2}
-#| html-table-processing: none
-#| classes: plain
-library(gt)
-tar_load(R2_table)
-n_comparisons_in_lm <- unique(R2_table$POCP_nobs) %>% prettyNum(big.mark = ",")
-R2_table %>% arrange(desc(POCPu_R2)) %>%
-    gt::gt(rowname_col = "tool") %>%
-    tab_stubhead("Approach name") %>% cols_align(align = "left", columns = "tool") %>%
-    tab_spanner("POCP", starts_with("POCP_")) %>%
-    tab_spanner("POCPu", starts_with("POCPu_")) %>% cols_hide(ends_with("_nobs")) %>%
-    cols_label(
-      POCP_R2 = md("$R^2$"),POCPu_R2 = md("$R^2$"),
-      POCP_p_label = md("$p$-value"),POCPu_p_label = md("$p$-value")
-    ) %>%
-  tab_options(column_labels.font.weight = "bold")
-```
-
-Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r n_comparisons_in_lm` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
-:::
-
 BLASTPDB produced exactly similar POCP values to BLASTP (@suppfig-pocp-blastdb). The other approaches do not perform as well.
-All flavors of DIAMOND have a coefficient of determination ($R^2$) above 0.99 when matching their POCP values with the original from BLASTP, with the exception of the DIAMOND_FAST approach that deviates more from the expected values (@fig-blast-vs-all-pocp and @tbl-R2).
+All flavors of DIAMOND have a coefficient of determination ($R^2$) above 0.99 when matching their POCP values with the original from BLASTP, with the exception of the DIAMOND_FAST approach that deviates more from the expected values (@fig-blast-vs-all-pocp).
 This deviation is exacerbated when using the MMSEQS2_S1DOT0 approach, but is somehow rescued with the others MMSEQS2 approaches, though they perform worse than the DIAMOND approaches and should therefore not be used as BLASTP alternatives for POCP.
 
 What happens when POCP values deviate between the alternative and BLASTP?
@@ -428,6 +404,32 @@ Otherwise, the same patterns observed for POCP hold for POCPu, though with highe
 The 3 different sensitive approaches of DIAMOND produce POCPu values that match perfectly the ones produce by the legacy approach BLAST_BLASTP, with no underestimation as in the case of POCP previously.
 However, the MMSEQS2 approaches, whilst better with POCPu than POCP, still tend to underestimate POCPu values.
 All in all, POCPu is closer to BLASTP than POCP (@fig-blast-vs-all-pocpu) thus guiding our choices to an accurate BLASTP alternative.
+
+
+
+::: {#tbl-R2}
+
+```{r R2}
+#| html-table-processing: none
+#| classes: plain
+library(gt)
+tar_load(R2_table)
+n_comparisons_in_lm <- unique(R2_table$POCP_nobs) %>% prettyNum(big.mark = ",")
+R2_table %>% arrange(desc(POCPu_R2)) %>%
+    gt::gt(rowname_col = "tool") %>%
+    tab_stubhead("Approach name") %>% cols_align(align = "left", columns = "tool") %>%
+    tab_spanner("POCP", starts_with("POCP_")) %>%
+    tab_spanner("POCPu", starts_with("POCPu_")) %>% cols_hide(ends_with("_nobs")) %>%
+    cols_label(
+      POCP_R2 = md("$R^2$"),POCPu_R2 = md("$R^2$"),
+      POCP_p_label = md("$p$-value"),POCPu_p_label = md("$p$-value")
+    ) %>%
+  tab_options(column_labels.font.weight = "bold")
+```
+
+Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r n_comparisons_in_lm` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
+:::
+
 
 The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-pocp-blastdb, @suppfig-pocpu-blastdb and @tbl-R2) in `r time_fraction_category[["BLAST"]]` of the time (@tbl-tools-metrics).
 Still, DIAMOND-based sensitive approaches are way faster with excellent adequacy with BLAST_BLASTP approach, especially for POCPu (@tbl-R2).
