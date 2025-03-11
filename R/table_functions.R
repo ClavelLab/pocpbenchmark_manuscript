@@ -196,7 +196,7 @@ write_supp_table <- function(tbl_genome,tbl_family){
            across(Domain:Species, ~ str_remove(.x, "[dpcofgs]__"))
     ) %>%
     relocate(accession, benchmark_type) %>%
-    arrange(benchmark_type,Phylum, Family) %>%
+    arrange(benchmark_type,Phylum, Family, Genus) %>%
     readr::write_csv("Table_S1_shortlisted_genomes.csv")
   return("Table_S1_shortlisted_genomes.csv")
 }
