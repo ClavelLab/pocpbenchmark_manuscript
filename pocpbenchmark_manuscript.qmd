@@ -55,6 +55,7 @@ crossref:
 library(tidyverse)
 library(targets)
 library(cowplot)
+library(gt)
 ```
 
 
@@ -179,7 +180,7 @@ The former is used in @holzerPOCPnfAutomaticNextflow2024 while the latter is use
 Similarly to BLASTPDB, these approaches require that a protein database is built for each genome before performing the alignment (@tbl-tools-parameters).
 DIAMOND and MMseqs2 were both used with four different sensitivity thresholds (@tbl-tools-parameters) based on a recent comparisons [@buchfinkSensitiveProteinAlignments2021].
 
-:::{#tbl-tools-parameters}
+::: {#tbl-tools-parameters}
 
 ```{r tbl-tools-parameters}
 tibble::tribble(
@@ -424,7 +425,6 @@ All in all, POCPu is closer to BLASTP than POCP (@fig-blast-vs-all-pocpu) thus g
 ```{r R2}
 #| html-table-processing: none
 #| classes: plain
-library(gt)
 tar_load(R2_table)
 n_comparisons_in_lm <- unique(R2_table$POCP_nobs) %>% prettyNum(big.mark = ",")
 R2_table %>% arrange(desc(POCPu_R2)) %>%
@@ -604,7 +604,6 @@ Overall, POCPu provides a useful and interpretable metric to delineate genera.
 ```{r optimized_threshold}
 #| html-table-processing: none
 #| classes: plain
-library(gt)
 tar_read(optimized_pocpu_table)
 ```
 
