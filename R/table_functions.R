@@ -182,3 +182,21 @@ format_metrics_table <- function(tbl){
       locations = cells_row_groups("MMSEQS2")
     )
 }
+
+write_supp_table <- function(tbl_genome,tbl_family){
+  tbl_genome %>%
+    select(accession, Domain:Species, num_seqs:genome_size) %>%
+    left_join(
+      select(tbl_family, Family, benchmark_type), by = "Family"
+    ) %>% 
+    mutate(benchmark_type = forcats::as_factor(benchmark_type) %>% 
+             forcats::fct_recode(
+               "All approaches"="full", "Recommended approach"="recommended"
+             ),
+           across(Domain:Species, ~ str_remove(.x, "[dpcofgs]__"))
+    ) %>%
+    relocate(accession, benchmark_type) %>%
+    arrange(benchmark_type,Phylum, Family) %>%
+    readr::write_csv("Table_S1_shortlisted_genomes.csv")
+  return("Table_S1_shortlisted_genomes.csv")
+}

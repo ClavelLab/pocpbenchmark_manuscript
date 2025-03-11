@@ -21,6 +21,7 @@ list(
   tar_parquet(pocp_values, read_parquet(pocp_values_parquet)),
   tar_parquet(genome_metadata, read_parquet(genome_metadata_parquet)),
   tar_parquet(family_metadata, read_parquet(family_metadata_parquet)),
+  tar_file(supptbl_shortlisted, write_supp_table(genome_metadata,family_metadata)),
   tar_target(total_proteins,
              setNames(genome_metadata[["num_seqs"]], genome_metadata[["accession"]])),
   tar_target(genome_sizes,
