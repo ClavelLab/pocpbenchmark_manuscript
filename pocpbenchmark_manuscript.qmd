@@ -1,7 +1,7 @@
 ---
 title: Robust genome-based delineation of bacterial genera
 affiliations:
-  - id: uka
+  - id: 1
     name: University Hospital of RWTH Aachen
     department: Institute of Medical Microbiology
     group: Functional Microbiome Research Group
@@ -13,7 +13,7 @@ authors:
     orcid: 0000-0001-9832-2507
     email: cpauvert@ukaachen.de
     affiliations:
-      - ref: uka
+      - ref: 1
     roles:
       - Conceptualization
       - Formal analysis
@@ -25,16 +25,18 @@ authors:
   - name: Thomas C.A. Hitch
     orcid: 0000-0003-2244-7412
     affiliations:
-      - ref: uka
+      - ref: 1
     roles:
       - Conceptualization
       - Supervision
       - Visualization
       - Writing - review & editing
   - name: Thomas Clavel
+    corresponding: true
+    email: tclavel@ukaachen.de
     orcid: 0000-0002-7229-5595
     affiliations:
-      - ref: uka
+      - ref: 1
     roles:
       - Funding acquisition
       - Resources
@@ -236,7 +238,7 @@ We did not rely on the adjusted coefficient of determination as the linear regre
 
 We computed classification metrics with a positive event defined as "both genomes belong to the same genus".
 Thus, for a pair of bacterial genomes with a POCP (or POCPu) >50%, the pair was a True Positive ($TP$) if it belonged to the same genus, else it was considered as a False Positive ($FP$).
-Conversely, for a pair of bacterial genomes with a POCP (or POCPu) $\leq$50%, the pair was a False Negative ($FN$) if it belonged to the same genus, else it was considered as a True Negative ($TN$).
+Conversely, for a pair of bacterial genomes with a POCP (or POCPu) $\leq$ 50%, the pair was a False Negative ($FN$) if it belonged to the same genus, else it was considered as a True Negative ($TN$).
 We then assessed the classification performance of both POCP and POCPu using Matthews Correlation Coefficient (MCC; @eq-mcc).
 
 $$
@@ -667,7 +669,7 @@ We showed that DIAMOND_VERYSENSITIVE can reliably replace BLASTP, speeding up th
 In addition, we addressed an assumption made in previous POCP implementations [e.g., @holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024; @linSilentGeneBiopyBiopy2021], and thereby clearly defined an alternative POCP metric -- POCPu -- that uses only unique matches, thereby making genus delineation more accurate.
 
 Genus names occur before species names in the binomial nomenclature of bacteria, and are therefore an important first contact with bacterial entities. They are key to existing knowledge in databases or articles and provide intuitive information on the evolutionary history and ecological roles of the organisms under study [@reimerBacDive2022Knowledge2022; @rosonovskiEuropePMC20232024; @schochNCBITaxonomyComprehensive2020].
-The system works best when resources and tools follow FAIR principles [e.g., https://nfdi4microbiota.de, @wilkinsonFAIRGuidingPrinciples2016a], as done in this work.
+The system works best when resources and tools follow FAIR principles [e.g., <https://nfdi4microbiota.de>, @wilkinsonFAIRGuidingPrinciples2016a], as done in this work.
 We demonstrated that not all tools and parameters are suitable to speed up BLASTP; some combinations, whilst extremely fast, under- or overestimate POCP values, resulting in erroneous splitting or merging of genera.
 While our analysis included phylogenomically diverse taxa, it was limited to the taxa within GTDB [@parksCompleteDomaintospeciesTaxonomy2020; @parksGTDBOngoingCensus2022] and focused on the dominant bacterial fraction. Despite the comprehensive nature of GTDB, our final genome selection might have missed important taxonomic groups of interest to readers. However, filtering the studied taxa was necessary to obtain enough data points per taxa to ensure statistical robustness. In addition, the work has been performed in full compliance with the FAIR principles, making the approach easily accessible and thus reproducible to facilitate further expansion of this work by others. Previous studies on many-vs-many proteins alignment comparison used less phylogenetic diversity: 4 genomes from 4 genera in in @hernandez-salmeronProgressQuicklyFinding2020, maximum 167 genomes from 5 genera in @holzerPOCPnfAutomaticNextflow2024.
 @riescoUpdateProposedMinimal2024 evaluated much more genomes -- 1,573 type strains -- but calculated POCP -- using Bio-Py [@linSilentGeneBiopyBiopy2021] -- only to be compared with AAI and not to evaluate genus delineation.
