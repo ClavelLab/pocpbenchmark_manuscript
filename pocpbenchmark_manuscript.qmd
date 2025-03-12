@@ -189,7 +189,7 @@ DIAMOND and MMseqs2 were both used with four different sensitivity thresholds pr
 
 ::: {#tbl-tools-parameters}
 
-```{r tbl-tools-parameters}
+```{r tools-parameters}
 tibble::tribble(
   ~Name, ~Parameters,
   "BLAST_BLASTP","--evalue 0.00001 --qcov_hsp_perc 50.0",
