@@ -265,7 +265,7 @@ Statistical analyses and visualization were conducted within R using targets v.1
 
 
 First, we set out to identify a scalable alternative to BLASTP to compute the Percentage Of Conserved Proteins (POCP) to delineate genera.
-We evaluated ten proteins alignment approaches (@tbl-tools-parameters) based on three tools -- BLASTP [@camachoBLASTArchitectureApplications2009], DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMseqs2 [@steineggerMMseqs2EnablesSensitive2017].
+We evaluated ten proteins alignment methods (@tbl-tools-parameters) based on three tools -- BLASTP [@camachoBLASTArchitectureApplications2009], DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMseqs2 [@steineggerMMseqs2EnablesSensitive2017].
 
 ```{r benchmark_all_text}
 phyla_count_text <- tar_read(tree_metadata) %>% filter(benchmark_type=="All approaches") %>% 
@@ -309,9 +309,9 @@ n_processes <- tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.m
 tar_read(metrics_table)
 ```
 
-Fold change of computing metrics for the 10 approaches used in the benchmark compared to the BLAST_BLASTP approach.
+Fold change of computing metrics for the ten methods used in the benchmark compared to the BLAST_BLASTP method.
 The metrics include processing time as real-time, memory usage, CPU usage and disk usage as input/output (I/O).
-A fold change below 1 means the metric is lower, whilst above 1 means it is higher, compared to the BLAST_BLASTP approach.
+A fold change below 1 means the metric was lower, above 1 means it was higher, compared to the reference.
 The fold change values are median computed over $n$ = `r n_processes` number of processes tracked per approach.
 :::
 
@@ -323,18 +323,19 @@ time_fraction_category <- tar_read(tool_table) %>%
   summarise(
     fraction = median(1/time_fold) %>% round(),
     fraction = if_else(fraction == 2, "twice",
-                       glue::glue("{fraction}×"))
+                       glue::glue("{fraction}x"))
   ) %>% deframe()
 ```
 
 
-To do so, we used GTDB genomes from a wide range of bacterial phylogenetic diversity across four phyla: `r phyla_count_text`. 
+We used GTDB genomes from a wide range of bacterial phylogenetic diversity across four phyla: `r phyla_count_text`. 
 We processed these `r n_genomes_in_full` genomes and conducted `r full_benchmark_stats$n_realized` pairwise comparisons with a total of `r full_benchmark_stats$total_hours` CPU-Hours (`r full_benchmark_stats$total_years` in years).
-All the approaches tested are faster than our control BLASTP (@tbl-tools-metrics).
-BLASTPDB, the database approach to BLASTP (@tbl-tools-parameters) that allows for parallel computations, was only half the time of BLASTP on average, but DIAMOND and MMSEQS2 based approaches were respectively ran in a `r time_fraction_category[["DIAMOND"]]` and `r time_fraction_category[["MMSEQS2"]]` of the time of BLASTP.
-Such speed-up does not come without a price: all approaches are obviously using more memory and more CPU (@tbl-tools-metrics), plus, they also read and write more to the disk. We confirmed, as one would expect, the trend that more sensitive approaches consume more resources in general.
+All the methods tested were faster than the reference BLASTP (@tbl-tools-metrics).
+BLASTPDB, the database method of BLASTP (@tbl-tools-parameters) that enables paralleled computations, was only half the time of BLASTP on average.
+In contrast, all DIAMOND and MMSEQS2-based methods ran in `r time_fraction_category[["DIAMOND"]]` and `r time_fraction_category[["MMSEQS2"]]` the speed of BLASTP, at the cost of using more memory, CPU, and disk usage (@tbl-tools-metrics).
+Thus, as expected, more sensitive methods consumed more resources in general.
 
-However, a more important criteria for a BLASTP alternative is to evaluate whether the accuracy of the POCP calculation is not sacrificed in the name of computational performance.
+An important criterion for a BLASTP alternative is to evaluate whether the accuracy of POCP calculation is comparable and not compromised for increased speed.
 
 ### DIAMOND gives POCP as accurate as BLASTP
 
@@ -346,22 +347,19 @@ n_blastdb_comparisons <- tar_read(blast_vs_all_pocpu) %>%
 knitr::include_graphics(tar_read(fig_blast_vs_blastdb_pocp_png))
 ```
 
-Adequacy between POCP values computed with the legacy BLAST_BLASTP against the BLAST_BLASTPDB approach that build databases before alignment.
+Adequacy between POCP values computed with the reference BLAST_BLASTP against the BLAST_BLASTPDB method that build databases before alignment.
 Each point ($n$ = `r n_blastdb_comparisons`) represents a POCP value between two genomes (see @eq-pocp).
 The colors represent the number of data points binned together in hexagons to avoid over-plotting.
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
 
 
-BLASTPDB produced exactly similar POCP values to BLASTP (@suppfig-pocp-blastdb). The other approaches do not perform as well.
-All flavors of DIAMOND have a coefficient of determination ($R^2$) above 0.99 when matching their POCP values with the original from BLASTP, with the exception of the DIAMOND_FAST approach that deviates more from the expected values (@fig-blast-vs-all-pocp).
-This deviation is exacerbated when using the MMSEQS2_S1DOT0 approach, but is somehow rescued with the others MMSEQS2 approaches, though they perform worse than the DIAMOND approaches and should therefore not be used as BLASTP alternatives for POCP.
-
-What happens when POCP values deviate between the alternative and BLASTP?
-If the alternative underestimate POCP -- i.e., with values under the dashed line in @fig-blast-vs-all-pocp --, the alternative will split genus and tend to assign genomes to different genera when they are from the same genus.
-Conversely, if the alternative overestimate POCP -- i.e., with values over the dashed line in @fig-blast-vs-all-pocp --, the alternative will lump genera together and tend to assign genomes to the same genus when they are not.
-DIAMOND approaches show underestimation, especially DIAMOND_FAST, but not overestimation (@fig-blast-vs-all-pocp), whilst MMSEQS2 approaches tend to overestimate more than underestimate, with more deviation altogether.
-All in all, DIAMOND-based approaches, especially with increased sensitivity gives POCP as accurate as BLASTP for a fraction of the time.
+BLASTPDB produced the exact same POCP values as BLASTP (@suppfig-pocp-blastdb).
+The other methods did not perform as good. All methods of DIAMOND had a coefficient of determination ($R^2$) above 0.99, with the exception of DIAMOND_FAST that deviated from the expected values (@fig-blast-vs-all-pocp).
+All DIAMOND methods, especially DIAMOND_FAST, tended to underestimate POCP values (all dots were below the reference dashed line), meaning that they might assign genomes to different genera when they are from the same genus (top panels).
+Deviation from the BLASTP reference was aggravated when using the MMSEQS2_S1DOT0 method, mainly through underestimation (bottom panels).
+The other MMSEQS2 methods performed better, but still less good than the DIAMOND methods.
+They also tended to overestimate more than underestimate. All in all, the DIAMOND methods, especially with increased sensitivity, generated POCP values nearly as accurate as BLASTP for a fraction of the time, but we restrained from using the MMSEQS2 methods due to being less accurate.
 
 
 ::: {#fig-blast-vs-all-pocp}
@@ -373,24 +371,23 @@ n_blast_comparisons <- tar_read(blast_vs_all_pocp) %>%
 knitr::include_graphics(tar_read(fig_blast_vs_all_pocp_png))
 ```
 
-Adequacy between POCP values computed with the legacy BLAST_BLASTP against flavors of faster alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].
+Adequacy between POCP values computed with the reference method BLAST_BLASTP and methods of faster alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].
 Each point ($n$ = `r n_blast_comparisons` per tool) represents a POCP value between two genomes (see @eq-pocp).
 The colors represent the number of data points binned together in hexagons to avoid over-plotting.
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
 
-### Towards a clearer POCP definition
+### Proposal for clear and fast computation of POCP values
 
-Yet, all approaches have POCP values over 100% (@fig-blast-vs-all-pocp). Surprised as we were to see percentages exceed their supposed upper bound, we sought to investigate and eventually suggest a clearer definition of POCP, that we termed POCPu.
+We observed that all methods generated POCP values exceeding the supposed upper limit of 100%. Hence, we sought to investigate the underlying reasons and suggest a clearer definition of POCP, termed POCPu.
 
-During the alignment process, proteins sequences from the query can match multiple subject sequences in the case of duplicated genes.
-While briefly mentioned in the original paper that "The number of conserved proteins in each genome of strains being compared was slightly different because of the existence of duplicate genes (paralogs)" [@qinProposedGenusBoundary2014, p. 2211], the expected influence on the POCP values is lacking. Therefore, we defined the POCP with unique matches (POCPu) between two genomes $Q$ and $S$ as:
+During the alignment process, proteins sequences from the query can match multiple subject sequences in the case of duplicated genes. Whilst briefly mentioned in the original article that "The number of conserved proteins in each genome of strains being compared was slightly different because of the existence of duplicate genes (paralogs)" [@qinProposedGenusBoundary2014, p. 2211], the expected influence on the POCP values was lacking. Therefore, we defined the POCP with unique matches (POCPu) between two genomes $Q$ and $S$ as:
 
 $$
 POCPu = \dfrac{C_{uQS} + C_{uSQ}}{T_Q + T_S} \times 100\%
 $$ {#eq-pocpu}
 
-where $C_{uQS}$ represent the conserved number of proteins from *the unique matches of* $Q$ when aligned to $S$ and conversely $C_{uSQ}$ represent the conserved number of proteins from *the unique matches of* $S$ when aligned to $Q$, and $T_Q + T_S$ represent the total number of proteins in the two genomes being compared, respectively.
+where $C_{uQS}$ represents the conserved number of proteins from *the unique matches of* $Q$ when aligned to $S$ and, conversely, $C_{uSQ}$ the conserved number of proteins from *the unique matches of* $S$ when aligned to $Q$; $T_Q + T_S$ represents the total number of proteins in each of the two genomes being compared.
 
 
 ::: {#suppfig-pocpu-blastdb}
@@ -398,7 +395,7 @@ where $C_{uQS}$ represent the conserved number of proteins from *the unique matc
 knitr::include_graphics(tar_read(fig_blast_vs_blastdb_pocpu_png))
 ```
 
-Adequacy between POCPu values computed with the legacy BLAST_BLASTP against the BLAST_BLASTPDB approach that build databases before alignment.
+Adequacy between POCPu values computed with the reference BLAST_BLASTP against the BLAST_BLASTPDB approach that build databases before alignment.
 Each point ($n$ = `r n_blastdb_comparisons`) represents a POCPu value between two genomes (see @eq-pocpu).
 The colors represent the number of data points binned together in hexagons to avoid over-plotting.
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
@@ -413,17 +410,16 @@ n_blast_comparisons_pocpu <- tar_read(blast_vs_all_pocpu) %>%
 knitr::include_graphics(tar_read(fig_blast_vs_all_pocpu_png))
 ```
 
-Adequacy between POCPu values computed with the legacy BLAST_BLASTP against flavors of faster alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].
+Adequacy between POCPu values computed with the reference method BLAST_BLASTP and methods of faster alternatives: DIAMOND [@buchfinkSensitiveProteinAlignments2021] and MMSEQS2 [@steineggerMMseqs2EnablesSensitive2017].
 Each point ($n$ = `r n_blast_comparisons_pocpu` per tool) represents a POCPu value between two genomes (see @eq-pocpu).
 The colors represent the number of data points binned together in hexagons to avoid over-plotting.
 Coefficient of determination ($R^2$) and associated $p$-value are shown on top of each linear regressions.
 :::
 
-These higher-than-100% POCP values disappears when using the POCPu (@fig-blast-vs-all-pocpu and @suppfig-pocpu-blastdb).
-Otherwise, the same patterns observed for POCP hold for POCPu, though with higher values of coefficient of determination (@fig-blast-vs-all-pocpu and @tbl-R2).
-The 3 different sensitive approaches of DIAMOND produce POCPu values that match perfectly the ones produce by the legacy approach BLAST_BLASTP, with no underestimation as in the case of POCP previously.
-However, the MMSEQS2 approaches, whilst better with POCPu than POCP, still tend to underestimate POCPu values.
-All in all, POCPu is closer to BLASTP than POCP (@fig-blast-vs-all-pocpu) thus guiding our choices to an accurate BLASTP alternative.
+POCP values above 100% disappeared when using POCPu (@fig-blast-vs-all-pocpu and @suppfig-pocpu-blastdb).
+In general, the same patterns observed for POCP hold for POCPu, though with higher values of coefficient of determination (@fig-blast-vs-all-pocpu and @tbl-R2).
+The 3 different sensitive methods of DIAMOND produced POCPu values that matched perfectly the ones produced by the reference method BLAST_BLASTP, with no underestimation as in the case of POCP previously.
+In contrast, the MMSEQS2 methods, whilst better with POCPu than POCP, still tended to underestimate POCPu values. All in all, POCPu is closer to BLASTP than POCP (@fig-blast-vs-all-pocpu) thus guiding our choice to create an accurate BLASTP alternative.
 
 
 
@@ -446,15 +442,14 @@ R2_table %>% arrange(desc(POCPu_R2)) %>%
   tab_options(column_labels.font.weight = "bold")
 ```
 
-Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each approach against the respective POCP and POCPu values of BLAST_BLASTP legacy approach. Each linear regression are based on $n$ = `r n_comparisons_in_lm` comparisons per approach. Approaches are sorted by decreasing POCPu $R^2$ values.
+Coefficient of determination ($R^2$) and associated $p$-value for linear regressions matching the POCP and POCPu values computed by each method against the respective POCP and POCPu values of the reference method BLAST_BLASTP. Each linear regression are based on $n$ = `r n_comparisons_in_lm` comparisons per method. Methods are sorted by decreasing POCPu $R^2$ values.
 :::
 
 
-The BLAST_BLASTPDB approach is a strong contender for a BLAST_BLASTP alternative because whilst using more resources, it performs exactly the same as BLAST_BLASTP (@suppfig-pocp-blastdb, @suppfig-pocpu-blastdb and @tbl-R2) in `r time_fraction_category[["BLAST"]]` of the time (@tbl-tools-metrics).
-Still, DIAMOND-based sensitive approaches are way faster with excellent adequacy with BLAST_BLASTP approach, especially for POCPu (@tbl-R2).
-Whilst DIAMOND_ULTRASENSITIVE would have the highest $R^2$ value using POCPu (@tbl-R2), it has the highest memory consumption and disk usage of the tested approaches (@tbl-tools-metrics).
-A more sustainable alternative would be DIAMOND_VERYSENSITIVE that performs respectively 10x and faster than BLAST_BLASTPDB,  BLAST_BLASTP, while still maintaining reasonable usage of the resources (@tbl-tools-metrics).
-More importantly, DIAMOND_VERYSENSITIVE POCPu provides extremely similar results to the legacy approach BLAST_BLASTP (@fig-blast-vs-all-pocpu and @tbl-R2) and is essentially identical to DIAMOND_ULTRASENSITIVE POCPu $R^2$ up to 5 digits (@tbl-R2).
+In summary, the BLAST_BLASTPDB method was a strong contender for a BLAST_BLASTP alternative because it performed exactly the same as BLAST_BLASTP (@suppfig-pocp-blastdb, @suppfig-pocpu-blastdb and @tbl-R2) in `r time_fraction_category[["BLAST"]]` the speed (@tbl-tools-metrics), at the cost of using more resources. However, the DIAMOND sensitive methods were way faster with excellent adequacy with BLAST_BLASTP, especially for POCPu (@tbl-R2).
+Whilst DIAMOND_ULTRASENSITIVE had the highest $R^2$ value using POCPu (@tbl-R2), it was also characterized by the highest memory consumption and disk usage (@tbl-tools-metrics).
+A more sustainable alternative is DIAMOND_VERYSENSITIVE that performed 10 times faster than BLAST_BLASTPDB, in less than a twentieth of the time of the time of BLAST_BLASTP, while still maintaining reasonable usage of the computing resources (@tbl-tools-metrics).
+More importantly, POCPu values calculated using DIAMOND_VERYSENSITIVE gave results that were extremely close to the reference BLAST_BLASTP (@fig-blast-vs-all-pocpu and @tbl-R2) and were essentially identical to DIAMOND_ULTRASENSITIVE POCPu $R^2$ up to 5 digits (@tbl-R2).
 Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternative to BLAST_BLASTP for POCP/POCPu computations.
 
 ## Genus delineation with POCP and POCPu
