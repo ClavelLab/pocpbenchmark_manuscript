@@ -201,7 +201,7 @@ tibble::tribble(
     `Database creation` = if_else(Name == "BLAST_BLASTP", "No", "Yes"),
     category = str_remove(Name, "_.*")
   ) %>%
-  deplyr::rename("Method" = "Name") %>% group_by(category) %>%
+  dplyr::rename("Method" = "Name") %>% group_by(category) %>%
   gt::gt() %>%
   tab_style(
     style = cell_text(font = system_fonts(name = "monospace-code")),
