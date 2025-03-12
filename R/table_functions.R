@@ -169,18 +169,8 @@ format_metrics_table <- function(tbl){
       values = "DIAMOND_VERYSENSITIVE",
       targets = "row"
     ) %>% 
-    tab_footnote(
-      footnote = md("@camachoBLASTArchitectureApplications2009"),
-      locations = cells_row_groups("BLAST")
-    ) %>% 
-    tab_footnote(
-      footnote = md("@buchfinkSensitiveProteinAlignments2021"),
-      locations = cells_row_groups("DIAMOND")
-    ) %>% 
-    tab_footnote(
-      footnote = md("@steineggerMMseqs2EnablesSensitive2017"),
-      locations = cells_row_groups("MMSEQS2")
-    )
+    tab_options(column_labels.font.weight = "bold")
+
 }
 
 write_supp_table <- function(tbl_genome,tbl_family){

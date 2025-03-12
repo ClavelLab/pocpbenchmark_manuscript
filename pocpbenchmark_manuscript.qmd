@@ -210,7 +210,12 @@ tibble::tribble(
     values = "DIAMOND_VERYSENSITIVE",
     targets = "row"
   ) %>% 
-  cols_move_to_end("Parameters")
+  cols_move_to_end("Parameters") %>% 
+ tab_options(
+   column_labels.font.weight = "bold",
+   column_labels.font.size = "small",
+   table.font.size = "small"
+ )
 ```
 
 List of the ten approaches and associated parameters for the many-versus-many proteins alignments tools used in the benchmark. The recommended approach is indicated in bold.
