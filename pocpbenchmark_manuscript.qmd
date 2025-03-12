@@ -452,7 +452,7 @@ A more sustainable alternative is DIAMOND_VERYSENSITIVE that performed 10 times 
 More importantly, POCPu values calculated using DIAMOND_VERYSENSITIVE gave results that were extremely close to the reference BLAST_BLASTP (@fig-blast-vs-all-pocpu and @tbl-R2) and were essentially identical to DIAMOND_ULTRASENSITIVE POCPu $R^2$ up to 5 digits (@tbl-R2).
 Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternative to BLAST_BLASTP for POCP/POCPu computations.
 
-## Genus delineation with POCP and POCPu
+## Unique matches enhance the accuracy of genus delineation
 
 ```{r confusion_matrix}
 targets::tar_load(c(pocp_confusion,pocpu_confusion))
@@ -468,7 +468,6 @@ phyla_count_total_text <- tar_read(tree_metadata) %>%
   glue::glue_collapse(sep = ", ", last = " and ")
 ```
 
-### Considering only unique matches enhances genus delineation
 
 ```{r pairwise_counts_for_recommended_approach}
 pairs_for_recommended <- stats_by_type %>% 
@@ -480,20 +479,18 @@ pairs_for_recommended <- stats_by_type %>%
 ```
 
 
-Then, we tested the 50%-threshold of POCP and POCPu, and evaluate how useful these metrics are to delineate bacterial genera.
-Using additional genomes, this dataset covers even more bacterial phylogenetic diversity: `r phyla_count_total_text`.
-We use all the `r n_genomes` genomes and calculate POCP and POCPu for `r pairs_for_recommended` pairwise comparisons with the DIAMOND_VERYSENSITIVE approach (@fig-pocp-pocpu-densities).
-Optimistically, we expected two bell-shaped distributions, with the "Between genera" POCPs neatly apart from the "Within genus" POCPs by a gap around 50%.
+Next, we evaluated the 50%-threshold of POCP and POCPu to determine their reliability to delineate bacterial genera. This analysis was based on a broader range of genera to capture additional diversity: `r phyla_count_total_text`.
+We included all the `r n_genomes` genomes and calculated POCP and POCPu for `r pairs_for_recommended` pairwise comparisons using the DIAMOND_VERYSENSITIVE method (@fig-pocp-pocpu-densities).
 
-The two distributions do overlap though (@fig-pocp-pocpu-densities A).
-Indeed, POCP yields a high number of false positives (FP = `r pocp_confusion["FP"]`), where the "Between genera" distribution is above 50%, especially compared to the number of true negatives (TN = `r pocp_confusion["TN"]`), where the "Between genera" distribution is below 50%.
-Thankfully, most of the "Within genus" distribution of POCP is above 50% (TP = `r pocp_confusion["TP"]`), with fewer below the threshold (FN = `r pocp_confusion["FN"]`).
+Instead of two bell-shaped distributions, with the 50% threshold separating between-genera POCPs (left) from within-genus POCPs (right), we observed overlapping POCP distributions (@fig-pocp-pocpu-densities A).
+This was associated with a high number of false positives (FP = `r pocp_confusion["FP"]`), where between-genera values were >50%, especially compared with the number of true negatives (TN = `r pocp_confusion["TN"]`), where between-genera values were <50%.
+Thankfully, most of the within-genus values were >50% (TP = `r pocp_confusion["TP"]`), with only few below the threshold (FN = `r pocp_confusion["FN"]`).
 
-POCPu is closer to our expectations (@fig-pocp-pocpu-densities B).
-"Between genera" POCPu follows a bi-modal distribution, with the highest peak and most of the distribution below the 50% threshold (TN = `r pocpu_confusion["TN"]`).
-Still, this distribution spills above the threshold, indicating POCPu also produces false positives (FP = `r pocp_confusion["FP"]`).
-Like POCP, "Within genus" POCPu concentrate largely above the threshold of 50% (TP = `r pocpu_confusion["TP"]`), with fewer below the threshold (FN = `r pocpu_confusion["FN"]`).
-All in all, we put forward that considering only unique matches enhances genus delineation.
+In contrast, POCPu was much closer to the expected expected results given the taxonomic assignments of each genome (@fig-pocp-pocpu-densities B).
+Between-genera POCPu values followed a bi-modal distribution, with the highest peak and most of the distribution remaining below the 50%-threshold (TN = `r pocpu_confusion["TN"]`).
+Nonetheless, a fraction of between-genera values spilled over the threshold, representing false positives, i.e., different genera when they are not  (FP = `r pocp_confusion["FP"]`).
+As in the case of POCP, within-genus POCPu values were above the threshold of 50% (TP = `r pocpu_confusion["TP"]`), with a few below the threshold (FN = `r pocpu_confusion["FN"]`).
+All in all, considering only unique protein matches improves genus delineation.
 
 
 ```{r mcc}
@@ -507,9 +504,8 @@ tally_mcc_thresholds <- summarise(
 )
 ```
 
-We quantify our findings on the confusion matrix using the  Matthews Correlation Coefficient (@eq-mcc).
-MCC is a binary classification rate that gives a high score only when the classifier correctly predicts the majority of positive and negative cases.
-Therefore, POCPu (MCC = `r mcc_pocpu`) surpasses POCP (MCC = `r mcc_pocp`) to delineate bacterial genus, which quantitatively confirm our visual findings (@fig-pocp-pocpu-densities).
+To quantify these findings on the confusion matrix (true/false positives and negatives), we used the Matthews Correlation Coefficient (MCC, @eq-mcc), which is a binary classification rate that gives a high score only when the classifier correctly predicts the majority of positive and negative cases.
+POCPu (MCC = `r mcc_pocpu`) surpassed POCP (MCC = `r mcc_pocp`) to delineate bacterial genera, which quantitatively confirmed the visual findings (@fig-pocp-pocpu-densities).
 
 ::: {#fig-pocp-pocpu-densities}
 
@@ -518,9 +514,10 @@ tar_load(c(pocpu_group_sizes, pocp_range, pocpu_range))
 knitr::include_graphics(tar_read(fig_pocp_pocpu_densities_png))
 ```
 
-Distribution of POCP (A) and POCPu (B) values for all pairwise genome comparisons: `r pocpu_group_sizes[1]` in orange and `r pocpu_group_sizes[2]` in sky blue, both based on GTDB taxonomy.
-Contrast these true categories with POCP/POCPu decisions: POCP > 50%, meaning right of the dashed line (A, B) indicates more than half of shared conserved proteins, and hence same genus.
-POCP and POCPu values are calculated with the recommended approach DIAMOND_VERYSENSITIVE (@tbl-tools-parameters) and they range from `r pocp_range` and `r pocpu_range`.
+Distribution of POCP (A) and POCPu (B) values for all pairwise genome comparisons: `r pocpu_group_sizes[1]` in orange and `r pocpu_group_sizes[2]` in sky blue.
+ The GTDB taxonomy was used as reference for the confusion matrix (true/false positives and negatives).
+ POCP and POCPu values were calculated with our recommended method DIAMOND_VERYSENSITIVE  (@tbl-tools-parameters); they range from `r pocp_range` and `r pocpu_range`.
+ The dashed lines indicate the standard 50% threshold for genus delineation.
 :::
 
 
@@ -532,19 +529,36 @@ knitr::include_graphics(tar_read(fig_genus_delineation_png))
 
 
 POCPu delineates bacterial genera in a family-specific manner.
-Three representative examples of family-specific genus delineation capacity (A) where POCPu distributions can be neatly distinct and allow for genus delineation (A; _Xanthobacteraceae_), or overlap and hamper genus delineation (A; _Streptomycetaceae_), or any in between scenario (A; _Lactobacillaceae_).
-These scenarios can be quantified with the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020]. We show MCC values for each family where MCC of -1 and +1 indicates perfect misclassification and classification, respectively (B). Random genus delineation would give MCC = 0. The dashed line in B indicates the overall MCC when not splitting by family. We also highlight how many $n$ genomes are included per family, and their phyla in the vertical facets (B). The POCPu distributions for all families are drawn in @suppfig-pocpu-by-family.
+(A) Three representative examples of family-specific genus delineation capacity where POCPu values can (i) overlap and hamper genus delineation (top; example = _Streptomycetaceae_); (ii) be neatly distinct and allow for genus delineation (bottom; example =  _Xanthobacteraceae_); or (iii) any scenario in between (middle; example = _Lactobacillaceae_). The dashed lines indicate the standard threshold of 50% conserved proteins.
+(B) The ability of POCPu to delineate genera was quantified for each of the 35 families analysed using the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020].
+An MCC of -1 and +1 indicates perfect misclassification or classification, respectively; random genus delineation corresponds to MCC = 0. The dashed line indicates the global MCC on the whole dataset, across all families. The number of genomes included per family are indicated in brackets next to the family names. The families were ranked per phyla (alphabetically; vertical facets in grey) and then by decreasing MCC within each phylum. The visual POCPu distributions for all families are provided in @suppfig-pocpu-by-family.
 :::
 
-### Family-specific POCPu thresholds for a clearer delineation
+### Family-specific POCPu thresholds enable clearer genus delineation
+
+```{r strepto_details}
+strepto_details <- tar_read(pocpu_confusion_by_family) %>%
+  filter(Family == "f__Streptomycetaceae") %>%
+  mutate(p = proportions(n),
+         p = scales::label_percent()(p),
+         n = prettyNum(n,big.mark = ","),
+         category=if_else(
+           str_starts(class,"F"), "false cases", "true cases")
+         ) %>%
+  group_by(category) %>% nest() %>%
+  mutate(
+    foo = map(data, function(x){
+      glue::glue_data(x,"{class} = {n} ({p})") %>% glue::glue_collapse(sep = " and ")
+    })) %>% unnest(foo) %>%
+  select(-data) %>% 
+  deframe()
+```
 
 
-When we consider the bacterial families separately, another pattern emerge (@fig-genus-delineation and @suppfig-pocpu-by-family).
-The large family of _Streptomycetaceae_ (Actinomycetota), for instance, exhibits many `r targets::tar_read(streptomycetaceae)`, and consequently has a very low MCC (@fig-genus-delineation A).
-We highlight two additional examples that illustrate how MCC well capture the separation of the POCPu distributions, and hence the genus delineation (@fig-genus-delineation A).
-In `r tally_mcc_thresholds[["n_25"]]` families out of 35, POCPu is clearly not adequate to delineate genus with low MCC (MCC $\leq$ 0.25; @fig-genus-delineation B).
-Not all is lost, as `r tally_mcc_thresholds[["n_70"]]` families out of 35 show that POCPu delineates bacterial genera accurately (MCC $\geq$ 0.7;  @fig-genus-delineation B). For instance, for all the comparisons done within the _Lactobacillaceae_ family (Bacillota), we see `r targets::tar_read(lactobacillaceae)` (@fig-genus-delineation A).
-All categories of the confusion matrix vary greatly, which underline the need to a metric that can aggregate these counts without bias, and thus show that while POCPu is not a one-size-fits-all method, it can correctly delineate genera.
+Analysing the bacterial families separately questioned the universal threshold of 50% conserved proteins(@fig-genus-delineation and @suppfig-pocpu-by-family).
+The large family of _Streptomycetaceae_ (Actinomycetota), for instance, exhibits many false cases `r strepto_details["false cases"]`, despite even more true case `r strepto_details["true cases"]`, and consequently has a very low MCC (@fig-genus-delineation A).
+In `r tally_mcc_thresholds[["n_25"]]` families out of 35, POCPu was clearly not adequate to delineate genus using a threshold of 50%, as indicated by low MCC (MCC $\leq$ 0.25; @fig-genus-delineation B).
+In contrast, POCPu delineated bacterial genera accurately for `r tally_mcc_thresholds[["n_70"]]` families (MCC $\geq$ 0.7;  @fig-genus-delineation B).
 
 ```{r}
 optimized_pocpu <- tar_read(optimized_pocpu) %>%
@@ -580,25 +594,22 @@ rescued_families <- optimized_pocpu %>%
 decrease_family<- optimized_pocpu %>%
   filter(category=="decrease") %>%
     mutate(across(Phylum:Family, ~ str_remove(.x, "[p|f]__"))) %>%
-  group_by(Phylum) %>%
-  summarise(
-    fam = glue::glue("_{Family}_") %>%
-      glue::glue_collapse(", ", last = " and ")
-    ) %>%
-  glue::glue_data("{Phylum}: {fam}") %>%
-  glue::glue_collapse("; ", last = "")
+  glue::glue_data("{p}% for _{Family}_ (_{Phylum}_)",
+                  p = prettyNum(optimized_threshold, digits = 3)) %>%
+  glue::glue_collapse(" and ")
 ```
 
 
-What is a standard without its exception we asked ourselves, and we looked for family-specific POCPu thresholds by maximizing MCC to improve genus delineation (@suppfig-pocpu-by-family and @tbl-optimized_threshold).
-With this procedure, the genus delineation of `r n_tentative[["improved"]]` families (`r improved_families`) was improved, with at least 0.1 point increase in MCC, and for `r n_tentative[["rescued"]]` additional families (`r rescued_families`) it was even rescued with a maximum MCC above 0.7.
-Overall, for `r sum(n_tentative)` families out of the `r sum(stats_by_type$n_families)` families, thresholds distinct from the default 50% enhance the classification.
-Interestingly, in only `r n_category[["decrease"]]` cases, an optimal POCPu threshold had to be lowered (`r decrease_family`).
-In  `r n_category[["increase"]]` cases, a larger-than-half fraction of conserved proteins better separate genomes from within genus and between genera (@tbl-optimized_threshold).
+Due to these differences between families, we looked for family-specific POCPu thresholds by maximizing MCC to improve genus delineation (@suppfig-pocpu-by-family and @tbl-optimized_threshold).
+With this procedure, thresholds other than the default 50% would enhance classification for `r sum(n_tentative)` families out of the `r sum(stats_by_type$n_families)` families.
+The genus delineation of `r n_tentative[["improved"]]` families was improved, with at least 0.1-point increase in MCC (white squares in @tbl-optimized_threshold; `r improved_families`).
+For `r n_tentative[["rescued"]]` additional families  maximum MCC above 0.7 were even obtained (black squares in @tbl-optimized_threshold; `r rescued_families`).
+Interestingly, in `r n_category[["decrease"]]` cases, the optimal POCPu threshold was lower than the standard threshold:`r decrease_family`.
+In  `r n_category[["increase"]]` cases, new thresholds higher than 50% conserved proteins better separated genomes from within genus and between genera (@tbl-optimized_threshold).
 
-We even leverage our large dataset to assess claims that POCP is influenced by differences in genome size [@riescoUpdateProposedMinimal2024]. If POCPu is influenced, we reason that its genus delineation power should also be influenced, therefore we expect stronger genome size differences in the families for which an alternative POCPu threshold was found.
-We found no convincing patterns to support the claim that differences in genome size (@suppfig-delta A) nor in number of proteins (i.e., proteome; @suppfig-delta B) influenced POCPu.
-Overall, POCPu provides a useful and interpretable metric to delineate genera.
+Because POCP was previously proposed to be influenced by genome size [@riescoUpdateProposedMinimal2024], we used the large pairwise comparisons dataset to assess whether the changes in threshold were linked to differences in genome size.
+If POCPu is influenced, we reasoned that its genus delineation power should also be influenced, therefore we expected stronger genome size differences in the families for which an alternative POCPu threshold was found.
+We found no evidence that POCPu is affected by differences in genome size (@suppfig-delta A) nor proteins number (@suppfig-delta B).
 
 ::: {#tbl-optimized_threshold}
 
@@ -622,7 +633,8 @@ Families without squares already delineate genera correctly with the default of 
 knitr::include_graphics(tar_read(fig_pocpu_by_family_png))
 ```
 
-Distributions of POCPu values as in @fig-pocp-pocpu-densities broken down per bacterial family. The true category is based on the GTDB taxonomy. Tentative family-specific POCPu thresholds for genus delineation were taken from @tbl-optimized_threshold and are indicated with plain vertical line, else the default POCPu threshold is drawn at 50% with a dashed line.
+Distributions of POCPu values as in @fig-pocp-pocpu-densities broken down per bacterial family. The true category is based on the GTDB taxonomy.
+The family-specific POCPu thresholds for genus delineation proposed in this study were taken from @tbl-optimized_threshold and are indicated with plain vertical line, whilst the default POCPu threshold of 50% is indicated by dashed lines.
 :::
 
 
@@ -632,7 +644,7 @@ Distributions of POCPu values as in @fig-pocp-pocpu-densities broken down per ba
 knitr::include_graphics(tar_read(fig_delta_proteome_genome_png))
 ```
 
-Distributions of differences in genome size (A) and proteome size (B) for families using default threshold or optimized thresholds. We expected families using optimized threshold to have a shift in their differences distributions, which would have indicated that genome size and proteome size influence genus delineation. POCPu thresholds type were taken from @tbl-optimized_threshold.
+Distributions of differences in genome size (A) and proteome size (B) for families using default threshold or optimized thresholds. In case of an association between genome (or proteome) size and POCPu, we expected families for which optimized thresholds are proposed to have a shift towards larger differences explaining poor delineation performance in @fig-genus-delineation B. This was not the case, indicating that genome size and proteome size did not influence genus delineation. POCPu thresholds type were taken from  @tbl-optimized_threshold.
 :::
 
 # Discussion
