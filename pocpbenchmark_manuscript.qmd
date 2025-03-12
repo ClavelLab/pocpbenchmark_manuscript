@@ -62,7 +62,7 @@ library(gt)
 # Introduction
 
 In the last three years only, the number of bacterial genomes in the RefSeq collection has increased by 35 000 yearly, both from isolates and metagenomes [@haftRefSeqProkaryoticGenome2024]. To analyse these genomes, we need clear and quick methods to taxonomically assign genomes.
-For species, Average Nucleotide Identity [ANI, @jainHighThroughputANI2018] has been developed and shown to delineate species almost unanimously [@parksCompleteDomainspeciesTaxonomy2020].
+For species, Average Nucleotide Identity [ANI, @jainHighThroughputANI2018] has been developed and shown to delineate species almost unanimously [@parksCompleteDomaintospeciesTaxonomy2020].
 However, ANI is unable to delineate genera [@qinProposedGenusBoundary2014].
 While no single ANI threshold has been proposed for genus delineation, family-specific thresholds have been suggested using both the ANI value and alignment fraction, however the lack of a universal threshold limits their usability [@barcoGenusDefinitionBacteria2020].
 An alternative to ANI is the Average Amino acid Identity (AAI) which uses protein sequences instead of genomic nucleic sequences [@konstantinidisGenomeBasedTaxonomyProkaryotes2005].
