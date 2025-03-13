@@ -140,7 +140,7 @@ format_optimized_pocp_table <- function(optim_df){
       mcc = "MCC",maximum_mcc="Max. MCC",
       need_increase = "",
       is_rescued = "",
-      optimized_threshold = md("Threshold")
+      optimized_threshold = md("Threshold value (%)")
     ) %>%
     tab_options(column_labels.font.weight = "bold") %>% 
     cols_hide(c(threshold_change,improved_classification)) %>%
@@ -158,7 +158,7 @@ format_metrics_table <- function(tbl){
       columns = gt::ends_with("fold"), decimals = 3
     ) %>% 
     cols_label(
-      tool = "Approach name",
+      tool = "Method",
       time_fold =  "Time",
       memory_fold = "Memory",
       cpu_fold = "CPU",

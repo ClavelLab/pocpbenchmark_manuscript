@@ -54,11 +54,11 @@ crossref:
 abstract: |
     **Background**: Genomic analysis has become essential in bacterial taxonomy, enabling fast classification of bacteria. However, quantifiable measures to make informed decision on the taxonomic placement of bacterial taxa above the level of species are rare, which hampers the stability of knowledge in databases and articles. In this work, we focused on bacterial classification at the genus level and revisited the concept of Percentage Of Conserved Proteins (POCP). Whilst POCP is broadly used as an overall genome relatedness index, the underlying tool and method of calculation differ, resulting in disparate implementations and misnomers unfit for the increasing wealth of public genomes available.
     
-    **Results**: We evaluated 10 protein alignments methods and found evidence for a scalable yet robust alternative to BLASTP for POCP based on 2,358,466 pairwise comparisons of 4,767 genomes across 35 families. This alternative is 20x faster than BLAST, albeit more resource intensive. However, we showed that certain combinations of tools and parameters are not suited for POCP calculations owing to drastic over- or underestimation. Therefore, we bring forward a clearer definition of POCP using only unique matches, termed POCPu, that showed better genus delineation than with POCP. We suggested tentative family-specific thresholds when the standard of 50% was not resolutive enough.
+    **Results**: We evaluated 10 protein alignments methods and found evidence for a scalable yet robust alternative to BLASTP for POCP based on 2,358,466 pairwise comparisons of 4,767 genomes across 35 families. However, we showed that certain combinations of tools and parameters are not suited for POCP calculations owing to drastic over- or underestimation. Therefore, we bring forward a clearer definition of POCP using only unique matches, termed POCPu, that showed better genus delineation than with POCP. We suggested tentative family-specific thresholds when the standard of 50% was not resolutive enough.
     
-    **Conclusions**: We propose that faster bacterial genus delineation should be calculated with DIAMOND using very-sensitive settings and only unique matches (POCPu), based on our extensive evaluation. We advise microbiologists to carefully assess that the tools used for genus assignment match their biological assumptions to avoid misguided inferences.
+    **Conclusions**: We propose that faster bacterial genus delineation should be calculated with DIAMOND using very-sensitive settings and only unique matches (POCPu). We advise microbiologists to carefully assess that the tools used for genus assignment match their biological assumptions to avoid misguided inferences.
 notebook-links: false
-keywords: [bacterial taxonomy, genus delineation, protein sequence comparison, percentage of conserved proteins, benchmark]
+keywords: [bacterial taxonomy, bacterial genomics, genus delineation, protein sequence comparison, percentage of conserved proteins (POCP), benchmark]
 ---
 
 ```{r setup}
@@ -76,9 +76,8 @@ Two elements show that accurate taxonomic placement of microorganisms is more im
 It is therefore essential to consolidate the system for classifying bacteria. Whilst bacteria had been classified based on morphology and phenotypic parameters for decades, the advent of genomics has revolutionised the way we classify bacteria, giving rise to a plethora of Overall Genome Relatedness Indices [@chunIntegratingGenomicsTaxonomy2014].
 However, in the process of classifying bacteria, it is essential to provide a robust framework that includes easy-to-implement parameters to classify organisms at each level of bacterial lineage, including the genus level, which is the focus in this article. 
 
-The Genome Taxonomy Database (GTDB) proposed a standardized approach to group publicly available genomes into species clusters [@parksCompleteDomaintospeciesTaxonomy2020], resulting in valuable resource that is regularly updated and adopted by the community [@parksGTDBOngoingCensus2022]. 
-This approach is not a taxonomic ground truth as it has shown lack of congruence in taxonomy with previous already described and accepted species names [@parksCompleteDomaintospeciesTaxonomy2020].
-Nonetheless, their realistic approach has been shown to be resilient to genome contamination, that can plague public repository [@mussigPutativeGenomeContamination2024], making GTDB well-equipped for modern microbiology.
+The Genome Taxonomy Database (GTDB) has proposed a standardized approach to group publicly available genomes into species clusters [@parksCompleteDomaintospeciesTaxonomy2020], resulting in an invaluable resource that is regularly updated and adopted by the community [@parksGTDBOngoingCensus2022]. 
+The approach is resilient to genome contamination, which can plague public repositories [@mussigPutativeGenomeContamination2024], but also includes cases of taxonomic incongruence with previously described and accepted species names [@parksCompleteDomaintospeciesTaxonomy2020].
 
 In the last three years alone, the number of bacterial genomes in the RefSeq collection has increased by 35,000 per year, both from isolates and metagenomes [@haftRefSeqProkaryoticGenome2024]. To analyse these genomes, we need clear and rapid methods for taxonomic assignment.
 For species, Average Nucleotide Identity [ANI, @jainHighThroughputANI2018] has been developed and shown to delineate species almost unanimously [@parksCompleteDomaintospeciesTaxonomy2020].
@@ -90,17 +89,17 @@ A protein sequence-based genus delineation method proposed with an interpretable
 In this system, if two bacterial entities share more than half of their conserved proteins, i.e., POCP > 50%, they are considered to belong to the same genus.
 
 POCP is widely used in the community to assign novel bacterial taxa to known genera, or support the proposal of novel genera [@afrizalEnhancedCulturedDiversity2022; @chaplinHydrogeniiclostidiumMannosilyticumGen2020; @gonzalezAcidiferrimicrobiumAustraleGen2020; @hitchBroadDiversityHuman2024; @wylensekCollectionBacterialIsolates2020;@kuzmanovicTaxonomyRhizobiaceaeRevisited2022; @liuEnlighteningTaxonomyDarkness2021; @orataPhylogenomicAnalysisGammaproteobacterial2018; @sereikaClosedGenomesUncover2023]
-However, a major limitation of POCP is that comparing all proteins within each genome to each other is computationally demanding.
-Given that the number of valid genus names almost doubled since the original proposition of POCP by @qinProposedGenusBoundary2014 (@suppfig-lpsn), scalable methods as well as a timely re-evaluation of the POCP approach is needed.
+However, the validity of the threshold value aforementioned has not been widely tested. In addition, a major limitation of POCP is that comparing all proteins within each genome to each other is computationally demanding.
+Given that the number of valid genus names almost doubled since the original proposition of POCP by Qin et al. @qinProposedGenusBoundary2014 (@suppfig-lpsn), scalable methods as well as a timely re-evaluation of the POCP approach is needed.
 
 
-@hernandez-salmeronProgressQuicklyFinding2020 compared proteins alignment tools to find faster alternatives to find reciprocal best hits, without a loss in precision.
+Hernández-Salmerón et al. @hernandez-salmeronProgressQuicklyFinding2020 compared proteins alignment tools to find faster alternatives to find reciprocal best hits, without a loss in precision.
 They found that DIAMOND [@buchfinkSensitiveProteinAlignments2021], when switched to sensitive parameters instead of defaults, correctly found 87% of the reciprocal best hits of BLASTP [@camachoBLASTArchitectureApplications2009] in less than 8% of the computing time.
-Recently, @holzerPOCPnfAutomaticNextflow2024 suggested the use of DIAMOND with ultra-sensitive settings to compute POCP faster than with BLASTP. This method was based on previously available code [@holzerHoelzerPocp2020], implemented as a nextflow workflow [@holzerPOCPnfAutomaticNextflow2024]. However, validation of this new method was only validated on 5 genera, with 15 to 167 genomes each. 
+Recently, Hölzer @holzerPOCPnfAutomaticNextflow2024 suggested the use of DIAMOND with ultra-sensitive settings to compute POCP faster than with BLASTP. This method was based on previously available code [@holzerHoelzerPocp2020], implemented as a nextflow workflow [@holzerPOCPnfAutomaticNextflow2024]. However, this new method was only validated on 5 genera, with 15 to 167 genomes each. 
 Fundamental changes, such as the tool selected, can have significant effects on calculations, especially if 13% of matching proteins may not be found.
 Current implementations of POCP have also modified the calculation of POCP by limiting the calculation of conserved proteins to unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021], in contrast to the original implementation of POCP which had no such limitation [@qinProposedGenusBoundary2014].
 These studies clearly show the urgent need for a clear definition of POCP to avoid divergent assumptions in tools between microbiologists and developers.
-Furthermore, the field of microbial taxonomy lacks an extensive benchmarking of POCP given the increased number of genomic resources available, that would timely provide a comprehensive framework that enhances reproducibility and accuracy
+Furthermore, there is an urgent need for extensive benchmarking of POCP to enhance reproducibility and accuracy given the increased number of genomic resources available.
 
 ```{r overall_stats_cpu_hours}
 stats_by_type <- tar_read(family_metadata) %>%
@@ -127,8 +126,8 @@ overall_stats <- stats_by_type %>%
 ```
 
 
-To achieve this, we aimed to create a scalable alternative to BLASTP for computing POCP. Whilst fast and scalable, this alternative should not compromise the accuracy of the original approach.
-Secondly, POCP provides an interpretable and used metric that can delineate bacterial genera, but it is crucial to re-evaluate the proposed threshold in a comprehensive manner; we therefore evaluated the ability of our optimised implementation of POCP to correctly delineate bacterial genera based on `r overall_stats[["n_realized"]]` pairwise comparisons of `r overall_stats[["n_genomes"]]` genomes across `r overall_stats[["n_families"]]` families.
+To achieve this, we created a scalable alternative to BLASTP for computing POCP. This alternative is fast and did not compromise the accuracy of the original approach.
+Secondly, because POCP provides an interpretable and used metric but the proposed threshold needs to be assessed in a comprehensive manner, we evaluated the ability of the optimised POCP implementation to correctly delineate bacterial genera based on `r overall_stats[["n_realized"]]` pairwise comparisons of `r overall_stats[["n_genomes"]]` genomes across `r overall_stats[["n_families"]]` families.
 
 ::: {#suppfig-lpsn}
 
@@ -145,9 +144,8 @@ Cumulative number of validly published genera names according to the Internation
 
 ## Standardisation of protein sequences and taxonomy via GTDB
 
-As GTDB provides curated taxonomy along with genomes and genome-derived proteins sequences [@parksGTDBOngoingCensus2022], we used it as a reliable source of high-quality data for reference in our benchmark.
-Therefore, we used inclusion criteria to facilitate the selection of a diverse range of taxonomic groups from GTDB (r214) (N = 394,932 bacterial genomes), while maintaining achievable comparisons with the time, human, and computing resources available.
-We included any GTDB bacteria if (1) the bacteria had a valid name according to the List of Prokaryotic names with Standing in Nomenclature [@parteListProkaryoticNames2020] and a representative genome was available (N = 11,699), (2) they belonged to a family with at least two genera (N = 5,904), and (3) to a genus with at least ten genomes (N = 4,767).
+As GTDB provides curated taxonomy along with genomes and genome-derived proteins sequences [@parksGTDBOngoingCensus2022], we used it as a reliable source of high-quality data in our benchmark.
+We used inclusion criteria to facilitate the selection of a diverse range of taxonomic groups from GTDB (r214) (N = 394,932 bacterial genomes), while maintaining achievable comparisons with the time, human, and computing resources available: (1) the bacteria had a valid name according to the List of Prokaryotic names with Standing in Nomenclature [@parteListProkaryoticNames2020] and a representative genome was available (N = 11,699), (2) they belonged to a family with at least two genera (N = 5,904), and (3) to a genus with at least ten genomes (N = 4,767).
 Based on these criteria, the protein sequence files for the shortlisted bacteria were obtained from GTDB.
 
 
@@ -233,7 +231,7 @@ All proteins matches were filtered to only keep matches with > 40 % identity to 
 The filtering was adapted to the method as the range of percentage of identity in MMseqs2 is $[0-1]$ and $[0-100]$ for BLAST and DIAMOND.
 The total number of proteins per genomes ($T_Q$ and $T_S$ in @eq-pocp and @eq-pocpu) was computed using seqkit stats v2.2.0 [@shenSeqKitCrossPlatformUltrafast2016].
 
-Linear regressions were implemented using `r R.version.string` to fit the expected POCP (or POCPu) values obtained via the BLAST_BLASTP reference method against the others methods considered.
+Linear regressions were implemented using `r R.version.string` to fit the expected POCP (or POCPu) values obtained via the BLAST_BLASTP reference method against the other methods considered.
 The coefficient of determination R^2^ of the linear regression is used as an interpretable and bounded goodness-of-fit measure between the expected and measured values instead of other errors measurement [@chiccoCoefficientDeterminationRsquared2021].
 We did not rely on the adjusted coefficient of determination as the linear regressions had only one predictor, namely the POCP (or POCPu) values of the evaluated method.
 
@@ -261,7 +259,7 @@ The tools used are provided within Docker container [@merkelDockerLightweightLin
 
 Nextflow natively keeps track of the time, CPU, memory and disk usage of each process in an execution trace log file, which we used to evaluate the computing resources utilization. Process duration is available as wall-time and real-time, the CPU usage is reported as a percentage of usage of a unique CPU, meaning multi-threaded processes will have a value higher than 100%.
 
-Statistical analyses and visualization were conducted within R using targets v.1.7.0 [@landauTargetsPackageDynamic2021].
+Statistical analyses and visualization were conducted in R using targets v.1.7.0 [@landauTargetsPackageDynamic2021].
 
 
 
@@ -308,18 +306,6 @@ n_genomes_in_full <- stats_by_type %>%
 ```
 
 
-::: {#tbl-tools-metrics}
-
-```{r tools-metrics}
-n_processes <- tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=",")
-tar_read(metrics_table)
-```
-
-Fold change of computing metrics for the ten methods used in the benchmark compared to the BLAST_BLASTP method.
-The metrics include processing time as real-time, memory usage, CPU usage and disk usage as input/output (I/O).
-A fold change below 1 means the metric was lower, above 1 means it was higher, compared to the reference.
-The fold change values are median computed over $n$ = `r n_processes` number of processes tracked per approach.
-:::
 
 ```{r fraction_time}
 time_fraction_category <- tar_read(tool_table) %>% 
@@ -343,6 +329,19 @@ Thus, as expected, more sensitive methods consumed more resources in general.
 
 An important criterion for a BLASTP alternative is to evaluate whether the accuracy of POCP calculation is comparable and not compromised for increased speed.
 
+
+::: {#tbl-tools-metrics}
+
+```{r tools-metrics}
+n_processes <- tar_read(tool_table) %>% pull(n) %>% unique() %>% prettyNum(big.mark=",")
+tar_read(metrics_table)
+```
+
+Fold change of computing metrics for the ten methods used in the benchmark compared to the BLAST_BLASTP method.
+The metrics include processing time as real-time, memory usage, CPU usage and disk usage as input/output (I/O).
+A fold change below 1 means the metric was lower, above 1 means it was higher, compared to the reference.
+The fold change values are median computed over $n$ = `r n_processes` number of processes tracked per approach.
+:::
 ### DIAMOND gives POCP as accurate as BLASTP
 
 ::: {#suppfig-pocp-blastdb}
@@ -361,7 +360,7 @@ Coefficient of determination ($R^2$) and associated $p$-value are shown on top o
 
 
 BLASTPDB produced the exact same POCP values as BLASTP (@suppfig-pocp-blastdb).
-The other methods did not perform as good. All methods of DIAMOND had a coefficient of determination ($R^2$) above 0.99, with the exception of DIAMOND_FAST that deviated from the expected values (@fig-blast-vs-all-pocp).
+The other methods did not perform as good. All methods of DIAMOND had a coefficient of determination ($R^2$) above 0.99, except for DIAMOND_FAST that deviated from the expected values (@fig-blast-vs-all-pocp).
 All DIAMOND methods, especially DIAMOND_FAST, tended to underestimate POCP values (all dots were below the reference dashed line), meaning that they might assign genomes to different genera when they are from the same genus (top panels).
 Deviation from the BLASTP reference was aggravated when using the MMSEQS2_S1DOT0 method, mainly through underestimation (bottom panels).
 The other MMSEQS2 methods performed better, but still less good than the DIAMOND methods.
@@ -385,7 +384,7 @@ Coefficient of determination ($R^2$) and associated $p$-value are shown on top o
 
 ### Proposal for clear and fast computation of POCP values
 
-We observed that all methods generated POCP values exceeding the supposed upper limit of 100%. Hence, we sought to investigate the underlying reasons and suggest a clearer definition of POCP, termed POCPu.
+We observed that all methods generated POCP values exceeding the supposed upper limit of 100%. Hence, we investigated the underlying reasons and suggest a clearer definition of POCP, termed POCPu.
 
 During the alignment process, proteins sequences from the query can match multiple subject sequences in the case of duplicated genes. Whilst briefly mentioned in the original article that "The number of conserved proteins in each genome of strains being compared was slightly different because of the existence of duplicate genes (paralogs)" [@qinProposedGenusBoundary2014, p. 2211], the expected influence on the POCP values was lacking. Therefore, we defined the POCP with unique matches (POCPu) between two genomes $Q$ and $S$ as:
 
@@ -438,7 +437,7 @@ tar_load(R2_table)
 n_comparisons_in_lm <- unique(R2_table$POCP_nobs) %>% prettyNum(big.mark = ",")
 R2_table %>% arrange(desc(POCPu_R2)) %>%
     gt::gt(rowname_col = "tool") %>%
-    tab_stubhead("Approach name") %>% cols_align(align = "left", columns = "tool") %>%
+    tab_stubhead("Method") %>% cols_align(align = "left", columns = "tool") %>%
     tab_spanner("POCP", starts_with("POCP_")) %>%
     tab_spanner("POCPu", starts_with("POCPu_")) %>% cols_hide(ends_with("_nobs")) %>%
     cols_label(
@@ -453,7 +452,7 @@ Coefficient of determination ($R^2$) and associated $p$-value for linear regress
 
 
 In summary, the BLAST_BLASTPDB method was a strong contender for a BLAST_BLASTP alternative because it performed exactly the same as BLAST_BLASTP (@suppfig-pocp-blastdb, @suppfig-pocpu-blastdb and @tbl-R2) in `r time_fraction_category[["BLAST"]]` the speed (@tbl-tools-metrics), at the cost of using more resources. However, the DIAMOND sensitive methods were way faster with excellent adequacy with BLAST_BLASTP, especially for POCPu (@tbl-R2).
-Whilst DIAMOND_ULTRASENSITIVE had the highest $R^2$ value using POCPu (@tbl-R2), it was also characterized by the highest memory consumption and disk usage (@tbl-tools-metrics).
+Whilst DIAMOND_ULTRASENSITIVE had the highest $R^2$ value using POCPu (@tbl-R2), it also had the highest memory consumption and disk usage (@tbl-tools-metrics).
 A more sustainable alternative is DIAMOND_VERYSENSITIVE that performed 10 times faster than BLAST_BLASTPDB, in less than a twentieth of the time of the time of BLAST_BLASTP, while still maintaining reasonable usage of the computing resources (@tbl-tools-metrics).
 More importantly, POCPu values calculated using DIAMOND_VERYSENSITIVE gave results that were extremely close to the reference BLAST_BLASTP (@fig-blast-vs-all-pocpu and @tbl-R2) and were essentially identical to DIAMOND_ULTRASENSITIVE POCPu $R^2$ up to 5 digits (@tbl-R2).
 Therefore, we consider DIAMOND_VERYSENSITIVE to be a valid and scalable alternative to BLAST_BLASTP for POCP/POCPu computations.
@@ -492,7 +491,7 @@ Instead of two bell-shaped distributions, with the 50% threshold separating betw
 This was associated with a high number of false positives (FP = `r pocp_confusion["FP"]`), where between-genera values were >50%, especially compared with the number of true negatives (TN = `r pocp_confusion["TN"]`), where between-genera values were <50%.
 Thankfully, most of the within-genus values were >50% (TP = `r pocp_confusion["TP"]`), with only few below the threshold (FN = `r pocp_confusion["FN"]`).
 
-In contrast, POCPu was much closer to the expected expected results given the taxonomic assignments of each genome (@fig-pocp-pocpu-densities B).
+In contrast, POCPu was much closer to the expected results given the taxonomic assignments of each genome (@fig-pocp-pocpu-densities B).
 Between-genera POCPu values followed a bi-modal distribution, with the highest peak and most of the distribution remaining below the 50%-threshold (TN = `r pocpu_confusion["TN"]`).
 Nonetheless, a fraction of between-genera values spilled over the threshold, representing false positives, i.e., different genera when they are not  (FP = `r pocp_confusion["FP"]`).
 As in the case of POCP, within-genus POCPu values were above the threshold of 50% (TP = `r pocpu_confusion["TP"]`), with a few below the threshold (FN = `r pocpu_confusion["FN"]`).
@@ -510,7 +509,7 @@ tally_mcc_thresholds <- summarise(
 )
 ```
 
-To quantify these findings on the confusion matrix (true/false positives and negatives), we used the Matthews Correlation Coefficient (MCC, @eq-mcc), which is a binary classification rate that gives a high score only when the classifier correctly predicts the majority of positive and negative cases.
+To quantify these findings on the confusion matrix (true/false positives and negatives), we used the Matthews Correlation Coefficient (MCC, @eq-mcc), which is a binary classification rate that gives a high score only when the classifier correctly predicts most of positive and negative cases.
 POCPu (MCC = `r mcc_pocpu`) surpassed POCP (MCC = `r mcc_pocp`) to delineate bacterial genera, which quantitatively confirmed the visual findings (@fig-pocp-pocpu-densities).
 
 ::: {#fig-pocp-pocpu-densities}
@@ -524,20 +523,6 @@ Distribution of POCP (A) and POCPu (B) values for all pairwise genome comparison
  The GTDB taxonomy was used as reference for the confusion matrix (true/false positives and negatives).
  POCP and POCPu values were calculated with our recommended method DIAMOND_VERYSENSITIVE  (@tbl-tools-parameters); they range from `r pocp_range` and `r pocpu_range`.
  The dashed lines indicate the standard 50% threshold for genus delineation.
-:::
-
-
-::: {#fig-genus-delineation}
-
-```{r genus-delineation}
-knitr::include_graphics(tar_read(fig_genus_delineation_png))
-```
-
-
-POCPu delineates bacterial genera in a family-specific manner.
-(A) Three representative examples of family-specific genus delineation capacity where POCPu values can (i) overlap and hamper genus delineation (top; example = _Streptomycetaceae_); (ii) be neatly distinct and allow for genus delineation (bottom; example =  _Xanthobacteraceae_); or (iii) any scenario in between (middle; example = _Lactobacillaceae_). The dashed lines indicate the standard threshold of 50% conserved proteins.
-(B) The ability of POCPu to delineate genera was quantified for each of the 35 families analysed using the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020].
-An MCC of -1 and +1 indicates perfect misclassification or classification, respectively; random genus delineation corresponds to MCC = 0. The dashed line indicates the global MCC on the whole dataset, across all families. The number of genomes included per family are indicated in brackets next to the family names. The families were ranked per phyla (alphabetically; vertical facets in grey) and then by decreasing MCC within each phylum. The visual POCPu distributions for all families are provided in @suppfig-pocpu-by-family.
 :::
 
 ### Family-specific POCPu thresholds enable clearer genus delineation
@@ -561,10 +546,26 @@ strepto_details <- tar_read(pocpu_confusion_by_family) %>%
 ```
 
 
-Analysing the bacterial families separately questioned the universal threshold of 50% conserved proteins(@fig-genus-delineation and @suppfig-pocpu-by-family).
-The large family of _Streptomycetaceae_ (Actinomycetota), for instance, exhibits many false cases `r strepto_details["false cases"]`, despite even more true case `r strepto_details["true cases"]`, and consequently has a very low MCC (@fig-genus-delineation A).
+Analysing the bacterial families separately questioned the universal threshold of 50% conserved proteins (@fig-genus-delineation and @suppfig-pocpu-by-family).
+The large family of _Streptomycetaceae_ (_Actinomycetota_), for instance, exhibited many false cases `r strepto_details["false cases"]`, despite even more true case `r strepto_details["true cases"]`, and consequently had a very low MCC (@fig-genus-delineation A).
 In `r tally_mcc_thresholds[["n_25"]]` families out of 35, POCPu was clearly not adequate to delineate genus using a threshold of 50%, as indicated by low MCC (MCC $\leq$ 0.25; @fig-genus-delineation B).
 In contrast, POCPu delineated bacterial genera accurately for `r tally_mcc_thresholds[["n_70"]]` families (MCC $\geq$ 0.7;  @fig-genus-delineation B).
+
+
+
+::: {#fig-genus-delineation}
+
+```{r genus-delineation}
+knitr::include_graphics(tar_read(fig_genus_delineation_png))
+```
+
+
+POCPu delineates bacterial genera in a family-specific manner.
+(A) Three representative examples of family-specific genus delineation capacity where POCPu values can (i) overlap and hamper genus delineation (top; example = _Streptomycetaceae_); (ii) be neatly distinct and allow for genus delineation (bottom; example =  _Xanthobacteraceae_); or (iii) any scenario in between (middle; example = _Lactobacillaceae_). The dashed lines indicate the standard threshold of 50% conserved proteins.
+(B) The ability of POCPu to delineate genera was quantified for each of the 35 families analysed using the Matthews Correlation Coefficient [MCC, @chiccoAdvantagesMatthewsCorrelation2020].
+An MCC of -1 and +1 indicates perfect misclassification or classification, respectively; random genus delineation corresponds to MCC = 0. The dashed line indicates the global MCC on the whole dataset, across all families. The number of genomes included per family are indicated in brackets next to the family names. The families were ranked per phyla (alphabetically; vertical facets in grey) and then by decreasing MCC within each phylum. The visual POCPu distributions for all families are provided in @suppfig-pocpu-by-family.
+:::
+
 
 ```{r}
 optimized_pocpu <- tar_read(optimized_pocpu) %>%
@@ -610,7 +611,7 @@ Due to these differences between families, we looked for family-specific POCPu t
 With this procedure, thresholds other than the default 50% would enhance classification for `r sum(n_tentative)` families out of the `r sum(stats_by_type$n_families)` families.
 The genus delineation of `r n_tentative[["improved"]]` families was improved, with at least 0.1-point increase in MCC (white squares in @tbl-optimized_threshold; `r improved_families`).
 For `r n_tentative[["rescued"]]` additional families  maximum MCC above 0.7 were even obtained (black squares in @tbl-optimized_threshold; `r rescued_families`).
-Interestingly, in `r n_category[["decrease"]]` cases, the optimal POCPu threshold was lower than the standard threshold:`r decrease_family`.
+Interestingly, in `r n_category[["decrease"]]` cases, the optimal POCPu threshold was lower than the standard threshold: `r decrease_family`.
 In  `r n_category[["increase"]]` cases, new thresholds higher than 50% conserved proteins better separated genomes from within genus and between genera (@tbl-optimized_threshold).
 
 Because POCP was previously proposed to be influenced by genome size [@riescoUpdateProposedMinimal2024], we used the large pairwise comparisons dataset to assess whether the changes in threshold were linked to differences in genome size.
@@ -666,17 +667,18 @@ n_genera <- tar_read(genome_metadata) %>% pull(Genus) %>% n_distinct()
 ```
 
 
-@qinProposedGenusBoundary2014 proposed to separate bacterial genera using the Percentage of Conserved Proteins (POCP) in genomes more than 10 years ago.
-The descriptions of many novel genera note POCP values close to the threshold of 50%, suggesting it is not a clear-cut separation [@afrizalEnhancedCulturedDiversity2022; @hitchBroadDiversityHuman2024; @wylensekCollectionBacterialIsolates2020].
-We therefore set out to re-evaluate genus-level delineation based on POCP, and to develop a faster and clearer method. We did this using a diverse collection of `r total_stats$n_genomes` genomes from `r n_genera` genera across `r total_stats$n_families` families and 4 phyla, resulting in `r total_stats$n_realized` unique genome pair combinations, with a total running time of `r total_stats$total_hours` CPU-Hours (`r total_stats$total_years` years).
-We showed that DIAMOND_VERYSENSITIVE can reliably replace BLASTP, speeding up the computing process by 20x.
+Qin et al. @qinProposedGenusBoundary2014 proposed to separate bacterial genera using the Percentage of Conserved Proteins (POCP) in genomes more than 10 years ago.
+The descriptions of many novel genera note POCP values oscillating around the proposed threshold value of 50%, suggesting it is not a clear-cut separation [@afrizalEnhancedCulturedDiversity2022; @hitchBroadDiversityHuman2024; @wylensekCollectionBacterialIsolates2020].
+We therefore set out to re-evaluate genus-level delineation based on POCP using a comprehensive dataset, and to develop a faster and clearer method.
+<!-- We did this using a diverse collection of `r total_stats$n_genomes` genomes from `r n_genera` genera across `r total_stats$n_families` families and 4 phyla, resulting in `r total_stats$n_realized` unique genome pair combinations, with a total running time of `r total_stats$total_hours` CPU-Hours (`r total_stats$total_years` years). -->
+We show that DIAMOND_VERYSENSITIVE can reliably replace BLASTP, speeding up the computing process by 20x.
 In addition, we addressed an assumption made in previous POCP implementations [e.g., @holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024; @linSilentGeneBiopyBiopy2021], and thereby clearly defined an alternative POCP metric -- POCPu -- that uses only unique matches, thereby making genus delineation more accurate.
 
 Genus names occur before species names in the binomial nomenclature of bacteria, and are therefore an important first contact with bacterial entities. They are key to existing knowledge in databases or articles and provide intuitive information on the evolutionary history and ecological roles of the organisms under study [@reimerBacDive2022Knowledge2022; @rosonovskiEuropePMC20232024; @schochNCBITaxonomyComprehensive2020].
 The system works best when resources and tools follow FAIR principles [e.g., <https://nfdi4microbiota.de>, @wilkinsonFAIRGuidingPrinciples2016a], as done in this work.
 We demonstrated that not all tools and parameters are suitable to speed up BLASTP; some combinations, whilst extremely fast, under- or overestimate POCP values, resulting in erroneous splitting or merging of genera.
-While our analysis included phylogenomically diverse taxa, it was limited to the taxa within GTDB [@parksCompleteDomaintospeciesTaxonomy2020; @parksGTDBOngoingCensus2022] and focused on the dominant bacterial fraction. Despite the comprehensive nature of GTDB, our final genome selection might have missed important taxonomic groups of interest to readers. However, filtering the studied taxa was necessary to obtain enough data points per taxa to ensure statistical robustness. In addition, the work has been performed in full compliance with the FAIR principles, making the approach easily accessible and thus reproducible to facilitate further expansion of this work by others. Previous studies on many-vs-many proteins alignment comparison used less phylogenetic diversity: 4 genomes from 4 genera in in @hernandez-salmeronProgressQuicklyFinding2020, maximum 167 genomes from 5 genera in @holzerPOCPnfAutomaticNextflow2024.
-@riescoUpdateProposedMinimal2024 evaluated much more genomes -- 1,573 type strains -- but calculated POCP -- using Bio-Py [@linSilentGeneBiopyBiopy2021] -- only to be compared with AAI and not to evaluate genus delineation.
+While our analysis included phylogenomically diverse taxa, it was limited to the taxa within GTDB [@parksCompleteDomaintospeciesTaxonomy2020; @parksGTDBOngoingCensus2022] and focused on the dominant bacterial fraction. Despite the comprehensive nature of GTDB, our final genome selection might have missed important taxonomic groups of interest to readers. However, filtering the studied taxa was necessary to obtain enough data points per taxa to ensure statistical robustness. Previous studies on many-vs-many proteins alignment comparison used less phylogenetic diversity: 4 genomes from 4 genera in @hernandez-salmeronProgressQuicklyFinding2020, maximum 167 genomes from 5 genera in @holzerPOCPnfAutomaticNextflow2024.
+Riesco et al. @riescoUpdateProposedMinimal2024 evaluated much more genomes -- 1,573 type strains -- but calculated POCP -- using Bio-Py [@linSilentGeneBiopyBiopy2021] -- only to be compared with AAI and not to evaluate genus delineation.
 
 Threshold-based approaches are always a matter of compromise, and do not provide one-size-fits-all solution. Regarding species delineation, Parks et al. (2022) stated: "The use of ANI to delineate species despite the lack of clear evidence for discrete species boundaries in the GTDB dataset is a pragmatic approach for organizing the rapidly growing biodiversity being discovered with metagenomic approaches" @parksGTDBOngoingCensus2022.
 We share their vision and propose the use of POCPu as an interpretable and pragmatic approach to delineate bacterial genera. In an effort to improve this process, we suggest refining the classification by applying family-specific POCPu thresholds, as shown previously for _Rhizobiaceae_ [@kuzmanovicTaxonomyRhizobiaceaeRevisited2022].
@@ -695,7 +697,7 @@ The Nextflow workflow used for the benchmark is available at <https://github.com
 
 # Funding
 
-CP and TC received funding from the German Research Foundation (DFG): project no. 460129525 (NFDI4Microbiota), and project no. 445552570.
+TC received funding from the German Research Foundation (DFG): project no. 460129525 (NFDI4Microbiota), and project no. 445552570.
 
 # Acknowledgments
 
