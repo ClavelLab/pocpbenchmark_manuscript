@@ -10,7 +10,8 @@ format:
   html:
     embed-resources: true
   #jats: default
-  docx: default
+  docx:
+   reference-doc: better-custom-reference-doc.docx
   
   # (other formats)
   # pdf: default
