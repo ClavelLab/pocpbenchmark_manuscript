@@ -69,7 +69,7 @@ library(gt)
 ```
 
 
-# Introduction
+# Background
 
 Bacterial taxonomy is the classification of bacterial strains into lineages ranging from phyla to species within the domain Bacteria. This is critical to our understanding of bacterial diversity by creating a coherent framework that reflect their evolutionary relationships.
 Two elements show that accurate taxonomic placement of microorganisms is more important now than ever: (i) a very high fraction of bacteria, both in the environment and host-associated microbiomes, remain to be described and named [@sutcliffeAddressingSublimeScale2021; @thomasMultipleLevelsUnknown2019]; (ii) large-scale metagenomic studies in the last decade and now high-throughput cultivation methods are accelerating the pace of bacterial discovery [@hugenholtzProkaryoticTaxonomyNomenclature2021].
@@ -684,6 +684,13 @@ Threshold-based approaches are always a matter of compromise, and do not provide
 We share their vision and propose the use of POCPu as an interpretable and pragmatic approach to delineate bacterial genera. In an effort to improve this process, we suggest refining the classification by applying family-specific POCPu thresholds, as shown previously for _Rhizobiaceae_ [@kuzmanovicTaxonomyRhizobiaceaeRevisited2022].
 However, one should only deviate from the standard threshold of 50% if the benefit is greater than the risk of creating more confusion. We have provided tentative thresholds for several families, for which confidence was high. Finally, it is important to remember that accurate taxonomic placement is best achieved when multiple lines of evidence are considered, as implemented in Protologger [@hitchAutomatedAnalysisGenomic2021].
 In the case of genera, POCPu decisions can be supported, for example by assessing the topology of phylogenetic trees, considering 16S rRNA gene identities [@yarzaUnitingClassificationCultured2014], and the result of GTDB-Tk analysis [@chaumeilGTDBTkV2Memory2022].
+
+# Conclusions
+
+
+Our research contributes significantly to the field of genome-based microbiology by re-evaluating genus-level delineation based on the Percentage Of Conserved Proteins (POCP) proposed 10 years ago. We introduce a refined definition of POCP using only unique matches (POCPu) that improves genus delineation, and demonstrate the effectiveness of DIAMOND_VERYSENSITIVE as a faster yet accurate replacement for BLASTP.
+Robust methodologies like the one we put forward are needed as genomics has revolutionized bacterial classification.
+Finally, accurate bacterial taxonomy at scale is of critical importance in the era of rapid discovery of microorganisms.
 
 # Data availability
 
