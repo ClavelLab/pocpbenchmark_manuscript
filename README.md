@@ -25,8 +25,8 @@ Our analysis workflow is orchestrated by [`targets`](https://docs.ropensci.org/t
 
 ### Prepare the data for the analysis
 
-> [!NOTE] I want to run the workflow!
-> You can skip to the next part if you want to start the workflow from already prepared files!
+> [!NOTE]
+> You can skip to the next section if you want to start the workflow from already prepared files!
 
 
 1. Download the raw output files from the workflow using the "Download all" button: <https://doi.org/10.5281/zenodo.14974869>
