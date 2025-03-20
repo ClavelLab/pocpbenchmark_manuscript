@@ -2,6 +2,12 @@
 
 `popcbenchmark_manuscript` contains the workflow for analyzing data produced by our benchmark [`ClavelLab/pocpbenchmark`](https://github.com/ClavelLab/pocpbenchmark). We set out to compare proteins alignment tools for improved genus delineation using the Percentage Of Conserved Proteins (POCP).
 
+A preprint of our work is available at bioRxiv: 
+> Robust genome-based delineation of bacterial genera.
+> Charlie Pauvert, Thomas C.A. Hitch, Thomas Clavel.
+> bioRxiv 2025.03.17.643616; doi: https://doi.org/10.1101/2025.03.17.643616 
+
+
 
 ### Setup the environment for the workflow
 
