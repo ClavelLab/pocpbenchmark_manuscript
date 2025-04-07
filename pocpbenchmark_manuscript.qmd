@@ -43,6 +43,7 @@ authors:
       - Writing - review & editing
 license: "CC BY"
 bibliography: references.bib
+csl: oxford-university-press-scimed-numeric.csl
 crossref:
   custom:
     - kind: float
