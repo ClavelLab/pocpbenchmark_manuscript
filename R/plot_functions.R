@@ -184,7 +184,7 @@ plot_lpsn_stats <- function(lpsn_stats){
               color="#E69F00", size=4 , angle=0, fontface="bold",
               hjust=-0.1, vjust=0.8
     )+
-    scale_y_continuous(expand = expansion(add = c(0,800)))
+    scale_y_continuous(expand = expansion(add = c(0,900)))
 }
 
 plot_pocp_density <- function(df){

@@ -133,7 +133,7 @@ list(
   tar_file(lpsn_stats_file, "lpsn30.json"),
   tar_target(lpsn_stats, parse_lpsn_stats(lpsn_stats_file)),
   tar_target(fig_lpsn_stats, plot_lpsn_stats(lpsn_stats)),
-  tar_file(fig_lpsn_stats_png, save_png(fig_lpsn_stats, "figures/fig_lpsn_stats.png", 6, 9)),
+  tar_file(fig_lpsn_stats_png, save_png(fig_lpsn_stats, "figures/fig_lpsn_stats.png", 5, 9)),
   tar_file(computing_metrics_parquet, "pocpbenchmark_computing_metrics.parquet"),
   tar_parquet(computing_metrics, read_parquet(computing_metrics_parquet)),
   tar_parquet(computing_metrics_fullbenchmark,
