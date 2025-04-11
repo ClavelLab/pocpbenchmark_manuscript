@@ -4,12 +4,14 @@
 # Save ggplot2 plots for file, a wrapper around cowplot::ggsave2 w/ sensible defaults
 save_png <- function(plot, filename, width, height){
   fs::dir_create("figures")
-  cowplot::ggsave2(filename = filename,
-                   plot = plot, width = width, height = height,
-                   units = "in", dpi = 300, device = grDevices::png)
+  # Tiff for submission
+  # but png as the last return because needed for quarto and targets
   cowplot::ggsave2(filename = stringr::str_replace(filename, ".png$", ".tiff"),
                    plot = plot, width = width, height = height,
                    units = "in", dpi = 300, device = grDevices::tiff)
+  cowplot::ggsave2(filename = filename,
+                   plot = plot, width = width, height = height,
+                   units = "in", dpi = 300, device = grDevices::png)
 }
 # POCP vs blast plot
 plot_pocp_vs_blast <- function(df, pocp_label, R2_table){
