@@ -4,11 +4,11 @@
 # Save ggplot2 plots for file, a wrapper around cowplot::ggsave2 w/ sensible defaults
 save_png <- function(plot, filename, width, height){
   fs::dir_create("figures")
-  # Tiff for submission
+  # PDF for submission with cairo for embed fonts
   # but png as the last return because needed for quarto and targets
-  cowplot::ggsave2(filename = stringr::str_replace(filename, ".png$", ".tiff"),
+  cowplot::ggsave2(filename = stringr::str_replace(filename, ".png$", ".pdf"),
                    plot = plot, width = width, height = height,
-                   units = "in", dpi = 300, device = grDevices::tiff)
+                   units = "in", dpi = 300, device = cairo_pdf)
   cowplot::ggsave2(filename = filename,
                    plot = plot, width = width, height = height,
                    units = "in", dpi = 300, device = grDevices::png)
