@@ -7,6 +7,9 @@ save_png <- function(plot, filename, width, height){
   cowplot::ggsave2(filename = filename,
                    plot = plot, width = width, height = height,
                    units = "in", dpi = 300, device = grDevices::png)
+  cowplot::ggsave2(filename = stringr::str_replace(filename, ".png$", ".tiff"),
+                   plot = plot, width = width, height = height,
+                   units = "in", dpi = 300, device = grDevices::tiff)
 }
 # POCP vs blast plot
 plot_pocp_vs_blast <- function(df, pocp_label, R2_table){
