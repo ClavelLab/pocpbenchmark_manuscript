@@ -1,5 +1,5 @@
 ---
-title: Robust genome-based delineation of bacterial genera
+title: Fast and robust estimate of genus novelty with POCPu
 affiliations:
   - id: 1
     name: University Hospital of RWTH Aachen
@@ -53,11 +53,9 @@ crossref:
       space-before-numbering: false
       latex-list-of-description: Supplementary Figure
 abstract: |
-    Genomic analysis has become essential in bacterial taxonomy, enabling fast classification of bacteria across biomes. However, quantifiable measures to make informed decision on the taxonomic placement of bacterial taxa above the level of species are rare, which hampers the stability of knowledge in databases and articles. In this work, we focused on bacterial classification at the genus level and revisited the concept of Percentage Of Conserved Proteins (POCP). Whilst POCP is broadly used as an overall genome relatedness index, the underlying tool and method of calculation differ, resulting in disparate implementations and misnomers unfit for the increasing wealth of public genomes available.
-    
-    We evaluated 10 protein alignments methods and found evidence for a scalable yet robust alternative to BLASTP for POCP based on 2,358,466 pairwise comparisons of 4,767 genomes across 35 families. However, we showed that certain combinations of tools and parameters are not suited for POCP calculations owing to drastic over- or underestimation. Therefore, we bring forward a clearer definition of POCP using only unique matches, termed POCPu, that showed better genus delineation than with POCP. We suggested tentative family-specific thresholds when the standard of 50% was not resolutive enough.
-    
-    We propose that faster bacterial genus delineation should be calculated with DIAMOND using very-sensitive settings and only unique matches (POCPu). We advise microbiologists to carefully assess that the tools used for genus assignment match their biological assumptions to avoid misguided inferences.
+    Many biomes are extensively studied using sequencing techniques. Accurate taxonomic assignment of the microbial genomes and functions under study, obtained from isolates or metagenomes, is essential to identify novel taxa and to enable robust comparison between studies. However, the taxonomic placement of bacterial taxa above the species level is hampered by the lack of reliable quantitative measures to make informed decisions. In this work, we focused on bacterial classification at the genus level at a large scale using 4,767 genomes across 35 families and different isolation sources.
+
+    We tested 10 protein alignment methods to calculate the Percentage Of Conserved Proteins (POCP) and found evidence for a scalable yet robust alternative to BLASTP. However, due to limitations of the method, we introduce POCPu that showed better genus delineation than with POCP thanks to using only unique matches. This proposed method is 20x faster and more robust owing to using very-sensitive settings of DIAMOND, whilst also enhancing sustainability. In summary, POCPu improves bacterial genus assignment by facilitating comparative analysis of an increasingly larger number of genomes.
 notebook-links: false
 keywords: [bacterial taxonomy, bacterial genomics, genus delineation, protein sequence comparison, percentage of conserved proteins (POCP), benchmark]
 ---
@@ -73,8 +71,9 @@ library(gt)
 # Introduction
 
 Bacterial taxonomy is the classification of bacterial strains into lineages ranging from phyla to species within the domain Bacteria. This is critical to our understanding of bacterial diversity by creating a coherent framework that reflect their evolutionary relationships.
-Two elements show that accurate taxonomic placement of microorganisms is more important now than ever: (i) a very high fraction of bacteria, both in the environment and host-associated microbiomes, remain to be described and named [@sutcliffeAddressingSublimeScale2021; @thomasMultipleLevelsUnknown2019]; (ii) large-scale metagenomic studies in the last decade and now high-throughput cultivation methods are accelerating the pace of bacterial discovery [@hugenholtzProkaryoticTaxonomyNomenclature2021].
-It is therefore essential to consolidate the system for classifying bacteria. Whilst bacteria had been classified based on morphology and phenotypic parameters for decades, the advent of genomics has revolutionised the way we classify bacteria, giving rise to a plethora of Overall Genome Relatedness Indices [@chunIntegratingGenomicsTaxonomy2014].
+Two elements show that accurate taxonomic placement of microorganisms is more important now than ever: (i) a very high fraction of bacteria, both in the environment and host-associated microbiomes, remain to be described and named [@sutcliffeAddressingSublimeScale2021; @thomasMultipleLevelsUnknown2019;@dutkiewiczProposalPatescibacteriumDanicum2025]; (ii) large-scale metagenomic studies in the last decade and now high-throughput cultivation methods are accelerating the pace of bacterial discovery [@hugenholtzProkaryoticTaxonomyNomenclature2021].
+It is therefore essential to consolidate the system for classifying bacteria and confidently assess their taxonomic novelty. It is equally important to ensure that the boundaries between genera that include known taxa are stable.
+Whilst bacteria had been classified based on morphology and phenotypic parameters for decades, the advent of genomics has revolutionised the way we classify bacteria, giving rise to a plethora of Overall Genome Relatedness Indices [@chunIntegratingGenomicsTaxonomy2014].
 However, in the process of classifying bacteria, it is essential to provide a robust framework that includes easy-to-implement parameters to classify organisms at each level of bacterial lineage, including the genus level, which is the focus in this article. 
 
 The Genome Taxonomy Database (GTDB) has proposed a standardized approach to group publicly available genomes into species clusters [@parksCompleteDomaintospeciesTaxonomy2020], resulting in an invaluable resource that is regularly updated and adopted by the community [@parksGTDBOngoingCensus2022]. 
@@ -100,8 +99,7 @@ Recently, Hölzer @holzerPOCPnfAutomaticNextflow2024 suggested the use of DIAMON
 Fundamental changes, such as the tool selected, can have significant effects on calculations, especially if 13% of matching proteins may not be found.
 Current implementations of POCP have also modified the calculation of POCP by limiting the calculation of conserved proteins to unique matches [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024;@riescoUpdateProposedMinimal2024;@linSilentGeneBiopyBiopy2021], in contrast to the original implementation of POCP which had no such limitation [@qinProposedGenusBoundary2014].
 These studies clearly show the urgent need for a clear definition of POCP to avoid divergent assumptions in tools between microbiologists and developers.
-Furthermore, there is an urgent need for extensive benchmarking of POCP to enhance reproducibility and accuracy given the increased number of genomic resources available.
-
+Furthermore, given the increased number of genomic resources available, we need a fast and reproducible framework to regularly assess taxonomic novelty as part of investigating microbial ecosystems functioning.
 ```{r overall_stats_cpu_hours}
 stats_by_type <- tar_read(family_metadata) %>%
   select(Family,benchmark_type, n_genomes,CPU_hours) %>%
@@ -676,14 +674,19 @@ We show that DIAMOND_VERYSENSITIVE can reliably replace BLASTP, speeding up the 
 In addition, we addressed an assumption made in previous POCP implementations [@holzerHoelzerPocp2020; @holzerPOCPnfAutomaticNextflow2024; @linSilentGeneBiopyBiopy2021], and thereby clearly defined an alternative POCP metric -- POCPu -- that uses only unique matches, thereby making genus delineation more accurate.
 
 Genus names occur before species names in the binomial nomenclature of bacteria, and are therefore an important first contact with bacterial entities. They are key to existing knowledge in databases or articles and provide intuitive information on the evolutionary history and ecological roles of the organisms under study [@reimerBacDive2022Knowledge2022; @rosonovskiEuropePMC20232024; @schochNCBITaxonomyComprehensive2020].
-The system works best when resources and tools follow FAIR principles [e.g., <https://nfdi4microbiota.de>, @wilkinsonFAIRGuidingPrinciples2016a], as done in this work.
+The system works best when resources and tools follow FAIR principles [@NationalMicrobiomeData; @NFDI4Microbiota; @wilkinsonFAIRGuidingPrinciples2016a], as done in this work.
+Plus, we underlined that POPCu improves sustainability through faster computations and hence reduced electrical consumption, although the additional benefit of decreased disk usage is not captured by the carbon footprint estimator [@lannelongueGreenAlgorithmsQuantifying2021].
 We demonstrated that not all tools and parameters are suitable to speed up BLASTP; some combinations, whilst extremely fast, under- or overestimate POCP values, resulting in erroneous splitting or merging of genera.
-While our analysis included phylogenomically diverse taxa, it was limited to the taxa within GTDB [@parksCompleteDomaintospeciesTaxonomy2020; @parksGTDBOngoingCensus2022] and focused on the dominant bacterial fraction. Despite the comprehensive nature of GTDB, our final genome selection might have missed important taxonomic groups of interest to readers. However, filtering the studied taxa was necessary to obtain enough data points per taxa to ensure statistical robustness. Previous studies on many-vs-many proteins alignment comparison used less phylogenetic diversity: 4 genomes from 4 genera in @hernandez-salmeronProgressQuicklyFinding2020, maximum 167 genomes from 5 genera in @holzerPOCPnfAutomaticNextflow2024.
-Riesco et al. @riescoUpdateProposedMinimal2024 evaluated much more genomes -- 1,573 type strains -- but calculated POCP -- using Bio-Py [@linSilentGeneBiopyBiopy2021] -- only to be compared with AAI and not to evaluate genus delineation.
+While our analysis included phylogenetically diverse taxa sourced from various environments, it was limited to the taxa within GTDB [@parksCompleteDomaintospeciesTaxonomy2020; @parksGTDBOngoingCensus2022] and focused on the dominant bacterial fraction. Despite the comprehensive nature of GTDB, our final genome selection might have missed important taxonomic groups of interest to readers. However, filtering the studied taxa was necessary to obtain enough data points per taxa to ensure statistical robustness.
+Still, we kept enough genomes to represent more bacterial diversity than restricting our analyses to the type species of genera.
+Previous studies on many-vs-many proteins alignment comparison used less phylogenetic diversity: 4 genomes from 4 genera in @hernandez-salmeronProgressQuicklyFinding2020, maximum 167 genomes from 5 genera in @holzerPOCPnfAutomaticNextflow2024.
+Riesco et al. @riescoUpdateProposedMinimal2024 evaluated much more genomes -- 1,573 type strains  of type species of genera -- but calculated POCP -- using Bio-Py [@linSilentGeneBiopyBiopy2021] -- only to be compared with AAI and not to evaluate genus delineation.
 
 Threshold-based approaches are always a matter of compromise, and do not provide one-size-fits-all solution. Regarding species delineation, Parks et al. stated: "The use of ANI to delineate species despite the lack of clear evidence for discrete species boundaries in the GTDB dataset is a pragmatic approach for organizing the rapidly growing biodiversity being discovered with metagenomic approaches" @parksGTDBOngoingCensus2022.
 We share their vision and propose the use of POCPu as an interpretable and pragmatic approach to delineate bacterial genera. In an effort to improve this process, we suggest refining the classification by applying family-specific POCPu thresholds, as shown previously for _Rhizobiaceae_ [@kuzmanovicTaxonomyRhizobiaceaeRevisited2022].
-However, one should only deviate from the standard threshold of 50% if the benefit is greater than the risk of creating more confusion. We have provided tentative thresholds for several families, for which confidence was high. Finally, it is important to remember that accurate taxonomic placement is best achieved when multiple lines of evidence are considered, as implemented in Protologger [@hitchAutomatedAnalysisGenomic2021].
+However, one should only deviate from the standard threshold of 50% if the benefit is greater than the risk of creating more confusion. We have provided tentative thresholds for several families, for which confidence was high.
+Indeed, initiatives like the SeqCode [@hedlundSeqCodeNomenclaturalCode2022; @jimenezSeqCodeGoldenAge2024] require reliable methods to assess taxonomic novelty, and we propose that POCPu is a robust yet scalable approach for modern taxonomy.
+Finally, it is important to remember that accurate taxonomic placement is best achieved when multiple lines of evidence are considered, as implemented in Protologger [@hitchAutomatedAnalysisGenomic2021].
 In the case of genera, POCPu decisions can be supported, for example by assessing the topology of phylogenetic trees, considering 16S rRNA gene identities [@yarzaUnitingClassificationCultured2014], and the result of GTDB-Tk analysis [@chaumeilGTDBTkV2Memory2022].
 
 # Data availability
