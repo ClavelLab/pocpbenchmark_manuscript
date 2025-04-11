@@ -174,7 +174,8 @@ plot_lpsn_stats <- function(lpsn_stats){
          x="Year")+
     theme_minimal_vgrid()+
     theme(axis.line.x =  element_line(color="black",linewidth = 0.5),
-          axis.line.y = element_line(color="black",linewidth = 0.5))
+          axis.line.y = element_line(color="black",linewidth = 0.5),
+          axis.ticks = element_line(color="black"))
   lpsn_annotations <- lpsn_stats %>%
     filter(grouping %in% c(2014,2024)) %>%
     select(grouping,n) %>% 
